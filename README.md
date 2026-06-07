@@ -67,12 +67,12 @@ Developed at **Esprit School of Engineering – Tunisia** **PIDEV – 4SAE4 | 20
 1.  **Clone the project:**
 
 2.  **Start Infrastructure:**
-  2.1 **Backend:**
+  * **Backend:**
     ```bash
     cd backend
     docker-compose up -d
     ```
-      2.1 **Frontend:**
+    * **Frontend:**
     ```bash
     cd Frontend
     rm -rf node_modules package-lock.json
