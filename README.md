@@ -93,8 +93,8 @@ Developed at **Esprit School of Engineering – Tunisia** **PIDEV – 4SAE4 | 20
 * **Fawzi Saidi**
 ---
 
-## Tuteur : 
-* **Hadil Saidani**
+## Tutor : 
+* **Hedil Saidani**
 
 ---
 
