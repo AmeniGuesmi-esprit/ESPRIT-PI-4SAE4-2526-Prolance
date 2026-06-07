@@ -1,0 +1,416 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="publication-info">
+        <h2 class="modal-title">Comments</h2>
+        <p class="publication-titre">{{ publication.titre }}</p>
+      </div>
+      <button class="btn-close" (click)="onClose()" [disabled]="loading">✕</button>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+
+    <!-- Comments list -->
+    <div class="commentaires-section">
+
+      <div *ngIf="commentaires.length === 0 && !loading" class="empty-state">
+        <div class="empty-icon">💬</div>
+        <p>No comments yet</p>
+        <p class="empty-hint">Be the first to comment!</p>
+      </div>
+
+      <div *ngIf="loading && commentaires.length === 0" class="loading-container">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+
+      <div class="commentaires-list">
+        <div *ngFor="let commentaire of commentaires" class="commentaire-item" [class.is-pinned]="commentaire.pinned">
+
+          <div class="commentaire-header">
+            <div class="user-info">
+              <div class="user-avatar">
+                {{ commentaire.user?.name?.charAt(0) }}{{ commentaire.user?.lastName?.charAt(0) }}
+              </div>
+              <div class="user-details">
+                <h4 class="user-name">
+                  {{ commentaire.user?.name }} {{ commentaire.user?.lastName }}
+                  <span *ngIf="commentaire.user?.id === publication.user?.id" class="author-badge">Author</span>
+                </h4>
+                <span class="comment-time">{{ getTimeAgo(commentaire.createAt!) }}</span>
+              </div>
+            </div>
+            <div class="comment-actions-right">
+              <span *ngIf="commentaire.pinned" class="pinned-badge">📌 Pinned</span>
+              <button *ngIf="isPublicationOwner() && editingCommentaireId !== commentaire.id"
+                class="btn-pin" [class.pinned]="commentaire.pinned"
+                (click)="togglePin(commentaire)"
+                [title]="commentaire.pinned ? 'Unpin' : 'Pin this comment'">
+                📌
+              </button>
+              <div class="comment-actions" *ngIf="canModifyCommentaire(commentaire) && editingCommentaireId !== commentaire.id">
+                <button class="btn-icon-action edit" (click)="startEdit(commentaire)" title="Edit">✏️</button>
+                <button class="btn-icon-action delete" (click)="deleteCommentaire(commentaire)" title="Delete">🗑️</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content (read) -->
+          <div *ngIf="editingCommentaireId !== commentaire.id" class="commentaire-content">
+            <p [innerHTML]="parseContent(commentaire.contenue)"></p>
+            <img *ngIf="extractGifUrl(commentaire.contenue)"
+                 [src]="extractGifUrl(commentaire.contenue)"
+                 class="comment-gif" alt="GIF" />
+          </div>
+
+          <!-- Content (edit) -->
+          <div *ngIf="editingCommentaireId === commentaire.id" class="edit-mode mention-wrapper">
+            <div class="textarea-container" [class.has-gif]="selectedGifEdit">
+              <textarea [(ngModel)]="editingContent" class="edit-textarea" rows="3"
+                placeholder="Edit... (type @ to mention someone)"
+                (input)="onTextInput($event, 'edit')"></textarea>
+              <div class="gif-inline-preview" *ngIf="selectedGifEdit">
+                <img [src]="selectedGifEdit" class="gif-inline-img" alt="GIF" />
+                <button class="btn-remove-gif" (click)="removeGif('edit')" title="Supprimer le GIF">✕</button>
+              </div>
+            </div>
+            <div class="mention-dropdown" *ngIf="showMentionDropdown && activeMentionField === 'edit'" [ngStyle]="dropdownPosition">
+              <div *ngFor="let user of mentionSuggestions" class="mention-item" (mousedown)="selectMention(user)">
+                <span class="mention-avatar">{{ user.name.charAt(0) }}{{ user.lastName.charAt(0) }}</span>
+                <span class="mention-name">{{ user.name }} {{ user.lastName }}</span>
+              </div>
+            </div>
+            <!-- Emoji + GIF buttons in edit mode -->
+            <div class="toolbar-row">
+              <button class="btn-toolbar" (click)="toggleEmojiPicker('edit')" title="Emoji">😊</button>
+              <button class="btn-toolbar" (click)="toggleGifPicker('edit')" title="GIF">
+                <span class="gif-label">GIF</span>
+              </button>
+            </div>
+            <!-- Emoji Picker (edit) -->
+            <div class="emoji-picker-panel" *ngIf="showEmojiPicker && activeEmojiField === 'edit'">
+              <div class="emoji-categories">
+                <button *ngFor="let cat of emojiCategories" class="emoji-cat-btn"
+                  [class.active]="selectedCategory === cat.name"
+                  (click)="selectedCategory = cat.name">{{ cat.icon }}</button>
+              </div>
+              <div class="emoji-grid">
+                <button *ngFor="let emoji of getEmojisForCategory(selectedCategory)"
+                  class="emoji-btn" (click)="insertEmoji(emoji, 'edit')">{{ emoji }}</button>
+              </div>
+            </div>
+            <!-- GIF Picker (edit) -->
+            <div class="gif-picker-panel" *ngIf="showGifPicker && activeGifField === 'edit'">
+              <div class="gif-search-row">
+                <input class="gif-search-input" [(ngModel)]="gifSearchQuery"
+                  placeholder="Search GIFs..." (input)="onGifInput()" (keydown.enter)="searchGifs()" />
+                <button class="btn-gif-search" (click)="searchGifs()">🔍</button>
+              </div>
+              <div class="gif-loading" *ngIf="gifLoading"><div class="spinner-small-dark"></div></div>
+              <div class="gif-grid" *ngIf="!gifLoading">
+                <img *ngFor="let gif of gifResults" [src]="gif.preview" class="gif-thumb"
+                  (click)="insertGif(gif.url, 'edit')" [title]="gif.title" />
+                <div *ngIf="gifResults.length === 0 && !gifLoading" class="gif-empty">
+                  Type to search GIFs
+                </div>
+              </div>
+            </div>
+            <div *ngIf="moderationEditError" class="moderation-error">{{ moderationEditError }}</div>
+            <div class="edit-actions">
+              <button class="btn-cancel-edit" (click)="cancelEdit()">Cancel</button>
+              <button class="btn-save-edit" (click)="saveEdit(commentaire)">Save</button>
+            </div>
+          </div>
+
+          <div class="commentaire-footer" *ngIf="editingCommentaireId !== commentaire.id">
+            <button class="btn-reply" (click)="startReply(commentaire)" *ngIf="commentaire.user?.id !== currentUserId">
+              <span class="reply-icon">↩</span> Reply
+            </button>
+            <span class="replies-count" *ngIf="commentaire.replies && commentaire.replies.length > 0">
+              {{ commentaire.replies.length }} {{ commentaire.replies.length > 1 ? 'replies' : 'reply' }}
+            </span>
+          </div>
+
+          <!-- Reply form -->
+          <div *ngIf="replyingToId === commentaire.id" class="reply-form">
+            <div class="reply-to-label">
+              <span class="at-icon">@</span> Replying to <strong>{{ replyingToName }}</strong>
+            </div>
+            <div class="reply-input-row mention-wrapper">
+              <div class="textarea-container" [class.has-gif]="selectedGifReply">
+                <textarea [(ngModel)]="replyContent" class="reply-textarea" rows="2"
+                  placeholder="Your reply... (type @ to mention someone)"
+                  [disabled]="loading || moderatingReply"
+                  (input)="onTextInput($event, 'reply')"
+                  (keydown.enter)="$event.ctrlKey && submitReply(commentaire)">
+                </textarea>
+                <div class="gif-inline-preview" *ngIf="selectedGifReply">
+                  <img [src]="selectedGifReply" class="gif-inline-img" alt="GIF" />
+                  <button class="btn-remove-gif" (click)="removeGif('reply')" title="Supprimer le GIF">✕</button>
+                </div>
+              </div>
+              <div class="mention-dropdown" *ngIf="showMentionDropdown && activeMentionField === 'reply'" [ngStyle]="dropdownPosition">
+                <div *ngFor="let user of mentionSuggestions" class="mention-item" (mousedown)="selectMention(user)">
+                  <span class="mention-avatar">{{ user.name.charAt(0) }}{{ user.lastName.charAt(0) }}</span>
+                  <span class="mention-name">{{ user.name }} {{ user.lastName }}</span>
+                </div>
+              </div>
+              <!-- Emoji + GIF buttons in reply -->
+              <div class="toolbar-row">
+                <button class="btn-toolbar" (click)="toggleEmojiPicker('reply')" title="Emoji">😊</button>
+                <button class="btn-toolbar" (click)="toggleGifPicker('reply')" title="GIF">
+                  <span class="gif-label">GIF</span>
+                </button>
+              </div>
+              <!-- Emoji Picker (reply) -->
+              <div class="emoji-picker-panel" *ngIf="showEmojiPicker && activeEmojiField === 'reply'">
+                <div class="emoji-categories">
+                  <button *ngFor="let cat of emojiCategories" class="emoji-cat-btn"
+                    [class.active]="selectedCategory === cat.name"
+                    (click)="selectedCategory = cat.name">{{ cat.icon }}</button>
+                </div>
+                <div class="emoji-grid">
+                  <button *ngFor="let emoji of getEmojisForCategory(selectedCategory)"
+                    class="emoji-btn" (click)="insertEmoji(emoji, 'reply')">{{ emoji }}</button>
+                </div>
+              </div>
+              <!-- GIF Picker (reply) -->
+              <div class="gif-picker-panel" *ngIf="showGifPicker && activeGifField === 'reply'">
+                <div class="gif-search-row">
+                  <input class="gif-search-input" [(ngModel)]="gifSearchQuery"
+                    placeholder="Search GIFs..." (input)="onGifInput()" (keydown.enter)="searchGifs()" />
+                  <button class="btn-gif-search" (click)="searchGifs()">🔍</button>
+                </div>
+                <div class="gif-loading" *ngIf="gifLoading"><div class="spinner-small-dark"></div></div>
+                <div class="gif-grid" *ngIf="!gifLoading">
+                  <img *ngFor="let gif of gifResults" [src]="gif.preview" class="gif-thumb"
+                    (click)="insertGif(gif.url, 'reply')" [title]="gif.title" />
+                  <div *ngIf="gifResults.length === 0 && !gifLoading" class="gif-empty">Type to search GIFs</div>
+                </div>
+              </div>
+              <div *ngIf="moderationReplyError" class="moderation-error">{{ moderationReplyError }}</div>
+              <div class="reply-actions">
+                <button class="btn-cancel-reply" (click)="cancelReply()">Cancel</button>
+                <button class="btn-submit-reply" (click)="submitReply(commentaire)"
+                  [disabled]="loading || moderatingReply || !replyContent.trim()">
+                  <span *ngIf="!loading && !moderatingReply">Send</span>
+                  <span *ngIf="moderatingReply" class="spinner-small"></span>
+                  <span *ngIf="loading && !moderatingReply" class="spinner-small"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nested replies -->
+          <div *ngIf="commentaire.replies && commentaire.replies.length > 0" class="replies-list">
+            <div *ngFor="let reply of commentaire.replies" class="reply-item">
+              <div class="commentaire-header">
+                <div class="user-info">
+                  <div class="user-avatar reply-avatar">
+                    {{ reply.user?.name?.charAt(0) }}{{ reply.user?.lastName?.charAt(0) }}
+                  </div>
+                  <div class="user-details">
+                    <h4 class="user-name">
+                      {{ reply.user?.name }} {{ reply.user?.lastName }}
+                      <span *ngIf="reply.user?.id === publication.user?.id" class="author-badge">Author</span>
+                    </h4>
+                    <span class="comment-time">{{ getTimeAgo(reply.createAt!) }}</span>
+                  </div>
+                </div>
+                <div class="comment-actions" *ngIf="canModifyCommentaire(reply) && editingCommentaireId !== reply.id">
+                  <button class="btn-icon-action edit" (click)="startEdit(reply)" title="Edit">✏️</button>
+                  <button class="btn-icon-action delete" (click)="deleteCommentaire(reply)" title="Delete">🗑️</button>
+                </div>
+              </div>
+
+              <!-- Reply content (read) -->
+              <div *ngIf="editingCommentaireId !== reply.id" class="commentaire-content reply-content">
+                <p [innerHTML]="parseContent(reply.contenue)"></p>
+                <img *ngIf="extractGifUrl(reply.contenue)"
+                     [src]="extractGifUrl(reply.contenue)"
+                     class="comment-gif" alt="GIF" />
+              </div>
+
+              <!-- Reply content (edit) -->
+              <div *ngIf="editingCommentaireId === reply.id" class="edit-mode mention-wrapper">
+                <textarea [(ngModel)]="editingContent" class="edit-textarea" rows="2"
+                  placeholder="Edit... (type @ to mention someone)"
+                  (input)="onTextInput($event, 'edit')"></textarea>
+                <div class="mention-dropdown" *ngIf="showMentionDropdown && activeMentionField === 'edit'" [ngStyle]="dropdownPosition">
+                  <div *ngFor="let user of mentionSuggestions" class="mention-item" (mousedown)="selectMention(user)">
+                    <span class="mention-avatar">{{ user.name.charAt(0) }}{{ user.lastName.charAt(0) }}</span>
+                    <span class="mention-name">{{ user.name }} {{ user.lastName }}</span>
+                  </div>
+                </div>
+                <div class="toolbar-row">
+                  <button class="btn-toolbar" (click)="toggleEmojiPicker('edit')" title="Emoji">😊</button>
+                  <button class="btn-toolbar" (click)="toggleGifPicker('edit')" title="GIF">
+                    <span class="gif-label">GIF</span>
+                  </button>
+                </div>
+                <div class="emoji-picker-panel" *ngIf="showEmojiPicker && activeEmojiField === 'edit'">
+                  <div class="emoji-categories">
+                    <button *ngFor="let cat of emojiCategories" class="emoji-cat-btn"
+                      [class.active]="selectedCategory === cat.name"
+                      (click)="selectedCategory = cat.name">{{ cat.icon }}</button>
+                  </div>
+                  <div class="emoji-grid">
+                    <button *ngFor="let emoji of getEmojisForCategory(selectedCategory)"
+                      class="emoji-btn" (click)="insertEmoji(emoji, 'edit')">{{ emoji }}</button>
+                  </div>
+                </div>
+                <div class="gif-picker-panel" *ngIf="showGifPicker && activeGifField === 'edit'">
+                  <div class="gif-search-row">
+                    <input class="gif-search-input" [(ngModel)]="gifSearchQuery"
+                      placeholder="Search GIFs..." (input)="onGifInput()" (keydown.enter)="searchGifs()" />
+                    <button class="btn-gif-search" (click)="searchGifs()">🔍</button>
+                  </div>
+                  <div class="gif-loading" *ngIf="gifLoading"><div class="spinner-small-dark"></div></div>
+                  <div class="gif-grid" *ngIf="!gifLoading">
+                    <img *ngFor="let gif of gifResults" [src]="gif.preview" class="gif-thumb"
+                      (click)="insertGif(gif.url, 'edit')" [title]="gif.title" />
+                    <div *ngIf="gifResults.length === 0 && !gifLoading" class="gif-empty">Type to search GIFs</div>
+                  </div>
+                </div>
+                <div class="edit-actions">
+                  <button class="btn-cancel-edit" (click)="cancelEdit()">Cancel</button>
+                  <button class="btn-save-edit" (click)="saveEdit(reply)">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════ ADD COMMENT SECTION ═══════════════════════ -->
+    <div class="add-comment-section">
+      <div class="current-user-avatar">
+        {{ currentUserId ? 'U' : '?' }}
+      </div>
+      <div class="comment-input-wrapper mention-wrapper">
+
+        <!-- Textarea avec bouton ✨ et aperçu GIF intégrés -->
+        <div class="textarea-container" [class.has-gif]="selectedGifNew">
+          <textarea [(ngModel)]="newCommentaire" class="comment-input"
+            placeholder="Add a comment... (type @ to mention someone)"
+            rows="3"
+            [disabled]="loading || moderating"
+            (input)="onTextInput($event, 'new')"
+            (keydown.enter)="$event.ctrlKey && addCommentaire()">
+          </textarea>
+
+          <!-- Aperçu GIF à l'intérieur de la zone input -->
+          <div class="gif-inline-preview" *ngIf="selectedGifNew">
+            <img [src]="selectedGifNew" class="gif-inline-img" alt="GIF" />
+            <button class="btn-remove-gif" (click)="removeGif('new')" title="Supprimer le GIF">✕</button>
+          </div>
+
+          <!-- Bouton IA inline -->
+          <button class="btn-ai-inline"
+            (click)="loadSuggestions()"
+            [disabled]="loadingSuggestions"
+            [class.active]="suggestionsOpen && commentSuggestions.length > 0"
+            title="Suggestions IA">
+            <span *ngIf="!loadingSuggestions">✨</span>
+            <span *ngIf="loadingSuggestions" class="spinner-tiny"></span>
+          </button>
+        </div>
+
+        <!-- Panel suggestions compact -->
+        <div class="ai-suggestions-inline" *ngIf="commentSuggestions.length > 0 && suggestionsOpen">
+          <div class="ai-suggestions-scroll">
+            <button *ngFor="let s of commentSuggestions; let i = index"
+              class="btn-suggestion-inline"
+              [style.animation-delay]="(i * 50) + 'ms'"
+              (click)="applySuggestion(s)">
+              <span class="sug-num">{{ i + 1 }}</span>
+              <span class="sug-text">{{ s }}</span>
+              <span class="sug-arrow">↵</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mention dropdown for new comment -->
+        <div class="mention-dropdown" *ngIf="showMentionDropdown && activeMentionField === 'new'" [ngStyle]="dropdownPosition">
+          <div *ngFor="let user of mentionSuggestions" class="mention-item" (mousedown)="selectMention(user)">
+            <span class="mention-avatar">{{ user.name.charAt(0) }}{{ user.lastName.charAt(0) }}</span>
+            <span class="mention-name">{{ user.name }} {{ user.lastName }}</span>
+          </div>
+        </div>
+
+        <!-- Toolbar: Emoji + GIF buttons -->
+        <div class="toolbar-row">
+          <button class="btn-toolbar"
+            (click)="toggleEmojiPicker('new')" title="Add emoji">😊</button>
+          <button class="btn-toolbar"
+            (click)="toggleGifPicker('new')" title="Add GIF">
+            <span class="gif-label">GIF</span>
+          </button>
+        </div>
+
+        <!-- Emoji Picker Panel (new comment) -->
+        <div class="emoji-picker-panel" *ngIf="showEmojiPicker && activeEmojiField === 'new'">
+          <div class="emoji-categories">
+            <button *ngFor="let cat of emojiCategories" class="emoji-cat-btn"
+              [class.active]="selectedCategory === cat.name"
+              (click)="selectedCategory = cat.name">{{ cat.icon }}</button>
+          </div>
+          <div class="emoji-grid">
+            <button *ngFor="let emoji of getEmojisForCategory(selectedCategory)"
+              class="emoji-btn" (click)="insertEmoji(emoji, 'new')">{{ emoji }}</button>
+          </div>
+        </div>
+
+        <!-- GIF Picker Panel (new comment — mode 'all' ou 'gif') -->
+        <div class="gif-picker-panel" *ngIf="showGifPicker && activeGifField === 'new'">
+          <div class="gif-search-row">
+            <input class="gif-search-input" [(ngModel)]="gifSearchQuery"
+              placeholder="Search GIFs (ex: funny, hello...)" (input)="onGifInput()" (keydown.enter)="searchGifs()" />
+            <button class="btn-gif-search" (click)="searchGifs()">🔍</button>
+          </div>
+          <div class="gif-loading" *ngIf="gifLoading"><div class="spinner-small-dark"></div></div>
+          <div class="gif-grid" *ngIf="!gifLoading">
+            <img *ngFor="let gif of gifResults" [src]="gif.preview" class="gif-thumb"
+              (click)="insertGif(gif.url, 'new')" [title]="gif.title" />
+            <div *ngIf="gifResults.length === 0 && !gifLoading" class="gif-empty">
+              🔍 Type something to search GIFs
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="moderationError" class="moderation-error">{{ moderationError }}</div>
+        <div class="input-footer">
+          <span class="input-hint"></span>
+          <button class="btn-send-comment" (click)="addCommentaire()"
+            [disabled]="loading || moderating || (!newCommentaire.trim() && !selectedGifNew)">
+            <span *ngIf="!loading && !moderating">Send</span>
+            <span *ngIf="moderating" class="loading-text"><span class="spinner-small"></span> Checking...</span>
+            <span *ngIf="loading && !moderating" class="loading-text"><span class="spinner-small"></span></span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div class="delete-confirm-overlay" *ngIf="showDeleteModal" (click)="cancelDeleteCommentaire()">
+    <div class="delete-confirm-box" (click)="$event.stopPropagation()">
+      <div class="delete-confirm-icon">🗑️</div>
+      <h3 class="delete-confirm-title">Delete this comment?</h3>
+      <p class="delete-confirm-msg">
+        This action is <strong>irreversible</strong>. The comment will be permanently deleted.
+      </p>
+      <div class="delete-confirm-actions">
+        <button class="btn-cancel-del" (click)="cancelDeleteCommentaire()">Cancel</button>
+        <button class="btn-confirm-del" (click)="confirmDeleteCommentaire()">Yes, delete</button>
+      </div>
+    </div>
+  </div>
+
+</div>

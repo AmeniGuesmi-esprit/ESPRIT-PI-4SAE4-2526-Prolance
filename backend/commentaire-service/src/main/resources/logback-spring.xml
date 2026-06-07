@@ -1,0 +1,48 @@
+<configuration>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>${GRAYLOG_HOST:-localhost}</graylogHost>
+        <graylogPort>12201</graylogPort>
+        <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+            <originHost>commentaire-service</originHost>
+            <includeMarker>true</includeMarker>
+            <includeMdcData>true</includeMdcData>
+            <includeCallerData>false</includeCallerData>
+            <includeRootCauseData>true</includeRootCauseData>
+            <includeLevelName>true</includeLevelName>
+            <additionalField>
+                <key>application</key>
+                <value>commentaire-service</value>
+            </additionalField>
+            <additionalField>
+                <key>environment</key>
+                <value>production</value>
+            </additionalField>
+            <additionalField>
+                <key>port</key>
+                <value>8083</value>
+            </additionalField>
+        </encoder>
+    </appender>
+
+
+    <logger name="com.esprit.commentaireservice" level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.springframework.security" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="WARN"/>
+    <logger name="org.hibernate.type" level="WARN"/>
+    <logger name="com.netflix.eureka" level="WARN"/>
+    <logger name="com.netflix.discovery" level="WARN"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="GELF"/>
+    </root>
+
+</configuration>

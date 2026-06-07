@@ -1,0 +1,185 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="header-left">
+        <div class="header-icon">⚡</div>
+        <div>
+          <h2 class="panel-title">AI Recommendations</h2>
+          <p class="panel-subtitle">Personalized for your skills &amp; history</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <!-- Your skills strip -->
+    <div class="skills-strip" *ngIf="freelancerSkills.length > 0">
+      <span class="strip-label">YOUR SKILLS:</span>
+      <span *ngFor="let s of freelancerSkills" class="your-skill-chip">
+        {{ s.skillName }}
+        <span class="skill-level">{{ s.level | slice:0:3 }}</span>
+      </span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-row">
+      <button class="tab-btn" [class.active]="activeTab === 'recommendations'" (click)="setTab('recommendations')">
+        🎯 Recommendations
+        <span class="tab-count">{{ recommendations.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'gaps'" (click)="setTab('gaps')">
+        📈 Skill Gap Analysis
+        <span class="tab-count">{{ skillGaps.length }}</span>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-area">
+      <div class="loader-ring"></div>
+      <p>Analyzing your profile…</p>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!loading && error" class="error-area">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error }}</p>
+      <button class="btn-retry" (click)="loadRecommendations()">Try again</button>
+    </div>
+
+    <!-- ── TAB: Recommendations ── -->
+    <div *ngIf="!loading && !error && activeTab === 'recommendations'" class="content-area">
+      <div *ngIf="recommendations.length === 0" class="empty-area">
+        <p class="empty-title">No matching projects found</p>
+        <p class="empty-sub">Try adding more skills to your profile</p>
+      </div>
+
+      <div class="rec-grid">
+        <div *ngFor="let rec of recommendations" class="rec-card">
+
+          <!-- Score ring -->
+          <div class="score-ring-wrap">
+            <svg width="40" height="40" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f0edf8" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none"
+                [attr.stroke]="getScoreColor(rec.score)"
+                stroke-width="3"
+                stroke-linecap="round"
+                [attr.stroke-dasharray]="getCircumference(rec.score)"
+                stroke-dashoffset="0"
+                transform="rotate(-90 18 18)"/>
+              <text x="18" y="22" text-anchor="middle" font-size="8" font-weight="800"
+                [attr.fill]="getScoreColor(rec.score)">{{ rec.score }}%</text>
+            </svg>
+          </div>
+
+          <!-- Project info -->
+          <div class="rec-info">
+            <div class="rec-top">
+              <span class="rec-category">{{ getCategoryIcon(rec.project.category) }} {{ rec.project.category }}</span>
+              <span class="rec-budget">{{ formatBudget(rec.project.budget) }}</span>
+            </div>
+            <p class="rec-title">{{ rec.project.title }}</p>
+            <p class="rec-reason">{{ rec.reason }}</p>
+
+            <div class="rec-skills" *ngIf="rec.matchedSkills.length > 0">
+              <span *ngFor="let sk of rec.matchedSkills" class="matched-chip">✓ {{ sk }}</span>
+            </div>
+          </div>
+
+          <!-- Apply button -->
+          <button *ngIf="!isApplied(rec.project)"
+                  class="btn-apply"
+                  (click)="applyToProject(rec.project)">
+            Apply →
+          </button>
+          <span *ngIf="isApplied(rec.project)" class="applied-badge">✓ Applied</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: Skill Gap ── -->
+    <div *ngIf="!loading && !error && activeTab === 'gaps'" class="content-area">
+
+      <div class="gap-intro">
+        <p class="gap-intro-text">
+          Skills you <strong>don't have yet</strong> that would unlock the most new projects for you.
+        </p>
+      </div>
+
+      <div *ngIf="skillGaps.length === 0" class="empty-area">
+        <p class="empty-title">🎉 Great coverage!</p>
+        <p class="empty-sub">Your skills already match most available projects.</p>
+      </div>
+
+      <div class="gap-list">
+        <div *ngFor="let gap of skillGaps; let i = index"
+             class="gap-card"
+             [class.gap-high]="gap.priority === 'high'"
+             [class.gap-medium]="gap.priority === 'medium'">
+
+          <!-- Left side -->
+          <div class="gap-left">
+
+            <!-- Rank -->
+            <div class="gap-rank" [class.rank-top]="i < 3">{{ i + 1 }}</div>
+
+            <!-- Logo -->
+            <div class="gap-logo-wrap">
+              <img *ngIf="getSkillIcon(gap.skill)" [src]="getSkillIcon(gap.skill)"
+                   [alt]="gap.skill" class="gap-logo" />
+              <div *ngIf="!getSkillIcon(gap.skill)" class="gap-logo-fallback">
+                {{ getInitial(gap.skill) }}
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div class="gap-info">
+              <div class="gap-skill-row">
+                <span class="gap-skill-name">{{ gap.skill }}</span>
+                <span class="gap-category-badge">{{ getCategoryIcon(gap.category) }} {{ gap.category }}</span>
+                <span class="gap-priority-badge"
+                      [class.badge-high]="gap.priority === 'high'"
+                      [class.badge-med]="gap.priority === 'medium'">
+                  {{ getPriorityLabel(gap.priority) }}
+                </span>
+              </div>
+              <p class="gap-detail">
+                Would unlock <strong>{{ gap.projectCount }}</strong> new project{{ gap.projectCount > 1 ? 's' : '' }}
+                · avg budget <strong>{{ formatBudget(gap.avgBudget) }}</strong>
+              </p>
+            </div>
+          </div>
+
+          <!-- Right side: bar + count -->
+          <div class="gap-right">
+            <div class="gap-bar-wrap">
+              <div class="gap-bar">
+                <div class="gap-bar-fill"
+                     [style.width.%]="(gap.projectCount / skillGaps[0].projectCount) * 100"
+                     [class.bar-high]="gap.priority === 'high'"
+                     [class.bar-med]="gap.priority === 'medium'">
+                </div>
+              </div>
+            </div>
+            <span class="gap-count" [class.count-high]="gap.priority === 'high'">
+              +{{ gap.projectCount }} projects
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="gap-summary" *ngIf="skillGaps.length > 0">
+        <span class="summary-icon">💡</span>
+        <p>Adding <strong>{{ skillGaps[0].skill }}</strong> would unlock the most opportunities —
+          <strong>{{ skillGaps[0].projectCount }} projects</strong> with an average budget of
+          <strong>{{ formatBudget(skillGaps[0].avgBudget) }}</strong>.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+</div>

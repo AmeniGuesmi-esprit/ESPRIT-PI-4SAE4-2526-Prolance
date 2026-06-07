@@ -1,0 +1,152 @@
+<!-- ════════ TOP NAVBAR ════════ -->
+<nav class="user-navbar" [class.scrolled]="navbarScrolled">
+  <div class="container navbar-inner">
+
+    <!-- Brand -->
+    <a class="navbar-brand" routerLink="/app/dashboard">
+      <img src="assets/img/prolance.png" alt="Prolance" class="brand-logo">
+      <span class="brand-text">Prolance</span>
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler" (click)="toggleMobileMenu()">
+      <i class="material-icons">{{ mobileMenuOpen ? 'close' : 'menu' }}</i>
+    </button>
+
+    <!-- Nav Links -->
+    <div class="navbar-links" [class.open]="mobileMenuOpen">
+
+      <a class="dropdown-item" routerLink="/app/dashboard" (click)="closeAllMenus()">
+        <i class="material-icons">dashboard</i> Dashboard
+      </a>
+
+      <a class="nav-link" routerLink="/app/projects" routerLinkActive="active" (click)="closeAllMenus()">
+        <i class="material-icons">folder_shared</i> Projects
+      </a>
+
+      <a class="nav-link" routerLink="/app/forum" routerLinkActive="active" (click)="closeAllMenus()">
+        <i class="material-icons">forum</i> Forum
+      </a>
+
+      <a class="nav-link" routerLink="/app/ads" routerLinkActive="active" (click)="closeAllMenus()">
+        <i class="material-icons">campaign</i> Publicité
+      </a>
+
+      <a class="nav-link" routerLink="/app/events" routerLinkActive="active" (click)="closeAllMenus()">
+        <i class="material-icons">event</i> Événement
+      </a>
+
+      <!-- Abonnements Dropdown -->
+      <div class="subscription-dropdown">
+        <a class="nav-link" (click)="toggleSubscriptionDropdown(); $event.stopPropagation()">
+          <i class="material-icons">card_membership</i> Abonnements
+          <i class="material-icons arrow">{{ subscriptionDropdownOpen ? 'expand_less' : 'expand_more' }}</i>
+        </a>
+        <div class="subscription-menu" [class.open]="subscriptionDropdownOpen">
+          <a class="subscription-item" routerLink="/app/subscription/plans" (click)="closeAllMenus()">
+            <i class="material-icons">view_list</i> Voir les Plans
+          </a>
+          <a class="subscription-item" routerLink="/app/subscription/my" (click)="closeAllMenus()">
+            <i class="material-icons">subscriptions</i> Mon Abonnement
+          </a>
+          <a class="subscription-item" routerLink="/app/subscription/ai-recommendation" (click)="closeAllMenus()">
+            <i class="material-icons">psychology</i> AI Recommandation
+          </a>
+          <a class="subscription-item" routerLink="/app/subscription/stats" (click)="closeAllMenus()">
+            <i class="material-icons">bar_chart</i> Statistiques
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Section -->
+    <div class="navbar-right">
+
+      <!-- Role Switch -->
+      <div class="role-switch">
+        <button
+          class="role-btn"
+          [class.active]="currentRole === 'freelancer'"
+          (click)="toggleRole('freelancer')">
+          FREELANCER
+        </button>
+        <button
+          class="role-btn"
+          [class.active]="currentRole === 'client'"
+          (click)="toggleRole('client')">
+          CLIENT
+        </button>
+      </div>
+
+      <!-- Profile Dropdown -->
+      <div class="profile-dropdown-wrapper">
+        <button class="profile-avatar" (click)="toggleProfileDropdown()">
+          <img *ngIf="currentUser?.imageUrl"
+               [src]="currentUser!.imageUrl"
+               alt="avatar"
+               style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+          <i class="material-icons" *ngIf="!currentUser?.imageUrl">person</i>
+        </button>
+
+        <div class="profile-dropdown" [class.open]="profileDropdownOpen">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar">{{ userInitials }}</div>
+            <div class="dropdown-user-info">
+              <span class="dropdown-name">
+                {{ currentUser ? currentUser.name + ' ' + currentUser.lastName : 'Guest' }}
+              </span>
+              <span class="dropdown-email">{{ currentUser?.email }}</span>
+              <span class="dropdown-role">{{ currentRole | titlecase }}</span>
+            </div>
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <a class="dropdown-item" routerLink="/app/profile" (click)="profileDropdownOpen = false">
+            <i class="material-icons">person</i> Profile
+          </a>
+          <a class="dropdown-item" routerLink="/app/subscription/plans" (click)="profileDropdownOpen = false">
+            <i class="material-icons">card_membership</i> Abonnements
+          </a>
+          <a class="dropdown-item" routerLink="/app/subscription/my" (click)="profileDropdownOpen = false">
+            <i class="material-icons">subscriptions</i> Mon Abonnement
+          </a>
+
+          <div class="dropdown-divider"></div>
+
+          <!-- Admin Panel - visible seulement pour ADMIN -->
+          <a class="dropdown-item admin-item" *ngIf="isAdmin" (click)="goToAdmin(); profileDropdownOpen = false">
+            <i class="material-icons">admin_panel_settings</i> Admin Panel
+          </a>
+
+          <!-- Logout -->
+          <a class="dropdown-item logout-item" (click)="logout(); profileDropdownOpen = false">
+            <i class="material-icons">logout</i> Déconnexion
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</nav>
+
+<!-- ════════ MAIN CONTENT ════════ -->
+<main class="user-main">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="user-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <span class="footer-brand">&copy; {{ currentYear }} <strong>Prolance</strong></span>
+      <span class="footer-links">
+        <a href="javascript:void(0)">Terms</a>
+        <a href="javascript:void(0)">Privacy</a>
+        <a href="javascript:void(0)">Support</a>
+      </span>
+    </div>
+  </div>
+</footer>

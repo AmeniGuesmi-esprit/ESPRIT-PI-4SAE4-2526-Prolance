@@ -1,0 +1,341 @@
+<!-- ========== REGISTER PAGE ========== -->
+<div class="auth-wrapper">
+  <div class="auth-overlay"></div>
+
+  <div class="auth-container">
+    <div class="card auth-card">
+
+      <!-- Floating icon badge -->
+      <div class="card-header card-header-icon card-header-primary text-center">
+        <div class="card-icon">
+          <i class="material-icons">
+            {{ stage === 'done' ? 'mark_email_read' : stage === 'face' ? 'face_retouching_natural' : 'person_add' }}
+          </i>
+        </div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- STAGE: FORM                                    -->
+        <!-- ══════════════════════════════════════════════ -->
+        <div *ngIf="stage === 'form'">
+
+          <h3 class="auth-title">Join Prolance</h3>
+          <p class="auth-subtitle text-muted">Create your free account in seconds</p>
+
+          <!-- User Type Toggle -->
+          <div class="type-toggle">
+            <button type="button" class="toggle-btn"
+                    [class.active]="userType === 'freelancer'"
+                    (click)="setUserType('freelancer')">
+              <i class="material-icons">work</i> I want to Work
+            </button>
+            <button type="button" class="toggle-btn"
+                    [class.active]="userType === 'recruiter'"
+                    (click)="setUserType('recruiter')">
+              <i class="material-icons">business_center</i> I want to Hire
+            </button>
+          </div>
+
+          <!-- Google Register -->
+          <div class="social-login">
+            <button type="button" class="btn-google-full"
+                    (click)="registerWithGoogle()"
+                    [disabled]="googleLoading || isLoading">
+              <span class="google-spinner" *ngIf="googleLoading">
+                <i class="material-icons spinner-icon">autorenew</i>
+              </span>
+              <svg *ngIf="!googleLoading" width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.7 2.2 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.9 6.1C12.6 13 17.9 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.3 5.7c4.3-4 6.9-9.9 7.2-16.5z"/>
+                <path fill="#FBBC05" d="M10.7 28.6A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6L2.4 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8.2-6z"/>
+                <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.9 2.2-6.1 0-11.4-3.5-13.3-8.5l-7.9 6.1C6.7 42.6 14.7 48 24 48z"/>
+              </svg>
+              <span>{{ googleLoading ? 'Connecting...' : 'Continue with Google' }}</span>
+            </button>
+          </div>
+
+          <div class="divider"><span>or register with email</span></div>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- Name row -->
+            <div class="form-row-double">
+              <!-- First Name -->
+              <div class="form-group bmd-form-group"
+                   [class.has-success]="registerForm.get('fullName')?.valid && registerForm.get('fullName')?.touched"
+                   [class.has-danger]="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="material-icons">badge</i></span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="First Name" formControlName="fullName">
+                  <div class="input-group-append" *ngIf="registerForm.get('fullName')?.touched">
+                    <span class="input-group-text status-icon">
+                      <i class="material-icons">{{ registerForm.get('fullName')?.valid ? 'check_circle' : 'error' }}</i>
+                    </span>
+                  </div>
+                </div>
+                <small class="text-danger" *ngIf="registerForm.get('fullName')?.hasError('required') && registerForm.get('fullName')?.touched">Required</small>
+                <small class="text-danger" *ngIf="registerForm.get('fullName')?.hasError('minlength') && registerForm.get('fullName')?.touched">At least 2 characters</small>
+                <small class="text-danger" *ngIf="registerForm.get('fullName')?.hasError('pattern') && registerForm.get('fullName')?.touched">Letters only</small>
+              </div>
+
+              <!-- Last Name -->
+              <div class="form-group bmd-form-group"
+                   [class.has-success]="registerForm.get('lastName')?.valid && registerForm.get('lastName')?.touched"
+                   [class.has-danger]="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="material-icons">badge</i></span>
+                  </div>
+                  <input type="text" class="form-control" placeholder="Last Name" formControlName="lastName">
+                  <div class="input-group-append" *ngIf="registerForm.get('lastName')?.touched">
+                    <span class="input-group-text status-icon">
+                      <i class="material-icons">{{ registerForm.get('lastName')?.valid ? 'check_circle' : 'error' }}</i>
+                    </span>
+                  </div>
+                </div>
+                <small class="text-danger" *ngIf="registerForm.get('lastName')?.hasError('required') && registerForm.get('lastName')?.touched">Required</small>
+                <small class="text-danger" *ngIf="registerForm.get('lastName')?.hasError('pattern') && registerForm.get('lastName')?.touched">Letters only</small>
+              </div>
+            </div>
+
+            <!-- Birth Date -->
+            <div class="form-group bmd-form-group"
+                 [class.has-success]="registerForm.get('birthDate')?.valid && registerForm.get('birthDate')?.touched"
+                 [class.has-danger]="registerForm.get('birthDate')?.invalid && registerForm.get('birthDate')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">cake</i></span>
+                </div>
+                <input type="date" class="form-control" formControlName="birthDate" [max]="maxDate">
+                <div class="input-group-append" *ngIf="registerForm.get('birthDate')?.touched">
+                  <span class="input-group-text status-icon">
+                    <i class="material-icons">{{ registerForm.get('birthDate')?.valid ? 'check_circle' : 'error' }}</i>
+                  </span>
+                </div>
+              </div>
+              <small class="text-danger" *ngIf="registerForm.get('birthDate')?.hasError('required') && registerForm.get('birthDate')?.touched">Birth date is required</small>
+              <small class="text-danger" *ngIf="registerForm.get('birthDate')?.hasError('tooYoung') && registerForm.get('birthDate')?.touched">You must be at least 16 years old</small>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group bmd-form-group"
+                 [class.has-success]="registerForm.get('email')?.valid && registerForm.get('email')?.touched && !emailTaken"
+                 [class.has-danger]="(registerForm.get('email')?.invalid || emailTaken) && registerForm.get('email')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">email</i></span>
+                </div>
+                <input type="email" class="form-control" placeholder="Email Address" formControlName="email"
+                       (input)="emailTaken = false">
+                <div class="input-group-append" *ngIf="registerForm.get('email')?.touched">
+                  <span class="input-group-text status-icon">
+                    <i class="material-icons">{{ registerForm.get('email')?.valid && !emailTaken ? 'check_circle' : 'error' }}</i>
+                  </span>
+                </div>
+              </div>
+              <small class="text-danger" *ngIf="registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched">Email is required</small>
+              <small class="text-danger" *ngIf="registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched">Enter a valid email address</small>
+              <small class="text-danger" *ngIf="emailTaken">This email is already registered. <a routerLink="/login" class="text-primary">Sign in instead?</a></small>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group bmd-form-group"
+                 [class.has-success]="registerForm.get('password')?.valid && registerForm.get('password')?.touched"
+                 [class.has-danger]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">lock</i></span>
+                </div>
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="form-control" placeholder="Password" formControlName="password">
+                <div class="input-group-append">
+                  <span class="input-group-text toggle-password" (click)="togglePassword()">
+                    <i class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</i>
+                  </span>
+                </div>
+              </div>
+
+              <div class="strength-bar-wrap" *ngIf="pwVal.length > 0">
+                <div class="strength-bar">
+                  <div class="strength-fill"
+                       [style.width]="passwordStrength.width"
+                       [style.background]="passwordStrength.color"></div>
+                </div>
+                <span class="strength-label" [style.color]="passwordStrength.color">
+                  {{ passwordStrength.label }}
+                </span>
+              </div>
+
+              <ul class="pw-criteria" *ngIf="pwTouched || pwVal.length > 0">
+                <li [class.met]="hasLength">
+                  <i class="material-icons">{{ hasLength ? 'check_circle' : 'radio_button_unchecked' }}</i>
+                  At least 8 characters
+                </li>
+                <li [class.met]="hasUpper">
+                  <i class="material-icons">{{ hasUpper ? 'check_circle' : 'radio_button_unchecked' }}</i>
+                  One uppercase letter (A–Z)
+                </li>
+                <li [class.met]="hasLower">
+                  <i class="material-icons">{{ hasLower ? 'check_circle' : 'radio_button_unchecked' }}</i>
+                  One lowercase letter (a–z)
+                </li>
+                <li [class.met]="hasNumber">
+                  <i class="material-icons">{{ hasNumber ? 'check_circle' : 'radio_button_unchecked' }}</i>
+                  One number (0–9)
+                </li>
+                <li [class.met]="hasSpecial">
+                  <i class="material-icons">{{ hasSpecial ? 'check_circle' : 'radio_button_unchecked' }}</i>
+                  One special character (!@#$…)
+                </li>
+              </ul>
+            </div>
+
+            <!-- Terms -->
+            <div class="form-group terms-group"
+                 [class.has-danger]="registerForm.get('agreeTerms')?.invalid && registerForm.get('agreeTerms')?.touched">
+              <div class="form-check">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" formControlName="agreeTerms">
+                  <span class="form-check-sign"><span class="check"></span></span>
+                  I agree to the
+                  <a class="text-primary" href="javascript:void(0)">Terms of Service</a>
+                  and
+                  <a class="text-primary" href="javascript:void(0)">Privacy Policy</a>
+                </label>
+              </div>
+              <small class="text-danger" *ngIf="registerForm.get('agreeTerms')?.invalid && registerForm.get('agreeTerms')?.touched">
+                You must agree to continue
+              </small>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg auth-submit"
+                    [disabled]="isLoading || googleLoading">
+              <span *ngIf="!isLoading">
+                <i class="material-icons btn-icon">{{ userType === 'freelancer' ? 'work' : 'business_center' }}</i>
+                {{ userType === 'freelancer' ? 'Create Freelancer Account' : 'Create Recruiter Account' }}
+              </span>
+              <span *ngIf="isLoading" class="spinner-wrap">
+                <i class="material-icons spinner-icon">autorenew</i> Creating account...
+              </span>
+            </button>
+
+          </form>
+
+          <p class="auth-switch text-center">
+            Already have an account?
+            <a routerLink="/login" class="text-primary font-weight-bold">Sign in</a>
+          </p>
+        </div>
+
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- STAGE: FACE ENROLL                             -->
+        <!-- ══════════════════════════════════════════════ -->
+        <div *ngIf="stage === 'face'" class="face-enroll-stage">
+
+          <h3 class="auth-title">Set Up Face ID</h3>
+          <p class="auth-subtitle text-muted">
+            Scan your face once so you can sign in instantly next time.<br>
+            <small>Your face data stays on this device only.</small>
+          </p>
+
+          <!-- Camera ring -->
+          <div class="face-ring-wrap">
+            <div class="face-ring" [class]="faceRingState">
+              <video #enrollVideo class="face-video" autoplay muted playsinline></video>
+              <div class="face-ring-overlay"></div>
+            </div>
+
+            <!-- Progress arc when enrolling -->
+            <div class="enroll-progress-wrap" *ngIf="isFaceWorking && faceStatusType === 'working'">
+              <svg class="progress-ring" viewBox="0 0 120 120">
+                <circle class="progress-bg" cx="60" cy="60" r="54"/>
+                <circle class="progress-arc" cx="60" cy="60" r="54"
+                        [style.strokeDashoffset]="339 - (339 * enrollProgress / 100)"/>
+              </svg>
+              <span class="progress-pct">{{ enrollProgress }}%</span>
+            </div>
+          </div>
+
+          <!-- Status message -->
+          <div class="face-status-msg" [class]="'status-' + faceStatusType">
+            <i class="material-icons">
+              {{ faceStatusType === 'ok' ? 'check_circle'
+               : faceStatusType === 'fail' ? 'error'
+               : faceStatusType === 'working' ? 'sync'
+               : 'face' }}
+            </i>
+            <span>{{ faceStatus || 'Click "Start Scan" to enroll your face' }}</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="face-actions">
+            <button type="button"
+                    class="btn btn-primary btn-round btn-block auth-submit"
+                    (click)="startFaceEnroll()"
+                    [disabled]="isFaceWorking || faceStatusType === 'ok'">
+              <span *ngIf="!isFaceWorking">
+                <i class="material-icons btn-icon">face_retouching_natural</i>
+                Start Face Scan
+              </span>
+              <span *ngIf="isFaceWorking" class="spinner-wrap">
+                <i class="material-icons spinner-icon">autorenew</i> Scanning…
+              </span>
+            </button>
+
+            <button type="button"
+                    class="btn-skip-face"
+                    (click)="skipFaceEnroll()"
+                    [disabled]="isFaceWorking">
+              Skip for now, I'll set it up later
+            </button>
+          </div>
+        </div>
+
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- STAGE: DONE (check your email)                 -->
+        <!-- ══════════════════════════════════════════════ -->
+        <div *ngIf="stage === 'done'" class="text-center" style="padding: 20px 10px 30px;">
+          <div style="font-size: 64px; margin-bottom: 16px;">✉️</div>
+          <h3 style="color: #9c27b0; font-weight: 800; margin-bottom: 8px;">Check your inbox!</h3>
+          <p class="text-muted" style="font-size: 15px; margin-bottom: 24px;">
+            We sent a verification link to<br>
+            <strong>{{ registeredEmail }}</strong><br><br>
+            Click the link in the email to activate your account.
+          </p>
+          <p class="text-muted" style="font-size: 13px; margin-bottom: 12px;">Didn't receive it?</p>
+          <button type="button"
+                  class="btn btn-outline btn-round"
+                  style="border: 2px solid #9c27b0; color: #9c27b0; padding: 10px 28px;"
+                  (click)="resendVerification()"
+                  [disabled]="isLoading">
+            <i class="material-icons" style="font-size:16px; vertical-align:middle; margin-right:4px;">
+              {{ isLoading ? 'autorenew' : 'send' }}
+            </i>
+            {{ isLoading ? 'Sending...' : 'Resend verification email' }}
+          </button>
+          <p style="margin-top: 28px; font-size: 13px; color: #aaa;">
+            Already verified?
+            <a routerLink="/login" class="text-primary font-weight-bold">Sign in</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="auth-footer">
+    <a class="footer-brand" routerLink="/">
+      <strong>Pro</strong>lance
+    </a>
+    <span class="footer-copy">&copy; {{ currentYear }} Prolance. All rights reserved.</span>
+  </footer>
+</div>

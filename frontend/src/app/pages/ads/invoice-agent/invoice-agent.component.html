@@ -1,0 +1,398 @@
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- INVOICE AGENT — collapsed teaser / expanded workflow         -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- ── Teaser strip (always visible) ── -->
+<div class="ia-teaser" [class.ia-teaser--open]="isExpanded" (click)="!isExpanded && toggleExpand()">
+  <div class="ia-teaser__left">
+    <div class="ia-teaser__icon">
+      <i class="material-icons">receipt_long</i>
+    </div>
+    <div class="ia-teaser__text">
+      <span class="ia-teaser__title">AI Invoice Generator</span>
+      <span class="ia-teaser__sub">Describe your project — the agent handles the rest</span>
+    </div>
+    <div class="ia-teaser__badge" *ngIf="isAgentRunning">
+      <span class="pulse-dot"></span> Agent thinking…
+    </div>
+    <div class="ia-teaser__badge ia-teaser__badge--human" *ngIf="isHumanTurn">
+      <i class="material-icons">pause_circle</i> Your review needed
+    </div>
+    <div class="ia-teaser__badge ia-teaser__badge--done" *ngIf="isDone">
+      <i class="material-icons">check_circle</i> Invoice ready
+    </div>
+  </div>
+  <button class="ia-teaser__toggle" (click)="$event.stopPropagation(); toggleExpand()">
+    <i class="material-icons">{{ isExpanded ? 'expand_less' : 'auto_awesome' }}</i>
+    <span>{{ isExpanded ? 'Close' : 'Launch Agent' }}</span>
+  </button>
+</div>
+
+<!-- ── Expanded workspace ── -->
+<div class="ia-workspace" [class.ia-workspace--visible]="isExpanded">
+  <div class="ia-layout">
+
+    <!-- ════ LEFT: AGENT STEPPER ════ -->
+    <div class="ia-stepper">
+      <div class="ia-stepper__title">
+        <i class="material-icons">account_tree</i> Workflow
+      </div>
+      <div class="ia-stepper__list">
+        <div *ngFor="let step of steps; trackBy: trackByIndex"
+             class="ia-step" [ngClass]="getStepClass(step)">
+
+          <!-- Connector line -->
+          <div class="ia-step__line"></div>
+
+          <!-- Node -->
+          <div class="ia-step__node">
+            <span class="ia-step__spinner" *ngIf="step.status === 'running'"></span>
+            <i class="material-icons ia-step__icon" *ngIf="step.status !== 'running'">
+              {{ step.status === 'done' ? 'check' :
+                 step.status === 'error' ? 'error_outline' :
+                 step.status === 'waiting_human' ? 'pause' :
+                 step.type === 'agent' ? 'smart_toy' : 'person' }}
+            </i>
+          </div>
+
+          <!-- Label + meta -->
+          <div class="ia-step__body">
+            <div class="ia-step__label">{{ step.label }}</div>
+            <div class="ia-step__meta">
+              <span class="ia-step__dur" *ngIf="step.duration">{{ durationLabel(step.duration) }}</span>
+              <span class="ia-step__err" *ngIf="step.error">{{ step.error | slice:0:60 }}</span>
+            </div>
+            <!-- Output toggle -->
+            <button class="ia-step__peek" *ngIf="step.output && step.status === 'done'"
+                    (click)="toggleStepOutput(step.id)">
+              <i class="material-icons">{{ expandedStepId === step.id ? 'expand_less' : 'notes' }}</i>
+            </button>
+            <pre class="ia-step__output" *ngIf="expandedStepId === step.id && step.output">{{ step.output | slice:0:600 }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ RIGHT: ACTIVE PANEL ════ -->
+    <div class="ia-panel">
+
+      <!-- ── 1. IDLE — Input panel ── -->
+      <div class="ia-panel__section" *ngIf="isIdle && !isAgentRunning">
+        <div class="ia-panel__header">
+          <i class="material-icons">edit_note</i>
+          <h3>Describe your invoice</h3>
+        </div>
+        <p class="ia-panel__hint">
+          Tell the agent about the project, client, your name and contact details. The more you share, the better the output.
+        </p>
+        <textarea
+          class="ia-input"
+          [(ngModel)]="userInput"
+          rows="6"
+          placeholder="E.g. I'm Fawzi Saidi, fawzi@dev.com, based in Paris. I built a web app for John Doe at Acme Corp (john@acme.com) over 3 weeks. The project included frontend development, API integration and deployment. Invoice in EUR.">
+        </textarea>
+        <div class="ia-panel__actions">
+          <button class="ia-btn ia-btn--primary" [disabled]="!userInput.trim()" (click)="startAgent()">
+            <i class="material-icons">rocket_launch</i> Start Agent
+          </button>
+        </div>
+      </div>
+
+      <!-- ── 2. AGENT THINKING panel ── -->
+      <div class="ia-panel__section ia-panel__section--thinking" *ngIf="isAgentRunning">
+
+        <!-- Neural brain header -->
+        <div class="ia-thinking-header">
+          <div class="ia-brain-wrap">
+            <div class="ia-neural-ring ia-neural-ring--1"></div>
+            <div class="ia-neural-ring ia-neural-ring--2"></div>
+            <div class="ia-neural-ring ia-neural-ring--3"></div>
+            <i class="material-icons ia-brain-icon">psychology</i>
+          </div>
+          <div class="ia-thinking-meta">
+            <div class="ia-thinking-title">
+              {{ currentStep === 'extracting'         ? 'Extracting invoice data'        :
+                 currentStep === 'validating_data'    ? 'Validating data quality'        :
+                 currentStep === 'generating_items'   ? 'Generating line items'          :
+                 currentStep === 'benchmarking_rates' ? 'Benchmarking market rates'      :
+                 currentStep === 'calculating'        ? 'Calculating totals'             :
+                 currentStep === 'compliance_check'   ? 'Running compliance check'       :
+                 currentStep === 'generating_content' ? 'Writing professional content'   :
+                 currentStep === 'generating_pdf'     ? 'Building your PDF'              : 'Agent working' }}
+            </div>
+            <div class="ia-thinking-sub">
+              <span class="ia-dot"></span>
+              <span class="ia-dot ia-dot--2"></span>
+              <span class="ia-dot ia-dot--3"></span>
+              Agent is thinking
+            </div>
+          </div>
+        </div>
+
+        <!-- Split body: thoughts left, stream right -->
+        <div class="ia-thinking-body">
+
+          <!-- Left: Thought bubbles -->
+          <div class="ia-thoughts-col">
+            <div class="ia-col-label">
+              <i class="material-icons">auto_awesome</i> Internal reasoning
+            </div>
+            <div class="ia-thoughts-container">
+              <div class="ia-thought"
+                   *ngFor="let t of displayedThoughts; let i = index; trackBy: trackByIndex"
+                   [class.ia-thought--done]="i < displayedThoughts.length - 1"
+                   [class.ia-thought--active]="i === displayedThoughts.length - 1">
+                <span class="ia-thought__icon">
+                  <i class="material-icons" *ngIf="i < displayedThoughts.length - 1">check_circle</i>
+                  <span class="ia-thought__spinner" *ngIf="i === displayedThoughts.length - 1"></span>
+                </span>
+                <span class="ia-thought__text">{{ t }}</span>
+              </div>
+              <div class="ia-thought ia-thought--placeholder" *ngIf="displayedThoughts.length === 0">
+                <span class="ia-thought__spinner"></span>
+                <span class="ia-thought__text">Initialising…</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Live JSON stream -->
+          <div class="ia-stream-col">
+            <div class="ia-col-label">
+              <i class="material-icons">terminal</i> Live output
+              <span class="ia-stream-badge" *ngIf="activeStream">streaming</span>
+            </div>
+            <div class="ia-stream-box" #streamBox>
+              <pre class="ia-stream-pre" *ngIf="activeStream">{{ activeStream }}<span class="ia-cursor">▌</span></pre>
+              <div class="ia-stream-placeholder" *ngIf="!activeStream">
+                <span class="ia-thought__spinner"></span>
+                <span>Waiting for model output…</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Animated progress bar -->
+        <div class="ia-progress-bar">
+          <div class="ia-progress-bar__fill"></div>
+        </div>
+
+      </div>
+
+      <!-- ── 3. REVIEW DATA (HITL #1) ── -->
+      <div class="ia-panel__section" *ngIf="currentStep === 'review_data' && invoice">
+        <div class="ia-panel__header">
+          <i class="material-icons">manage_accounts</i>
+          <h3>Review parties &amp; project</h3>
+          <span class="ia-hitl-badge">Human review</span>
+        </div>
+        <div class="ia-form-grid">
+          <div class="ia-form-col">
+            <div class="ia-form-section-label"><i class="material-icons">person</i> Freelancer (You)</div>
+            <div class="ia-field"><label>Name</label>
+              <input type="text" [value]="invoice.freelancer.name" (input)="patchFreelancer('name', $any($event.target).value)" placeholder="Your full name" /></div>
+            <div class="ia-field"><label>Email</label>
+              <input type="email" [value]="invoice.freelancer.email" (input)="patchFreelancer('email', $any($event.target).value)" placeholder="your@email.com" /></div>
+            <div class="ia-field"><label>Address</label>
+              <input type="text" [value]="invoice.freelancer.address" (input)="patchFreelancer('address', $any($event.target).value)" placeholder="Street, City, Country" /></div>
+            <div class="ia-field"><label>Phone</label>
+              <input type="text" [value]="invoice.freelancer.phone" (input)="patchFreelancer('phone', $any($event.target).value)" placeholder="+33 6 00 00 00 00" /></div>
+            <div class="ia-field"><label>SIRET</label>
+              <input type="text" [value]="invoice.freelancer.siret" (input)="patchFreelancer('siret', $any($event.target).value)" placeholder="12345678900000" /></div>
+          </div>
+          <div class="ia-form-col">
+            <div class="ia-form-section-label"><i class="material-icons">business</i> Client</div>
+            <div class="ia-field"><label>Name</label>
+              <input type="text" [value]="invoice.client.name" (input)="patchClient('name', $any($event.target).value)" placeholder="Client full name" /></div>
+            <div class="ia-field"><label>Company</label>
+              <input type="text" [value]="invoice.client.company" (input)="patchClient('company', $any($event.target).value)" placeholder="Company Inc." /></div>
+            <div class="ia-field"><label>Email</label>
+              <input type="email" [value]="invoice.client.email" (input)="patchClient('email', $any($event.target).value)" placeholder="client@company.com" /></div>
+            <div class="ia-field"><label>Address</label>
+              <input type="text" [value]="invoice.client.address" (input)="patchClient('address', $any($event.target).value)" placeholder="Client address" /></div>
+            <div class="ia-form-section-label" style="margin-top:12px"><i class="material-icons">folder</i> Project</div>
+            <div class="ia-field"><label>Project name</label>
+              <input type="text" [value]="invoice.projectName" (input)="patchField('projectName', $any($event.target).value)" placeholder="Project name" /></div>
+            <div class="ia-field"><label>Currency</label>
+              <select [value]="invoice.currency" (change)="patchField('currency', $any($event.target).value)">
+                <option>EUR</option><option>USD</option><option>GBP</option><option>TND</option>
+              </select></div>
+          </div>
+        </div>
+        <div class="ia-panel__actions">
+          <button class="ia-btn ia-btn--secondary" (click)="back()"><i class="material-icons">arrow_back</i> Back</button>
+          <button class="ia-btn ia-btn--ghost" (click)="retry()"><i class="material-icons">refresh</i> Re-extract</button>
+          <button class="ia-btn ia-btn--primary" (click)="approve()"><i class="material-icons">arrow_forward</i> Approve &amp; Continue</button>
+        </div>
+      </div>
+
+      <!-- ── 4. REVIEW ITEMS (HITL #2) ── -->
+      <div class="ia-panel__section" *ngIf="currentStep === 'review_items' && invoice">
+        <div class="ia-panel__header">
+          <i class="material-icons">format_list_numbered</i>
+          <h3>Review line items</h3>
+          <span class="ia-hitl-badge">Human review</span>
+        </div>
+        <div class="ia-field ia-field--inline">
+          <label>Tax rate (%)</label>
+          <input type="number" min="0" max="100" style="width:80px"
+                 [value]="invoice.taxRate"
+                 (input)="patchField('taxRate', $any($event.target).value)" />
+        </div>
+        <div class="ia-items-table">
+          <div class="ia-items-table__head">
+            <span>Description</span><span>Qty</span><span>Unit Price ({{ invoice.currency }})</span><span>Total</span><span></span>
+          </div>
+          <div class="ia-items-table__row" *ngFor="let item of invoice.lineItems; let i = index; trackBy: trackByIndex">
+            <input type="text" [value]="item.description" (input)="patchLineItem(i, 'description', $any($event.target).value)" placeholder="Description" />
+            <input type="number" min="0" [value]="item.quantity" (input)="patchLineItem(i, 'quantity', $any($event.target).value)" />
+            <input type="number" min="0" [value]="item.unitPrice" (input)="patchLineItem(i, 'unitPrice', $any($event.target).value)" />
+            <span class="ia-item-total">{{ formatMoney(item.total) }}</span>
+            <button class="ia-btn-icon ia-btn-icon--danger" (click)="removeLineItem(i)"><i class="material-icons">delete</i></button>
+          </div>
+        </div>
+        <button class="ia-btn ia-btn--ghost ia-btn--sm" (click)="addLineItem()">
+          <i class="material-icons">add</i> Add row
+        </button>
+        <div class="ia-totals-preview">
+          <div class="ia-totals-row"><span>Subtotal</span><span>{{ formatMoney(computedSubtotal) }} {{ invoice.currency }}</span></div>
+          <div class="ia-totals-row"><span>VAT ({{ invoice.taxRate }}%)</span><span>{{ formatMoney(computedTaxAmount) }} {{ invoice.currency }}</span></div>
+          <div class="ia-totals-row ia-totals-row--total"><span>Total</span><span>{{ formatMoney(computedTotal) }} {{ invoice.currency }}</span></div>
+        </div>
+        <div class="ia-panel__actions">
+          <button class="ia-btn ia-btn--secondary" (click)="back()"><i class="material-icons">arrow_back</i> Back</button>
+          <button class="ia-btn ia-btn--ghost" (click)="retry()"><i class="material-icons">refresh</i> Re-generate items</button>
+          <button class="ia-btn ia-btn--primary" (click)="approve()"><i class="material-icons">arrow_forward</i> Approve &amp; Calculate</button>
+        </div>
+      </div>
+
+      <!-- ── 5. REVIEW DRAFT (HITL #3) ── -->
+      <div class="ia-panel__section" *ngIf="currentStep === 'review_draft' && invoice">
+        <div class="ia-panel__header">
+          <i class="material-icons">preview</i>
+          <h3>Review invoice draft</h3>
+          <span class="ia-hitl-badge">Human review</span>
+        </div>
+        <div class="ia-draft-preview">
+          <div class="ia-draft-preview__header">
+            <div>
+              <div class="ia-draft-preview__label">INVOICE</div>
+              <div class="ia-draft-preview__num">{{ invoice.invoiceNumber || 'Pending…' }}</div>
+            </div>
+            <div class="ia-draft-preview__dates">
+              <div class="ia-field ia-field--compact"><label>Due date</label>
+                <input type="date" [value]="invoice.dueDate" (input)="patchField('dueDate', $any($event.target).value)" /></div>
+            </div>
+          </div>
+          <div class="ia-draft-preview__parties">
+            <div><strong>From:</strong> {{ invoice.freelancer.name }} — {{ invoice.freelancer.email }}</div>
+            <div><strong>To:</strong> {{ invoice.client.name }}{{ invoice.client.company ? ', ' + invoice.client.company : '' }} — {{ invoice.client.email }}</div>
+          </div>
+          <div class="ia-draft-preview__project"><strong>Project:</strong> {{ invoice.projectName }}</div>
+          <div class="ia-items-table ia-items-table--readonly">
+            <div class="ia-items-table__head"><span>Description</span><span>Qty</span><span>Unit Price</span><span>Total</span></div>
+            <div class="ia-items-table__row--ro" *ngFor="let item of invoice.lineItems; trackBy: trackByIndex">
+              <span>{{ item.description }}</span>
+              <span>{{ item.quantity }}</span>
+              <span>{{ formatMoney(item.unitPrice) }} {{ invoice.currency }}</span>
+              <span>{{ formatMoney(item.total) }} {{ invoice.currency }}</span>
+            </div>
+          </div>
+          <div class="ia-totals-preview">
+            <div class="ia-totals-row"><span>Subtotal</span><span>{{ formatMoney(invoice.subtotal) }} {{ invoice.currency }}</span></div>
+            <div class="ia-totals-row"><span>VAT ({{ invoice.taxRate }}%)</span><span>{{ formatMoney(invoice.taxAmount) }} {{ invoice.currency }}</span></div>
+            <div class="ia-totals-row ia-totals-row--total"><span>TOTAL</span><span>{{ formatMoney(invoice.total) }} {{ invoice.currency }}</span></div>
+          </div>
+        </div>
+        <div class="ia-panel__actions">
+          <button class="ia-btn ia-btn--secondary" (click)="back()"><i class="material-icons">arrow_back</i> Back</button>
+          <button class="ia-btn ia-btn--ghost" (click)="retry()"><i class="material-icons">refresh</i> Recalculate</button>
+          <button class="ia-btn ia-btn--primary" (click)="approve()"><i class="material-icons">auto_awesome</i> Generate Content</button>
+        </div>
+      </div>
+
+      <!-- ── 6. REVIEW FINAL (HITL #4) ── -->
+      <div class="ia-panel__section" *ngIf="currentStep === 'review_final' && invoice">
+        <div class="ia-panel__header">
+          <i class="material-icons">task_alt</i>
+          <h3>Final invoice preview</h3>
+          <span class="ia-hitl-badge ia-hitl-badge--final">Ready to export</span>
+        </div>
+        <div class="ia-final-invoice">
+          <div class="ia-fi__header">
+            <div>
+              <div class="ia-fi__word">INVOICE</div>
+              <div class="ia-fi__num">{{ invoice.invoiceNumber }}</div>
+              <div class="ia-fi__dates">
+                <span>Issue: {{ invoice.issueDate }}</span>
+                <span>Due: {{ invoice.dueDate }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="ia-fi__parties">
+            <div class="ia-fi__party">
+              <div class="ia-fi__party-label">FROM</div>
+              <div class="ia-fi__party-name">{{ invoice.freelancer.name }}</div>
+              <div class="ia-fi__party-detail">{{ invoice.freelancer.email }}</div>
+              <div class="ia-fi__party-detail">{{ invoice.freelancer.address }}</div>
+              <div class="ia-fi__party-detail" *ngIf="invoice.freelancer.phone">{{ invoice.freelancer.phone }}</div>
+              <div class="ia-fi__party-detail" *ngIf="invoice.freelancer.siret">SIRET: {{ invoice.freelancer.siret }}</div>
+            </div>
+            <div class="ia-fi__party">
+              <div class="ia-fi__party-label">BILL TO</div>
+              <div class="ia-fi__party-name">{{ invoice.client.name }}</div>
+              <div class="ia-fi__party-detail" *ngIf="invoice.client.company">{{ invoice.client.company }}</div>
+              <div class="ia-fi__party-detail">{{ invoice.client.email }}</div>
+              <div class="ia-fi__party-detail">{{ invoice.client.address }}</div>
+            </div>
+          </div>
+          <div class="ia-fi__project">Project: <strong>{{ invoice.projectName }}</strong></div>
+          <div class="ia-fi__intro" *ngIf="invoice.professionalIntro">{{ invoice.professionalIntro }}</div>
+          <table class="ia-fi__table">
+            <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Total</th></tr></thead>
+            <tbody>
+              <tr *ngFor="let item of invoice.lineItems; trackBy: trackByIndex">
+                <td>{{ item.description }}</td>
+                <td class="center">{{ item.quantity }}</td>
+                <td class="right">{{ formatMoney(item.unitPrice) }} {{ invoice.currency }}</td>
+                <td class="right bold">{{ formatMoney(item.total) }} {{ invoice.currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="ia-fi__totals">
+            <div class="ia-fi__tot-row"><span>Subtotal</span><span>{{ formatMoney(invoice.subtotal) }} {{ invoice.currency }}</span></div>
+            <div class="ia-fi__tot-row"><span>VAT ({{ invoice.taxRate }}%)</span><span>{{ formatMoney(invoice.taxAmount) }} {{ invoice.currency }}</span></div>
+            <div class="ia-fi__tot-row ia-fi__tot-row--grand"><span>TOTAL DUE</span><span>{{ formatMoney(invoice.total) }} {{ invoice.currency }}</span></div>
+          </div>
+          <div class="ia-fi__notes" *ngIf="invoice.notes">{{ invoice.notes }}</div>
+          <div class="ia-fi__terms">{{ invoice.paymentTerms }}</div>
+        </div>
+        <div class="ia-panel__actions">
+          <button class="ia-btn ia-btn--secondary" (click)="back()"><i class="material-icons">arrow_back</i> Back</button>
+          <button class="ia-btn ia-btn--ghost" (click)="retry()"><i class="material-icons">refresh</i> Rewrite content</button>
+          <button class="ia-btn ia-btn--success" [disabled]="isGeneratingPdf" (click)="downloadPdf()">
+            <i class="material-icons">picture_as_pdf</i>
+            {{ isGeneratingPdf ? 'Generating…' : 'Download PDF' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- ── 7. DONE ── -->
+      <div class="ia-panel__section ia-panel__section--done" *ngIf="isDone">
+        <div class="ia-done-anim">
+          <div class="ia-done-circle">
+            <i class="material-icons">check</i>
+          </div>
+        </div>
+        <h3 class="ia-done-title">Invoice downloaded!</h3>
+        <p class="ia-done-sub">Your PDF has been saved to your downloads folder.</p>
+        <div class="ia-panel__actions ia-panel__actions--center">
+          <button class="ia-btn ia-btn--ghost" (click)="restartAgent()">
+            <i class="material-icons">add_circle</i> New invoice
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /ia-panel -->
+  </div><!-- /ia-layout -->
+</div><!-- /ia-workspace -->

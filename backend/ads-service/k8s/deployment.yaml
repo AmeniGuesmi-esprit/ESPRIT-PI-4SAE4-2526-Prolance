@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ads-service
+  namespace: prolance
+  labels:
+    app: ads-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ads-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: ads-service
+    spec:
+      containers:
+        - name: ads-service
+          image: 172.22.191.1:5000/ads-service:IMAGE_TAG
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8090
+          envFrom:
+            - configMapRef:
+                name: ads-service-config
+            - secretRef:
+                name: ads-service-secret
+          readinessProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"

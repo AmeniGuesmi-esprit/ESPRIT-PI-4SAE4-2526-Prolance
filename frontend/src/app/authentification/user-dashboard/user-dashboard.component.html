@@ -1,0 +1,187 @@
+<div class="container ud-container">
+
+  <!-- ════════ GREETING ════════ -->
+  <div class="ud-greeting">
+    <h2>Welcome back, <strong>{{ currentUser?.name }}</strong></h2>
+    <p class="text-muted">Here's what's happening with your {{ currentRole === 'freelancer' ? 'freelance career' : 'hiring pipeline' }} today.</p>
+  </div>
+
+  <!-- ════════ FREELANCER KPI CARDS ════════ -->
+  <div class="row" *ngIf="currentRole === 'freelancer'">
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-info card-header-icon">
+          <div class="card-icon"><i class="material-icons">gavel</i></div>
+          <p class="card-category">Active Bids</p>
+          <h3 class="card-title">{{ freelancerStats.activeBids }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">trending_up</i> 2 new this week</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-warning card-header-icon">
+          <div class="card-icon"><i class="material-icons">event</i></div>
+          <p class="card-category">Upcoming Deadlines</p>
+          <h3 class="card-title">{{ freelancerStats.upcomingDeadlines }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">schedule</i> Next: in 2 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-success card-header-icon">
+          <div class="card-icon"><i class="material-icons">account_balance_wallet</i></div>
+          <p class="card-category">Recent Earnings</p>
+          <h3 class="card-title">${{ freelancerStats.recentEarnings | number }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">date_range</i> Last 30 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-primary card-header-icon">
+          <div class="card-icon"><i class="material-icons">emoji_events</i></div>
+          <p class="card-category">Completed Projects</p>
+          <h3 class="card-title">{{ freelancerStats.completedProjects }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">star</i> 4.9 avg. rating</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ CLIENT KPI CARDS ════════ -->
+  <div class="row" *ngIf="currentRole === 'client'">
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-info card-header-icon">
+          <div class="card-icon"><i class="material-icons">work</i></div>
+          <p class="card-category">Active Job Posts</p>
+          <h3 class="card-title">{{ clientStats.activeJobPosts }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">visibility</i> 340 views this week</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-warning card-header-icon">
+          <div class="card-icon"><i class="material-icons">mark_email_unread</i></div>
+          <p class="card-category">Unread Proposals</p>
+          <h3 class="card-title">{{ clientStats.unreadProposals }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">fiber_new</i> 4 new today</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-success card-header-icon">
+          <div class="card-icon"><i class="material-icons">payments</i></div>
+          <p class="card-category">Total Spent</p>
+          <h3 class="card-title">${{ clientStats.totalSpent | number }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">check_circle</i> All time</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6">
+      <div class="card card-stats ud-card">
+        <div class="card-header card-header-primary card-header-icon">
+          <div class="card-icon"><i class="material-icons">group</i></div>
+          <p class="card-category">Hired Freelancers</p>
+          <h3 class="card-title">{{ clientStats.hiredFreelancers }}</h3>
+        </div>
+        <div class="card-footer">
+          <div class="stats"><i class="material-icons">verified</i> 100% completion rate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ RECENT ACTIVITY ════════ -->
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card ud-card">
+        <div class="card-header card-header-primary">
+          <h4 class="card-title">Recent Activity</h4>
+          <p class="card-category">Your latest updates and notifications</p>
+        </div>
+        <div class="card-body">
+          <div class="activity-list" *ngIf="currentRole === 'freelancer'">
+            <div class="activity-item" *ngFor="let a of freelancerActivity">
+              <div class="activity-icon activity-icon-{{ a.iconColor }}">
+                <i class="material-icons">{{ a.icon }}</i>
+              </div>
+              <div class="activity-content">
+                <span class="activity-title">{{ a.title }}</span>
+                <span class="activity-subtitle">{{ a.subtitle }}</span>
+              </div>
+              <span class="activity-time">{{ a.time }}</span>
+            </div>
+          </div>
+          <div class="activity-list" *ngIf="currentRole === 'client'">
+            <div class="activity-item" *ngFor="let a of clientActivity">
+              <div class="activity-icon activity-icon-{{ a.iconColor }}">
+                <i class="material-icons">{{ a.icon }}</i>
+              </div>
+              <div class="activity-content">
+                <span class="activity-title">{{ a.title }}</span>
+                <span class="activity-subtitle">{{ a.subtitle }}</span>
+              </div>
+              <span class="activity-time">{{ a.time }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════ QUICK ACTIONS ════════ -->
+    <div class="col-lg-4">
+      <div class="card ud-card">
+        <div class="card-header card-header-info">
+          <h4 class="card-title">Quick Actions</h4>
+          <p class="card-category">Shortcuts to common tasks</p>
+        </div>
+        <div class="card-body quick-actions">
+          <a class="qa-item" routerLink="/app/marketplace" *ngIf="currentRole === 'freelancer'">
+            <i class="material-icons">search</i>
+            <span>Browse Marketplace</span>
+          </a>
+          <a class="qa-item" routerLink="/app/projects" *ngIf="currentRole === 'freelancer'">
+            <i class="material-icons">folder_open</i>
+            <span>View Active Projects</span>
+          </a>
+          <a class="qa-item" routerLink="/app/wallet" *ngIf="currentRole === 'freelancer'">
+            <i class="material-icons">account_balance_wallet</i>
+            <span>Check Wallet</span>
+          </a>
+          <a class="qa-item" routerLink="/app/marketplace" *ngIf="currentRole === 'client'">
+            <i class="material-icons">add_circle_outline</i>
+            <span>Post a New Job</span>
+          </a>
+          <a class="qa-item" routerLink="/app/projects" *ngIf="currentRole === 'client'">
+            <i class="material-icons">people</i>
+            <span>Manage Freelancers</span>
+          </a>
+          <a class="qa-item" routerLink="/app/wallet" *ngIf="currentRole === 'client'">
+            <i class="material-icons">payments</i>
+            <span>Release Payments</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

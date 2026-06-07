@@ -1,0 +1,105 @@
+<div class="reaction-root">
+
+  <!-- Error message -->
+  <div class="reaction-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <!-- ROW : pill + React button -->
+  <div class="reaction-row">
+
+    <!-- Aggregate pill -->
+    <button class="pill-count" *ngIf="total > 0" (click)="openModal()">
+      <ng-container *ngFor="let opt of options">
+        <span *ngIf="counts[opt.type] > 0" class="pill-emoji">{{ opt.emoji }}</span>
+      </ng-container>
+      <span class="pill-number">{{ total }}</span>
+    </button>
+
+    <!-- React button + hover picker -->
+    <div class="react-wrapper" (mouseenter)="onHoverEnter()" (mouseleave)="onHoverLeave()">
+
+      <button
+        class="btn-react"
+        [class.has-reaction]="userReaction"
+        [class.loading]="loading"
+        [style.color]="userReaction ? getColor(userReaction) : null"
+        [disabled]="loading"
+        (click)="onClickMainBtn()">
+        <svg class="btn-thumb-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3m0 11V11m0 11h10a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3.5l1-4a2 2 0 0 0-2-2.5L10 8.5V11H7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="btn-label">{{ userReaction ? getLabel(userReaction) : 'Like' }}</span>
+      </button>
+
+      <!-- Hover picker -->
+      <div class="hover-picker" [class.visible]="pickerVisible">
+        <button
+          *ngFor="let opt of options"
+          class="hover-emoji-btn"
+          [class.active]="userReaction === opt.type"
+          [title]="opt.label"
+          (click)="onReact(opt.type)">
+          <span class="hover-emoji">{{ opt.emoji }}</span>
+          <span class="hover-label">{{ opt.label }}</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="onOverlayClick($event)">
+    <div class="modal-box">
+
+      <!-- Header tabs -->
+      <div class="modal-header">
+        <div class="modal-tabs">
+          <button
+            class="modal-tab"
+            [class.active]="activeFilter === 'ALL'"
+            (click)="activeFilter = 'ALL'">
+            <span class="tab-text">All</span>
+            <span class="tab-count">{{ total }}</span>
+          </button>
+          <ng-container *ngFor="let opt of options">
+            <button
+              *ngIf="counts[opt.type] > 0"
+              class="modal-tab"
+              [class.active]="activeFilter === opt.type"
+              (click)="activeFilter = opt.type">
+              <img [src]="getEmojiImg(opt.type)" class="tab-emoji-img" [alt]="opt.label" />
+              <span class="tab-count">{{ counts[opt.type] }}</span>
+            </button>
+          </ng-container>
+        </div>
+
+        <button class="modal-close" (click)="showModal = false" title="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-divider"></div>
+
+      <!-- Reactors list -->
+      <ul class="modal-list">
+        <ng-container *ngIf="filteredReactors.length > 0; else emptyState">
+          <li *ngFor="let r of filteredReactors" class="modal-item">
+            <div class="avatar-wrap">
+              <div class="avatar-circle">{{ r.userName.charAt(0).toUpperCase() }}</div>
+              <span class="avatar-badge">{{ getEmoji(r.type) }}</span>
+            </div>
+            <span class="item-name">{{ r.userName }}</span>
+          </li>
+        </ng-container>
+        <ng-template #emptyState>
+          <li class="modal-empty">No reactions of this type yet.</li>
+        </ng-template>
+      </ul>
+
+    </div>
+  </div>
+
+</div>

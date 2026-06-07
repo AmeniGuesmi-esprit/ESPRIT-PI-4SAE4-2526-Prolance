@@ -1,0 +1,1201 @@
+user_id,role,domain_preference,experience_years,city,age,level_preference,format_preference,budget_max,profile_completeness,avg_rating_given,n_events_attended_total
+USR0001,client,Développement,2,Monastir,39,Débutant,Presentiel,150,0.85,4.5,4
+USR0002,client,Développement,9,Tunis,42,Débutant,Hybride,0,0.79,4.9,6
+USR0003,client,Design,6,Monastir,40,Débutant,Online,200,0.85,4.3,5
+USR0004,client,Développement,12,Sousse,45,Avancé,Online,200,0.89,3.7,16
+USR0005,client,Design,5,Tunis,34,Avancé,Hybride,0,0.92,4.6,2
+USR0006,client,Développement,5,Monastir,40,Débutant,Indifférent,50,0.87,4.9,3
+USR0007,client,Développement,12,Bizerte,42,Intermédiaire,Indifférent,150,0.91,4.2,3
+USR0008,client,Développement,3,Tunis,26,Intermédiaire,Presentiel,150,0.78,4.3,15
+USR0009,client,Développement,7,Sousse,23,Intermédiaire,Presentiel,100,0.9,3.7,6
+USR0010,client,Les deux,11,Sousse,35,Débutant,Presentiel,0,0.62,3.8,10
+USR0011,client,Design,3,Monastir,38,Avancé,Indifférent,150,0.9,3.2,15
+USR0012,client,Développement,11,Sfax,27,Avancé,Hybride,150,0.78,3.7,5
+USR0013,client,Les deux,8,Sousse,29,Avancé,Indifférent,100,0.65,3.5,5
+USR0014,client,Design,5,Tunis,41,Avancé,Presentiel,50,0.61,4.0,6
+USR0015,client,Design,12,Bizerte,37,Intermédiaire,Online,50,0.65,3.7,6
+USR0016,client,Développement,11,Bizerte,22,Intermédiaire,Online,0,0.78,4.4,14
+USR0017,client,Développement,12,Monastir,21,Débutant,Hybride,150,0.74,3.7,7
+USR0018,client,Les deux,4,Monastir,21,Débutant,Indifférent,150,0.54,4.3,13
+USR0019,client,Développement,2,Bizerte,27,Débutant,Presentiel,0,0.78,3.8,15
+USR0020,client,Design,9,Sfax,42,Avancé,Indifférent,150,0.95,3.6,13
+USR0021,client,Design,6,Sousse,36,Avancé,Online,200,0.98,3.2,12
+USR0022,client,Les deux,10,Sfax,26,Avancé,Online,50,0.62,4.1,2
+USR0023,client,Développement,6,Monastir,40,Avancé,Indifférent,100,0.52,3.6,10
+USR0024,client,Développement,7,Tunis,39,Débutant,Hybride,250,0.79,4.6,6
+USR0025,client,Développement,1,Bizerte,25,Avancé,Presentiel,100,0.91,3.1,17
+USR0026,client,Développement,4,Bizerte,41,Avancé,Hybride,150,0.56,4.4,3
+USR0027,client,Design,4,Bizerte,35,Intermédiaire,Indifférent,0,0.8,4.8,4
+USR0028,client,Design,9,Sousse,18,Débutant,Presentiel,250,0.92,4.2,8
+USR0029,client,Les deux,12,Sousse,36,Débutant,Presentiel,150,0.76,3.9,7
+USR0030,client,Développement,9,Monastir,38,Intermédiaire,Online,150,0.67,3.7,13
+USR0031,client,Design,2,Sousse,31,Avancé,Indifférent,100,0.83,3.8,5
+USR0032,client,Les deux,0,Monastir,20,Intermédiaire,Hybride,100,0.56,4.5,14
+USR0033,client,Les deux,0,Bizerte,32,Intermédiaire,Online,50,0.76,4.2,14
+USR0034,client,Design,7,Tunis,24,Intermédiaire,Presentiel,100,0.72,4.4,11
+USR0035,client,Développement,10,Bizerte,43,Débutant,Presentiel,100,0.78,4.1,9
+USR0036,client,Développement,1,Monastir,21,Avancé,Presentiel,150,0.97,3.6,6
+USR0037,client,Design,6,Monastir,33,Débutant,Indifférent,200,0.57,3.4,8
+USR0038,client,Design,11,Sfax,45,Débutant,Hybride,150,0.67,4.6,9
+USR0039,client,Développement,0,Sousse,41,Intermédiaire,Indifférent,50,0.72,4.0,17
+USR0040,client,Développement,12,Bizerte,30,Intermédiaire,Hybride,50,0.99,3.5,12
+USR0041,client,Développement,12,Monastir,19,Intermédiaire,Indifférent,250,0.96,3.8,9
+USR0042,client,Les deux,12,Sfax,33,Débutant,Presentiel,200,0.98,3.7,4
+USR0043,client,Développement,7,Tunis,34,Intermédiaire,Online,250,0.57,4.7,8
+USR0044,client,Les deux,1,Monastir,43,Intermédiaire,Hybride,200,0.85,4.3,14
+USR0045,client,Les deux,10,Bizerte,30,Intermédiaire,Indifférent,200,0.52,3.1,13
+USR0046,client,Design,4,Sfax,41,Débutant,Indifférent,0,0.88,4.4,4
+USR0047,client,Développement,2,Sousse,18,Débutant,Hybride,0,0.65,3.7,8
+USR0048,client,Développement,8,Monastir,36,Avancé,Presentiel,50,0.59,4.2,11
+USR0049,client,Développement,10,Sfax,33,Avancé,Presentiel,50,0.73,3.5,11
+USR0050,client,Développement,0,Monastir,27,Avancé,Presentiel,0,0.72,3.7,4
+USR0051,client,Design,10,Monastir,40,Intermédiaire,Indifférent,100,0.6,3.8,5
+USR0052,client,Design,3,Monastir,36,Intermédiaire,Hybride,250,0.65,5.0,4
+USR0053,client,Design,4,Tunis,36,Avancé,Online,200,0.87,4.7,4
+USR0054,client,Les deux,12,Sfax,37,Intermédiaire,Presentiel,250,0.6,3.5,3
+USR0055,client,Les deux,12,Sfax,38,Débutant,Online,100,0.89,3.1,5
+USR0056,client,Développement,2,Tunis,27,Intermédiaire,Indifférent,50,0.6,4.6,11
+USR0057,client,Les deux,5,Bizerte,34,Intermédiaire,Presentiel,100,0.96,4.9,6
+USR0058,client,Les deux,4,Sousse,43,Débutant,Indifférent,0,0.57,4.9,10
+USR0059,client,Les deux,11,Monastir,45,Avancé,Hybride,0,0.9,3.0,14
+USR0060,client,Design,7,Sousse,39,Avancé,Hybride,200,0.69,4.3,15
+USR0061,client,Développement,10,Sfax,33,Débutant,Hybride,200,0.61,3.1,7
+USR0062,client,Les deux,11,Sousse,38,Intermédiaire,Online,50,0.52,3.1,9
+USR0063,client,Les deux,1,Tunis,25,Avancé,Presentiel,150,0.73,4.3,13
+USR0064,client,Design,8,Monastir,36,Avancé,Presentiel,150,0.83,4.7,6
+USR0065,client,Design,4,Tunis,40,Intermédiaire,Presentiel,150,0.72,3.5,4
+USR0066,client,Développement,10,Sousse,35,Avancé,Hybride,0,0.7,3.4,6
+USR0067,client,Développement,7,Tunis,39,Débutant,Online,0,0.89,3.5,6
+USR0068,client,Développement,9,Sfax,20,Avancé,Presentiel,200,0.61,4.7,10
+USR0069,client,Développement,2,Bizerte,18,Intermédiaire,Presentiel,50,0.77,4.6,14
+USR0070,client,Développement,0,Sfax,18,Intermédiaire,Presentiel,200,0.66,3.3,7
+USR0071,client,Développement,11,Monastir,34,Débutant,Online,150,0.72,3.7,6
+USR0072,client,Design,7,Bizerte,25,Avancé,Online,250,0.89,4.7,7
+USR0073,client,Design,7,Tunis,19,Intermédiaire,Indifférent,150,0.84,4.0,13
+USR0074,client,Les deux,1,Tunis,28,Avancé,Presentiel,0,0.56,4.2,4
+USR0075,client,Design,11,Sousse,30,Avancé,Hybride,150,0.75,3.9,15
+USR0076,client,Les deux,1,Bizerte,41,Débutant,Indifférent,150,0.94,3.8,3
+USR0077,client,Les deux,6,Monastir,41,Débutant,Hybride,150,0.66,3.5,12
+USR0078,client,Les deux,10,Monastir,20,Débutant,Online,0,0.72,4.5,8
+USR0079,client,Développement,2,Bizerte,19,Avancé,Hybride,250,0.56,3.7,5
+USR0080,client,Design,12,Monastir,45,Avancé,Online,100,0.8,3.7,12
+USR0081,client,Design,3,Sfax,39,Intermédiaire,Presentiel,0,0.68,4.1,14
+USR0082,client,Développement,4,Bizerte,25,Intermédiaire,Online,200,0.96,4.7,9
+USR0083,client,Développement,2,Sousse,40,Intermédiaire,Hybride,100,0.5,4.7,5
+USR0084,client,Design,6,Tunis,22,Avancé,Online,0,0.87,3.4,4
+USR0085,client,Design,5,Sfax,29,Intermédiaire,Hybride,200,0.8,4.8,8
+USR0086,client,Développement,12,Bizerte,19,Avancé,Online,100,0.72,3.8,10
+USR0087,client,Design,6,Sousse,24,Avancé,Online,100,0.71,3.6,7
+USR0088,client,Design,7,Bizerte,39,Intermédiaire,Online,50,0.7,4.2,7
+USR0089,client,Développement,4,Sfax,42,Débutant,Hybride,100,0.66,3.0,4
+USR0090,client,Design,2,Sfax,30,Avancé,Presentiel,200,0.78,4.3,4
+USR0091,client,Développement,6,Tunis,31,Débutant,Indifférent,0,0.93,4.2,5
+USR0092,client,Design,11,Monastir,27,Débutant,Indifférent,0,0.98,3.3,5
+USR0093,client,Les deux,7,Sousse,20,Intermédiaire,Online,50,0.72,3.8,15
+USR0094,client,Développement,4,Sousse,25,Intermédiaire,Presentiel,0,0.76,3.2,3
+USR0095,client,Design,12,Sousse,29,Avancé,Presentiel,50,0.55,3.5,16
+USR0096,client,Développement,2,Tunis,23,Avancé,Indifférent,150,0.88,4.5,15
+USR0097,client,Design,9,Bizerte,28,Avancé,Hybride,50,0.72,3.9,10
+USR0098,client,Design,12,Sousse,36,Débutant,Hybride,200,0.54,3.9,16
+USR0099,client,Développement,5,Sousse,20,Avancé,Online,200,0.8,3.8,13
+USR0100,client,Design,12,Tunis,32,Avancé,Presentiel,100,0.8,4.0,14
+USR0101,client,Les deux,7,Tunis,43,Intermédiaire,Online,200,0.82,3.1,8
+USR0102,client,Design,7,Bizerte,34,Avancé,Presentiel,100,0.69,3.6,9
+USR0103,client,Design,5,Bizerte,19,Avancé,Hybride,0,0.66,4.1,17
+USR0104,client,Développement,4,Bizerte,45,Débutant,Hybride,0,0.79,3.3,11
+USR0105,client,Développement,10,Monastir,22,Avancé,Online,100,0.78,4.3,12
+USR0106,client,Développement,2,Bizerte,20,Avancé,Indifférent,200,0.68,3.7,15
+USR0107,client,Développement,3,Sousse,42,Intermédiaire,Presentiel,50,1.0,3.3,14
+USR0108,client,Développement,12,Tunis,34,Avancé,Online,250,0.67,4.5,13
+USR0109,client,Développement,6,Sfax,23,Débutant,Presentiel,250,0.72,3.8,16
+USR0110,client,Design,3,Monastir,37,Intermédiaire,Indifférent,50,0.77,3.6,4
+USR0111,client,Les deux,7,Sfax,29,Avancé,Indifférent,150,0.88,4.6,3
+USR0112,client,Design,6,Sfax,44,Débutant,Presentiel,100,0.53,4.0,3
+USR0113,client,Développement,1,Bizerte,45,Débutant,Hybride,0,0.88,3.5,17
+USR0114,client,Les deux,2,Monastir,20,Débutant,Indifférent,100,0.97,3.8,14
+USR0115,client,Développement,5,Sfax,30,Débutant,Hybride,50,0.51,4.9,8
+USR0116,client,Les deux,10,Sousse,43,Débutant,Presentiel,0,0.64,4.7,3
+USR0117,client,Design,2,Monastir,32,Avancé,Online,0,0.51,3.4,3
+USR0118,client,Développement,11,Bizerte,34,Intermédiaire,Online,100,0.62,3.2,4
+USR0119,client,Développement,10,Bizerte,32,Débutant,Online,150,0.8,3.0,16
+USR0120,client,Design,3,Sfax,27,Intermédiaire,Online,200,0.68,4.1,7
+USR0121,client,Développement,10,Tunis,34,Intermédiaire,Online,200,0.77,4.6,2
+USR0122,client,Design,0,Monastir,45,Intermédiaire,Online,250,0.69,3.7,4
+USR0123,client,Design,5,Tunis,29,Débutant,Online,200,0.87,3.7,5
+USR0124,client,Développement,8,Sousse,44,Avancé,Presentiel,250,0.73,4.4,14
+USR0125,client,Design,12,Sfax,20,Avancé,Indifférent,0,0.65,3.1,9
+USR0126,client,Développement,0,Sousse,27,Avancé,Indifférent,200,0.74,3.1,5
+USR0127,client,Design,4,Sousse,45,Débutant,Hybride,100,0.56,3.7,13
+USR0128,client,Les deux,11,Monastir,30,Intermédiaire,Presentiel,150,0.85,3.7,13
+USR0129,client,Les deux,4,Tunis,41,Intermédiaire,Online,150,0.8,4.6,6
+USR0130,client,Design,5,Tunis,20,Intermédiaire,Hybride,100,0.72,4.4,9
+USR0131,client,Développement,7,Sousse,32,Débutant,Hybride,200,1.0,3.5,5
+USR0132,client,Les deux,0,Tunis,39,Avancé,Indifférent,100,0.76,4.5,2
+USR0133,client,Développement,0,Sfax,45,Avancé,Indifférent,0,0.56,3.5,9
+USR0134,client,Design,5,Monastir,36,Débutant,Presentiel,250,0.72,3.7,9
+USR0135,client,Design,1,Bizerte,22,Avancé,Hybride,150,0.66,3.6,12
+USR0136,client,Les deux,0,Sfax,33,Avancé,Indifférent,200,0.56,4.5,12
+USR0137,client,Design,3,Bizerte,27,Avancé,Indifférent,50,0.56,4.7,12
+USR0138,client,Design,11,Monastir,20,Avancé,Hybride,250,0.67,3.1,14
+USR0139,client,Design,4,Sfax,40,Avancé,Presentiel,100,0.75,3.2,17
+USR0140,client,Développement,2,Sfax,43,Intermédiaire,Online,100,0.78,3.7,9
+USR0141,client,Les deux,8,Sfax,37,Débutant,Online,100,0.7,4.4,3
+USR0142,client,Design,6,Monastir,44,Avancé,Online,50,0.99,4.3,14
+USR0143,client,Design,10,Bizerte,29,Débutant,Presentiel,50,0.72,4.8,5
+USR0144,client,Développement,1,Bizerte,22,Intermédiaire,Presentiel,50,0.66,4.4,7
+USR0145,client,Développement,8,Sousse,45,Débutant,Hybride,50,0.82,4.1,5
+USR0146,client,Développement,4,Bizerte,35,Débutant,Presentiel,200,0.97,3.3,3
+USR0147,client,Design,11,Bizerte,28,Avancé,Online,0,0.54,4.9,5
+USR0148,client,Les deux,4,Sfax,42,Avancé,Indifférent,200,0.82,4.0,2
+USR0149,client,Design,4,Sousse,33,Débutant,Indifférent,100,0.73,4.4,12
+USR0150,client,Développement,6,Monastir,32,Débutant,Hybride,200,0.57,4.7,16
+USR0151,client,Développement,5,Monastir,22,Intermédiaire,Online,100,0.62,3.2,12
+USR0152,client,Design,2,Tunis,19,Intermédiaire,Indifférent,200,0.71,4.9,17
+USR0153,client,Les deux,5,Bizerte,41,Intermédiaire,Presentiel,50,0.75,4.0,12
+USR0154,client,Design,4,Monastir,18,Débutant,Indifférent,200,0.73,3.5,6
+USR0155,client,Design,0,Tunis,27,Intermédiaire,Indifférent,100,0.77,4.7,8
+USR0156,client,Design,4,Sousse,42,Intermédiaire,Hybride,0,0.7,4.1,6
+USR0157,client,Développement,8,Sousse,20,Intermédiaire,Indifférent,200,0.64,5.0,4
+USR0158,client,Design,1,Sfax,21,Intermédiaire,Hybride,100,0.78,3.7,15
+USR0159,client,Développement,9,Bizerte,30,Avancé,Online,0,0.52,4.4,13
+USR0160,client,Les deux,8,Monastir,22,Avancé,Presentiel,100,0.97,3.6,9
+USR0161,client,Développement,9,Sousse,36,Intermédiaire,Indifférent,250,0.78,3.9,8
+USR0162,client,Développement,5,Tunis,31,Avancé,Hybride,250,0.94,4.3,11
+USR0163,client,Design,4,Bizerte,36,Débutant,Online,200,0.74,4.0,3
+USR0164,client,Design,12,Monastir,22,Avancé,Presentiel,0,0.79,4.4,15
+USR0165,client,Développement,7,Sousse,31,Débutant,Indifférent,250,0.6,4.0,14
+USR0166,client,Design,7,Tunis,40,Débutant,Presentiel,200,0.66,4.3,10
+USR0167,client,Design,5,Sfax,32,Avancé,Hybride,200,0.68,4.5,6
+USR0168,client,Design,10,Sousse,37,Intermédiaire,Presentiel,50,0.64,3.6,15
+USR0169,client,Les deux,4,Sousse,40,Débutant,Indifférent,100,0.74,4.1,8
+USR0170,client,Les deux,11,Sousse,27,Débutant,Indifférent,150,0.91,4.9,11
+USR0171,client,Les deux,4,Tunis,27,Avancé,Online,100,0.96,4.3,14
+USR0172,client,Design,3,Sfax,44,Avancé,Hybride,200,0.85,3.3,6
+USR0173,client,Design,9,Sfax,25,Débutant,Presentiel,250,0.62,3.2,4
+USR0174,client,Développement,7,Tunis,39,Débutant,Online,200,0.99,3.3,13
+USR0175,client,Design,7,Monastir,38,Débutant,Hybride,100,0.64,3.1,4
+USR0176,client,Les deux,10,Bizerte,25,Avancé,Online,50,0.71,4.7,6
+USR0177,client,Les deux,0,Monastir,43,Intermédiaire,Presentiel,250,0.98,4.9,10
+USR0178,client,Les deux,0,Sousse,36,Avancé,Online,100,0.64,5.0,8
+USR0179,client,Design,7,Sfax,45,Avancé,Indifférent,100,0.6,3.2,13
+USR0180,client,Développement,7,Sousse,40,Débutant,Online,250,0.67,3.6,14
+USR0181,client,Design,3,Sfax,37,Avancé,Indifférent,150,0.76,3.2,2
+USR0182,client,Design,2,Sfax,33,Intermédiaire,Presentiel,0,0.63,3.5,16
+USR0183,client,Les deux,5,Sousse,36,Avancé,Online,100,0.83,4.4,11
+USR0184,client,Développement,1,Monastir,27,Débutant,Indifférent,250,0.75,4.8,16
+USR0185,client,Design,4,Tunis,38,Intermédiaire,Hybride,200,0.61,4.9,12
+USR0186,client,Design,7,Bizerte,29,Intermédiaire,Indifférent,200,0.9,4.7,9
+USR0187,client,Les deux,10,Bizerte,45,Débutant,Indifférent,200,0.85,3.2,5
+USR0188,client,Design,0,Bizerte,34,Débutant,Presentiel,50,0.66,4.0,7
+USR0189,client,Développement,3,Bizerte,33,Débutant,Indifférent,0,0.73,4.0,15
+USR0190,client,Design,0,Bizerte,32,Avancé,Hybride,250,0.51,3.5,6
+USR0191,client,Développement,3,Bizerte,20,Débutant,Indifférent,100,0.85,4.1,13
+USR0192,client,Développement,1,Monastir,19,Intermédiaire,Indifférent,50,0.88,4.5,8
+USR0193,client,Les deux,10,Monastir,29,Intermédiaire,Indifférent,150,0.69,4.4,2
+USR0194,client,Design,8,Sfax,38,Intermédiaire,Online,50,1.0,3.8,5
+USR0195,client,Développement,3,Tunis,42,Débutant,Hybride,150,0.84,4.1,14
+USR0196,client,Design,3,Sfax,32,Intermédiaire,Presentiel,100,0.59,4.8,8
+USR0197,client,Les deux,0,Monastir,37,Débutant,Presentiel,50,0.53,4.2,14
+USR0198,client,Design,10,Tunis,25,Avancé,Online,150,0.72,4.1,8
+USR0199,client,Les deux,12,Tunis,22,Avancé,Hybride,50,0.91,4.5,4
+USR0200,client,Développement,9,Sousse,25,Intermédiaire,Presentiel,250,0.76,3.8,7
+USR0201,client,Développement,8,Bizerte,41,Débutant,Indifférent,200,0.75,4.9,14
+USR0202,client,Les deux,10,Monastir,43,Avancé,Hybride,250,0.71,3.3,7
+USR0203,client,Développement,12,Bizerte,33,Débutant,Presentiel,100,0.93,3.3,13
+USR0204,client,Design,0,Bizerte,31,Intermédiaire,Presentiel,150,0.62,3.4,14
+USR0205,client,Design,7,Sousse,20,Avancé,Presentiel,0,0.63,4.3,14
+USR0206,client,Design,1,Sfax,43,Avancé,Presentiel,150,0.6,4.8,12
+USR0207,client,Développement,0,Sfax,24,Avancé,Online,250,1.0,4.0,14
+USR0208,client,Développement,9,Sfax,30,Débutant,Hybride,100,0.69,4.1,9
+USR0209,client,Développement,4,Sousse,34,Intermédiaire,Indifférent,0,0.9,4.4,2
+USR0210,client,Les deux,5,Sfax,29,Intermédiaire,Indifférent,0,0.78,3.4,14
+USR0211,client,Développement,4,Bizerte,36,Avancé,Indifférent,100,0.58,3.7,15
+USR0212,client,Développement,3,Monastir,35,Avancé,Hybride,100,0.88,4.0,13
+USR0213,client,Design,11,Monastir,32,Débutant,Hybride,50,0.57,4.1,8
+USR0214,client,Développement,8,Tunis,34,Débutant,Online,250,0.52,3.0,14
+USR0215,client,Développement,10,Sfax,20,Avancé,Presentiel,0,0.61,3.9,12
+USR0216,client,Développement,10,Bizerte,33,Avancé,Indifférent,0,0.5,4.1,14
+USR0217,client,Développement,8,Sousse,35,Intermédiaire,Online,200,0.91,4.3,5
+USR0218,client,Les deux,2,Tunis,21,Avancé,Presentiel,50,0.6,4.1,10
+USR0219,client,Les deux,4,Monastir,20,Intermédiaire,Indifférent,150,0.78,5.0,6
+USR0220,client,Développement,10,Tunis,38,Avancé,Online,0,0.7,3.8,4
+USR0221,client,Design,10,Tunis,40,Débutant,Online,150,0.92,4.3,11
+USR0222,client,Développement,1,Bizerte,19,Débutant,Presentiel,250,0.94,4.0,7
+USR0223,client,Développement,1,Sousse,35,Avancé,Online,50,0.96,3.6,9
+USR0224,client,Les deux,9,Sfax,42,Avancé,Indifférent,0,0.65,4.1,14
+USR0225,client,Design,6,Bizerte,28,Intermédiaire,Presentiel,250,0.86,4.0,10
+USR0226,client,Les deux,0,Tunis,31,Débutant,Online,100,0.8,4.2,12
+USR0227,client,Design,12,Sousse,18,Avancé,Hybride,150,0.75,3.7,4
+USR0228,client,Les deux,6,Sfax,39,Avancé,Indifférent,0,0.89,3.6,14
+USR0229,client,Développement,1,Tunis,26,Débutant,Indifférent,250,0.89,3.3,5
+USR0230,client,Développement,5,Tunis,20,Débutant,Hybride,150,0.68,3.5,16
+USR0231,client,Développement,2,Monastir,32,Avancé,Indifférent,0,0.51,3.7,5
+USR0232,client,Développement,9,Sousse,45,Intermédiaire,Online,100,0.71,4.6,13
+USR0233,client,Design,8,Sfax,36,Avancé,Presentiel,250,0.69,3.3,14
+USR0234,client,Développement,7,Sfax,20,Débutant,Indifférent,100,0.71,4.0,9
+USR0235,client,Développement,4,Sfax,41,Avancé,Indifférent,200,0.81,3.9,2
+USR0236,client,Développement,0,Monastir,28,Avancé,Indifférent,100,0.72,3.9,13
+USR0237,client,Les deux,10,Bizerte,22,Intermédiaire,Hybride,200,0.97,3.4,13
+USR0238,client,Développement,6,Sousse,27,Avancé,Indifférent,200,0.89,3.7,4
+USR0239,client,Développement,12,Monastir,29,Débutant,Presentiel,200,1.0,3.4,6
+USR0240,client,Les deux,0,Monastir,40,Débutant,Indifférent,100,0.92,3.1,6
+USR0241,client,Les deux,12,Monastir,39,Intermédiaire,Presentiel,250,0.65,3.5,6
+USR0242,client,Développement,6,Monastir,20,Intermédiaire,Indifférent,200,0.7,4.0,8
+USR0243,client,Les deux,11,Monastir,35,Débutant,Hybride,250,0.95,4.1,4
+USR0244,client,Design,1,Tunis,42,Débutant,Hybride,50,0.82,3.1,11
+USR0245,client,Les deux,10,Monastir,42,Intermédiaire,Indifférent,0,0.51,3.5,6
+USR0246,client,Design,8,Bizerte,36,Avancé,Presentiel,150,0.69,3.9,6
+USR0247,client,Design,11,Bizerte,22,Intermédiaire,Online,150,0.55,3.8,14
+USR0248,client,Les deux,1,Sfax,29,Intermédiaire,Hybride,150,0.89,4.0,2
+USR0249,client,Développement,1,Monastir,41,Avancé,Indifférent,100,0.53,3.1,6
+USR0250,client,Design,0,Sousse,38,Débutant,Presentiel,250,0.62,3.3,8
+USR0251,client,Développement,8,Monastir,32,Débutant,Indifférent,250,0.59,4.3,4
+USR0252,client,Design,0,Bizerte,24,Intermédiaire,Indifférent,150,0.5,3.4,15
+USR0253,client,Développement,11,Tunis,36,Débutant,Presentiel,100,0.66,3.9,14
+USR0254,client,Développement,7,Bizerte,38,Intermédiaire,Indifférent,200,0.7,3.2,15
+USR0255,client,Développement,7,Bizerte,23,Avancé,Hybride,200,0.8,4.3,10
+USR0256,client,Développement,3,Sousse,21,Débutant,Hybride,250,0.57,3.8,6
+USR0257,client,Design,9,Monastir,31,Débutant,Indifférent,250,0.77,4.8,5
+USR0258,client,Les deux,2,Bizerte,23,Intermédiaire,Hybride,50,0.59,4.7,12
+USR0259,client,Design,5,Tunis,33,Débutant,Presentiel,150,0.98,4.0,9
+USR0260,client,Design,10,Monastir,31,Avancé,Indifférent,150,0.58,4.1,10
+USR0261,client,Les deux,3,Sousse,19,Intermédiaire,Presentiel,200,0.64,4.6,13
+USR0262,client,Design,12,Monastir,35,Avancé,Online,200,0.56,4.6,10
+USR0263,client,Les deux,5,Bizerte,44,Débutant,Indifférent,200,0.61,3.9,11
+USR0264,client,Design,10,Sfax,27,Débutant,Indifférent,100,0.67,4.6,15
+USR0265,client,Design,1,Sfax,24,Avancé,Hybride,250,0.81,3.9,6
+USR0266,client,Design,12,Sfax,44,Débutant,Online,200,0.68,3.6,7
+USR0267,client,Design,5,Sousse,27,Avancé,Hybride,200,0.99,4.4,9
+USR0268,client,Développement,12,Monastir,19,Intermédiaire,Presentiel,250,0.93,3.5,12
+USR0269,client,Design,3,Monastir,33,Débutant,Hybride,250,0.71,3.9,4
+USR0270,client,Design,12,Tunis,30,Avancé,Hybride,250,0.97,3.7,14
+USR0271,client,Les deux,5,Bizerte,18,Avancé,Online,250,0.99,4.3,14
+USR0272,client,Design,1,Bizerte,30,Débutant,Indifférent,50,0.75,3.6,2
+USR0273,client,Développement,8,Bizerte,22,Avancé,Indifférent,100,0.95,4.5,6
+USR0274,client,Développement,10,Monastir,18,Débutant,Presentiel,150,0.73,5.0,10
+USR0275,client,Design,11,Sfax,38,Intermédiaire,Presentiel,100,0.55,3.7,16
+USR0276,client,Développement,10,Sfax,19,Intermédiaire,Hybride,250,0.85,3.5,11
+USR0277,client,Design,11,Tunis,18,Débutant,Indifférent,0,0.57,3.5,9
+USR0278,client,Design,0,Tunis,40,Intermédiaire,Online,150,0.85,4.0,5
+USR0279,client,Développement,1,Tunis,21,Intermédiaire,Hybride,100,0.57,4.5,11
+USR0280,client,Les deux,2,Sfax,20,Avancé,Online,200,0.83,3.9,14
+USR0281,client,Design,10,Sfax,31,Avancé,Indifférent,50,0.54,3.2,3
+USR0282,client,Les deux,9,Monastir,29,Intermédiaire,Hybride,50,0.62,4.3,14
+USR0283,client,Développement,9,Bizerte,41,Avancé,Hybride,250,0.51,4.7,9
+USR0284,client,Les deux,3,Bizerte,37,Avancé,Presentiel,250,0.7,4.3,7
+USR0285,client,Les deux,12,Sfax,33,Intermédiaire,Online,50,0.75,4.2,8
+USR0286,client,Design,0,Sousse,28,Débutant,Indifférent,200,0.71,4.1,14
+USR0287,client,Développement,7,Tunis,18,Avancé,Online,0,0.63,3.1,5
+USR0288,client,Développement,12,Monastir,34,Intermédiaire,Indifférent,150,0.85,3.2,11
+USR0289,client,Design,9,Sfax,26,Débutant,Hybride,0,0.76,3.4,8
+USR0290,client,Les deux,8,Sousse,30,Avancé,Online,100,0.85,4.5,10
+USR0291,client,Les deux,0,Sfax,20,Intermédiaire,Online,150,0.81,3.1,10
+USR0292,client,Design,10,Sfax,21,Débutant,Presentiel,250,0.51,4.0,10
+USR0293,client,Développement,8,Sousse,23,Intermédiaire,Presentiel,250,0.89,3.5,11
+USR0294,client,Les deux,12,Tunis,28,Intermédiaire,Hybride,200,0.53,4.4,11
+USR0295,client,Design,1,Monastir,32,Avancé,Hybride,0,0.75,4.1,13
+USR0296,client,Développement,4,Tunis,36,Avancé,Online,50,0.87,3.0,10
+USR0297,client,Les deux,0,Sfax,19,Intermédiaire,Hybride,150,0.96,3.4,14
+USR0298,client,Les deux,0,Bizerte,43,Avancé,Indifférent,50,0.66,3.8,14
+USR0299,client,Design,4,Tunis,36,Intermédiaire,Online,200,0.84,3.1,3
+USR0300,client,Développement,8,Tunis,30,Débutant,Indifférent,100,0.89,3.6,9
+USR0301,client,Développement,7,Tunis,29,Débutant,Hybride,200,0.89,4.5,6
+USR0302,client,Développement,5,Bizerte,33,Débutant,Presentiel,50,0.5,3.8,15
+USR0303,client,Développement,5,Tunis,28,Débutant,Indifférent,250,0.86,3.2,9
+USR0304,client,Design,3,Monastir,33,Débutant,Presentiel,250,0.64,3.1,10
+USR0305,client,Développement,8,Monastir,40,Intermédiaire,Indifférent,250,0.54,3.2,12
+USR0306,client,Développement,6,Tunis,36,Avancé,Online,150,0.83,3.3,4
+USR0307,client,Développement,5,Monastir,40,Avancé,Hybride,100,0.73,3.5,6
+USR0308,client,Les deux,2,Bizerte,21,Débutant,Online,50,0.72,3.6,3
+USR0309,client,Développement,5,Sfax,32,Intermédiaire,Indifférent,100,0.93,3.2,4
+USR0310,client,Les deux,4,Bizerte,19,Débutant,Hybride,50,0.55,3.5,5
+USR0311,client,Développement,8,Tunis,39,Intermédiaire,Hybride,50,0.52,3.8,15
+USR0312,client,Design,11,Bizerte,25,Débutant,Indifférent,0,0.9,3.3,7
+USR0313,client,Développement,12,Sfax,22,Débutant,Indifférent,100,0.84,4.9,11
+USR0314,client,Développement,9,Sousse,44,Débutant,Online,0,0.6,4.3,14
+USR0315,client,Les deux,1,Sousse,21,Débutant,Indifférent,0,0.58,4.1,3
+USR0316,client,Les deux,6,Monastir,18,Intermédiaire,Indifférent,50,0.68,4.8,7
+USR0317,client,Développement,7,Sfax,19,Avancé,Presentiel,250,0.65,3.8,6
+USR0318,client,Design,0,Tunis,26,Intermédiaire,Presentiel,150,0.6,4.8,4
+USR0319,client,Design,10,Bizerte,43,Débutant,Indifférent,250,0.68,4.1,14
+USR0320,client,Design,9,Bizerte,28,Intermédiaire,Hybride,50,0.51,4.2,11
+USR0321,client,Développement,12,Sousse,19,Intermédiaire,Hybride,200,1.0,4.9,5
+USR0322,client,Développement,10,Sfax,26,Avancé,Online,50,0.79,5.0,5
+USR0323,client,Développement,2,Sfax,25,Avancé,Hybride,250,0.85,4.8,17
+USR0324,client,Développement,11,Sousse,36,Avancé,Presentiel,200,0.97,4.7,7
+USR0325,client,Les deux,7,Bizerte,27,Débutant,Indifférent,0,0.55,3.5,5
+USR0326,client,Développement,8,Monastir,18,Intermédiaire,Presentiel,50,0.67,3.4,11
+USR0327,client,Les deux,5,Tunis,18,Débutant,Presentiel,0,0.92,4.7,6
+USR0328,client,Les deux,5,Monastir,36,Débutant,Hybride,100,0.66,5.0,7
+USR0329,client,Design,6,Monastir,38,Intermédiaire,Presentiel,250,0.98,4.4,3
+USR0330,client,Les deux,12,Sousse,25,Avancé,Presentiel,150,0.65,4.4,2
+USR0331,client,Développement,11,Tunis,40,Avancé,Indifférent,200,0.52,4.2,13
+USR0332,client,Les deux,9,Sfax,38,Avancé,Online,150,0.57,4.5,8
+USR0333,client,Développement,5,Sfax,38,Débutant,Hybride,150,0.51,3.4,17
+USR0334,client,Design,5,Sousse,43,Débutant,Online,0,0.69,4.5,13
+USR0335,client,Les deux,6,Monastir,30,Intermédiaire,Indifférent,0,0.91,4.6,2
+USR0336,client,Design,12,Sfax,23,Intermédiaire,Online,0,0.65,3.6,4
+USR0337,client,Les deux,1,Sousse,23,Intermédiaire,Presentiel,250,0.54,4.9,9
+USR0338,client,Les deux,5,Bizerte,37,Intermédiaire,Online,150,0.97,3.3,9
+USR0339,client,Les deux,2,Tunis,21,Intermédiaire,Presentiel,50,0.7,4.1,4
+USR0340,client,Les deux,8,Sousse,39,Intermédiaire,Hybride,50,0.55,3.8,12
+USR0341,client,Design,7,Sfax,19,Intermédiaire,Online,150,0.54,4.6,7
+USR0342,client,Design,7,Sfax,21,Débutant,Presentiel,50,0.82,5.0,10
+USR0343,client,Design,1,Sousse,43,Intermédiaire,Indifférent,150,0.95,3.5,10
+USR0344,client,Design,6,Sfax,29,Intermédiaire,Hybride,50,0.72,3.5,9
+USR0345,client,Design,3,Sousse,36,Débutant,Presentiel,250,0.83,3.2,10
+USR0346,client,Développement,8,Monastir,42,Avancé,Presentiel,200,0.53,3.8,9
+USR0347,client,Design,8,Monastir,36,Débutant,Indifférent,100,0.54,4.8,11
+USR0348,client,Design,8,Bizerte,34,Avancé,Presentiel,0,0.97,3.9,7
+USR0349,client,Les deux,2,Sfax,43,Débutant,Presentiel,0,0.71,5.0,5
+USR0350,client,Design,10,Sfax,44,Avancé,Hybride,100,0.96,4.8,14
+USR0351,client,Développement,6,Bizerte,30,Avancé,Hybride,100,0.76,4.8,7
+USR0352,client,Développement,11,Bizerte,36,Avancé,Indifférent,0,0.71,3.3,11
+USR0353,client,Design,12,Tunis,21,Avancé,Online,100,0.93,4.8,4
+USR0354,client,Les deux,4,Monastir,38,Intermédiaire,Indifférent,0,0.59,3.8,2
+USR0355,client,Design,10,Monastir,19,Intermédiaire,Hybride,250,0.62,4.5,7
+USR0356,client,Les deux,5,Tunis,28,Intermédiaire,Hybride,100,0.92,4.7,3
+USR0357,client,Design,3,Sfax,27,Avancé,Indifférent,100,0.63,3.8,9
+USR0358,client,Design,3,Monastir,24,Intermédiaire,Indifférent,200,0.93,4.6,16
+USR0359,client,Design,2,Tunis,27,Avancé,Indifférent,50,0.89,4.0,8
+USR0360,client,Design,2,Sfax,44,Débutant,Online,50,0.52,3.1,15
+USR0361,client,Développement,3,Sousse,29,Intermédiaire,Indifférent,250,0.96,4.4,12
+USR0362,client,Développement,7,Bizerte,32,Débutant,Indifférent,200,0.78,3.7,17
+USR0363,client,Les deux,4,Tunis,27,Débutant,Indifférent,0,0.58,4.1,2
+USR0364,client,Les deux,3,Sfax,39,Débutant,Hybride,250,0.7,3.0,7
+USR0365,client,Les deux,12,Tunis,33,Débutant,Presentiel,200,0.9,3.4,13
+USR0366,client,Design,4,Sousse,31,Intermédiaire,Hybride,150,0.63,3.9,12
+USR0367,client,Design,9,Monastir,36,Débutant,Online,200,1.0,4.9,11
+USR0368,client,Les deux,8,Bizerte,37,Intermédiaire,Hybride,250,0.55,3.1,5
+USR0369,client,Les deux,10,Sousse,45,Intermédiaire,Hybride,250,0.86,4.8,7
+USR0370,client,Développement,2,Bizerte,42,Débutant,Online,200,0.7,3.6,15
+USR0371,client,Développement,0,Monastir,27,Intermédiaire,Indifférent,150,0.69,3.1,8
+USR0372,client,Design,9,Sfax,28,Avancé,Presentiel,250,0.77,4.6,12
+USR0373,client,Les deux,10,Sousse,34,Intermédiaire,Presentiel,250,0.94,3.4,10
+USR0374,client,Développement,2,Sousse,41,Avancé,Presentiel,250,0.95,4.3,9
+USR0375,client,Développement,3,Sousse,31,Intermédiaire,Hybride,100,0.79,3.9,5
+USR0376,client,Développement,0,Bizerte,36,Avancé,Online,150,0.94,4.0,6
+USR0377,client,Les deux,6,Bizerte,27,Intermédiaire,Online,50,0.57,3.4,4
+USR0378,client,Design,9,Monastir,22,Intermédiaire,Presentiel,0,0.74,4.3,4
+USR0379,client,Développement,10,Tunis,18,Intermédiaire,Hybride,50,0.88,3.3,16
+USR0380,client,Les deux,7,Tunis,22,Avancé,Indifférent,250,0.71,3.9,5
+USR0381,client,Design,0,Tunis,35,Débutant,Hybride,0,0.95,4.5,14
+USR0382,client,Design,0,Tunis,38,Avancé,Presentiel,50,0.85,3.7,6
+USR0383,client,Développement,6,Bizerte,36,Intermédiaire,Presentiel,0,0.91,3.6,12
+USR0384,client,Développement,11,Bizerte,37,Avancé,Hybride,150,0.94,5.0,3
+USR0385,client,Développement,7,Sousse,42,Débutant,Presentiel,150,0.51,3.4,15
+USR0386,client,Les deux,3,Tunis,36,Avancé,Presentiel,0,0.68,4.3,7
+USR0387,client,Développement,10,Sousse,42,Avancé,Online,200,1.0,4.3,5
+USR0388,client,Design,0,Tunis,40,Débutant,Indifférent,150,0.69,4.1,4
+USR0389,client,Design,2,Sfax,40,Avancé,Online,100,0.71,3.2,13
+USR0390,client,Design,9,Bizerte,40,Débutant,Indifférent,0,0.76,4.2,13
+USR0391,client,Développement,12,Tunis,33,Débutant,Presentiel,100,0.92,4.9,9
+USR0392,client,Développement,6,Sousse,23,Débutant,Indifférent,50,0.84,4.0,7
+USR0393,client,Développement,0,Tunis,21,Avancé,Indifférent,50,0.97,4.6,12
+USR0394,client,Développement,11,Tunis,26,Avancé,Presentiel,150,0.99,3.6,3
+USR0395,client,Design,1,Sfax,45,Débutant,Hybride,100,0.9,3.6,15
+USR0396,client,Design,1,Tunis,18,Débutant,Presentiel,100,0.68,3.9,13
+USR0397,client,Design,11,Tunis,29,Intermédiaire,Presentiel,0,0.7,4.9,9
+USR0398,client,Développement,6,Monastir,43,Intermédiaire,Presentiel,0,0.57,4.5,8
+USR0399,client,Les deux,2,Tunis,31,Avancé,Indifférent,200,0.84,3.4,7
+USR0400,client,Développement,5,Bizerte,18,Avancé,Presentiel,150,0.96,3.2,13
+USR0401,client,Design,0,Tunis,26,Avancé,Hybride,0,0.85,4.4,8
+USR0402,client,Les deux,9,Bizerte,25,Avancé,Hybride,200,0.76,4.4,14
+USR0403,client,Développement,10,Sfax,33,Intermédiaire,Indifférent,50,0.92,4.1,13
+USR0404,client,Les deux,0,Tunis,38,Débutant,Indifférent,150,0.93,3.1,7
+USR0405,client,Design,3,Sousse,26,Débutant,Presentiel,200,0.82,3.8,3
+USR0406,client,Développement,7,Monastir,43,Avancé,Indifférent,0,0.93,3.9,4
+USR0407,client,Développement,7,Tunis,21,Intermédiaire,Indifférent,0,0.78,3.0,15
+USR0408,client,Développement,9,Bizerte,38,Intermédiaire,Presentiel,250,0.84,4.9,12
+USR0409,client,Développement,0,Sfax,45,Intermédiaire,Hybride,200,0.88,4.2,4
+USR0410,client,Design,5,Monastir,21,Débutant,Presentiel,0,0.67,4.7,11
+USR0411,client,Les deux,4,Bizerte,34,Intermédiaire,Online,0,0.95,4.0,8
+USR0412,client,Les deux,11,Monastir,21,Intermédiaire,Presentiel,50,0.56,4.7,3
+USR0413,client,Développement,12,Sfax,40,Intermédiaire,Online,150,0.52,4.3,13
+USR0414,client,Design,1,Monastir,32,Avancé,Presentiel,150,0.5,4.5,6
+USR0415,client,Design,6,Bizerte,33,Avancé,Presentiel,250,0.79,4.5,6
+USR0416,client,Développement,6,Bizerte,37,Intermédiaire,Indifférent,150,0.99,4.8,3
+USR0417,client,Les deux,4,Monastir,28,Intermédiaire,Indifférent,50,0.57,4.2,10
+USR0418,client,Les deux,8,Sousse,44,Avancé,Hybride,250,0.87,4.1,4
+USR0419,client,Développement,3,Bizerte,40,Intermédiaire,Hybride,250,0.57,4.4,10
+USR0420,client,Les deux,2,Bizerte,35,Avancé,Hybride,250,0.56,3.7,2
+USR0421,client,Design,9,Monastir,39,Avancé,Hybride,150,0.9,4.0,9
+USR0422,client,Développement,2,Tunis,39,Débutant,Presentiel,100,0.88,3.3,8
+USR0423,client,Développement,4,Sfax,44,Débutant,Hybride,50,0.88,3.1,7
+USR0424,client,Les deux,1,Bizerte,45,Avancé,Presentiel,250,0.82,3.8,11
+USR0425,client,Design,12,Sousse,40,Avancé,Online,150,0.69,4.9,5
+USR0426,client,Les deux,5,Bizerte,19,Débutant,Hybride,50,0.81,4.6,8
+USR0427,client,Les deux,3,Sousse,42,Avancé,Presentiel,250,0.98,3.6,11
+USR0428,client,Développement,10,Tunis,23,Débutant,Online,150,0.52,3.6,3
+USR0429,client,Développement,2,Bizerte,45,Intermédiaire,Online,100,0.73,4.9,13
+USR0430,client,Développement,5,Bizerte,19,Avancé,Hybride,150,0.89,4.1,9
+USR0431,client,Développement,11,Sousse,34,Débutant,Presentiel,200,0.53,4.0,15
+USR0432,client,Design,8,Monastir,20,Intermédiaire,Presentiel,50,0.83,3.7,7
+USR0433,client,Développement,12,Bizerte,34,Intermédiaire,Online,0,0.83,3.9,4
+USR0434,client,Les deux,9,Bizerte,25,Débutant,Hybride,150,0.96,4.9,2
+USR0435,client,Développement,8,Sousse,18,Avancé,Hybride,200,0.9,3.9,16
+USR0436,client,Développement,10,Sfax,28,Avancé,Online,0,0.58,4.9,5
+USR0437,client,Design,0,Tunis,24,Avancé,Presentiel,250,0.71,3.2,11
+USR0438,client,Design,11,Monastir,38,Débutant,Presentiel,0,0.73,3.7,7
+USR0439,client,Développement,0,Sfax,43,Intermédiaire,Online,200,0.91,4.8,8
+USR0440,client,Design,7,Monastir,31,Intermédiaire,Online,150,0.84,4.1,5
+USR0441,client,Design,9,Tunis,42,Avancé,Online,250,0.92,3.7,2
+USR0442,client,Design,4,Sousse,37,Débutant,Hybride,150,0.69,4.6,7
+USR0443,client,Développement,2,Bizerte,25,Débutant,Indifférent,200,0.65,4.3,4
+USR0444,client,Développement,12,Sousse,18,Avancé,Presentiel,0,0.52,4.1,11
+USR0445,client,Développement,8,Tunis,27,Débutant,Hybride,50,0.71,4.3,12
+USR0446,client,Design,2,Sfax,25,Avancé,Hybride,50,0.56,4.3,4
+USR0447,client,Design,0,Bizerte,32,Avancé,Online,100,0.84,3.5,4
+USR0448,client,Développement,9,Monastir,28,Intermédiaire,Presentiel,250,0.83,3.2,13
+USR0449,client,Design,3,Sousse,33,Intermédiaire,Hybride,200,0.83,4.4,6
+USR0450,client,Développement,9,Sousse,43,Intermédiaire,Indifférent,50,0.5,3.5,14
+USR0451,client,Développement,11,Monastir,26,Intermédiaire,Presentiel,250,0.87,4.8,8
+USR0452,client,Design,5,Sousse,33,Avancé,Online,50,0.82,3.2,14
+USR0453,client,Développement,2,Bizerte,24,Intermédiaire,Online,250,0.54,3.0,3
+USR0454,client,Design,0,Bizerte,36,Intermédiaire,Presentiel,0,0.78,4.1,6
+USR0455,client,Les deux,7,Sfax,29,Intermédiaire,Presentiel,200,0.87,3.6,10
+USR0456,client,Design,8,Tunis,30,Intermédiaire,Online,250,0.62,4.9,8
+USR0457,client,Les deux,10,Sfax,42,Avancé,Presentiel,150,0.58,4.1,9
+USR0458,client,Design,2,Monastir,29,Débutant,Presentiel,150,0.62,3.5,9
+USR0459,client,Développement,10,Sfax,34,Intermédiaire,Indifférent,150,0.96,4.8,13
+USR0460,client,Développement,10,Sousse,21,Avancé,Hybride,250,0.63,4.1,4
+USR0461,client,Développement,10,Monastir,29,Avancé,Online,200,0.63,4.9,11
+USR0462,client,Développement,6,Sousse,44,Intermédiaire,Indifférent,150,0.94,3.0,16
+USR0463,client,Les deux,7,Sfax,25,Débutant,Hybride,50,0.58,3.3,6
+USR0464,client,Design,1,Sfax,31,Intermédiaire,Online,150,0.84,4.0,2
+USR0465,client,Design,10,Monastir,18,Débutant,Online,50,0.79,3.3,10
+USR0466,client,Design,0,Bizerte,22,Débutant,Presentiel,100,0.96,4.0,12
+USR0467,client,Design,9,Tunis,41,Avancé,Hybride,0,0.61,4.2,8
+USR0468,client,Design,7,Sfax,25,Intermédiaire,Presentiel,200,0.91,3.4,3
+USR0469,client,Design,4,Sfax,41,Avancé,Hybride,150,0.8,3.1,3
+USR0470,client,Développement,2,Tunis,18,Débutant,Indifférent,50,0.8,3.4,12
+USR0471,client,Les deux,9,Tunis,43,Avancé,Online,0,0.74,3.3,9
+USR0472,client,Design,0,Monastir,34,Intermédiaire,Hybride,0,0.85,3.9,14
+USR0473,client,Les deux,7,Monastir,29,Avancé,Online,150,0.57,4.0,6
+USR0474,client,Développement,1,Sousse,37,Avancé,Indifférent,100,0.59,4.4,15
+USR0475,client,Les deux,9,Bizerte,21,Avancé,Online,150,0.83,4.4,10
+USR0476,client,Développement,5,Tunis,22,Intermédiaire,Hybride,100,0.93,3.8,14
+USR0477,client,Développement,4,Monastir,42,Débutant,Indifférent,200,0.89,4.0,8
+USR0478,client,Développement,8,Monastir,26,Intermédiaire,Hybride,250,0.7,3.3,13
+USR0479,client,Les deux,1,Sfax,32,Avancé,Presentiel,0,0.61,3.8,14
+USR0480,client,Développement,8,Bizerte,40,Avancé,Online,50,0.69,4.3,13
+USR0481,client,Les deux,2,Monastir,37,Intermédiaire,Online,0,0.63,3.7,12
+USR0482,client,Design,11,Monastir,30,Avancé,Hybride,250,0.98,3.1,7
+USR0483,client,Les deux,2,Monastir,32,Débutant,Presentiel,250,0.97,4.0,13
+USR0484,client,Développement,12,Bizerte,34,Avancé,Presentiel,200,0.58,3.1,7
+USR0485,client,Développement,0,Sfax,20,Intermédiaire,Indifférent,100,0.83,3.8,10
+USR0486,client,Développement,0,Tunis,20,Avancé,Hybride,250,0.91,4.8,3
+USR0487,client,Développement,4,Sfax,37,Débutant,Indifférent,150,0.79,3.5,13
+USR0488,client,Design,1,Bizerte,20,Avancé,Hybride,100,0.97,4.6,7
+USR0489,client,Les deux,8,Bizerte,26,Avancé,Indifférent,150,0.78,4.5,3
+USR0490,client,Les deux,12,Monastir,39,Intermédiaire,Online,150,0.56,3.1,11
+USR0491,client,Design,3,Sfax,43,Intermédiaire,Indifférent,100,0.76,3.0,7
+USR0492,client,Les deux,3,Sousse,20,Intermédiaire,Hybride,0,0.78,3.4,9
+USR0493,client,Développement,3,Bizerte,26,Débutant,Presentiel,150,0.87,3.5,16
+USR0494,client,Développement,4,Sfax,25,Débutant,Presentiel,200,0.68,4.6,16
+USR0495,client,Développement,1,Monastir,37,Débutant,Online,150,0.69,3.6,13
+USR0496,client,Les deux,9,Sousse,33,Débutant,Hybride,150,0.61,4.2,5
+USR0497,client,Développement,12,Monastir,33,Avancé,Online,200,0.67,4.7,16
+USR0498,client,Les deux,7,Tunis,40,Avancé,Indifférent,100,0.84,3.0,12
+USR0499,client,Développement,9,Tunis,28,Intermédiaire,Hybride,50,0.77,3.5,3
+USR0500,client,Design,9,Sousse,29,Débutant,Indifférent,150,0.61,4.4,6
+USR0501,client,Développement,6,Sousse,32,Débutant,Presentiel,200,0.84,4.6,16
+USR0502,client,Design,12,Sfax,35,Intermédiaire,Indifférent,50,0.57,4.9,8
+USR0503,client,Développement,12,Tunis,23,Intermédiaire,Indifférent,50,1.0,4.7,6
+USR0504,client,Design,11,Sousse,43,Intermédiaire,Hybride,100,0.78,4.1,10
+USR0505,client,Développement,11,Sfax,19,Débutant,Hybride,150,0.92,3.2,17
+USR0506,client,Design,4,Sousse,29,Avancé,Hybride,100,0.51,3.2,14
+USR0507,client,Les deux,9,Sfax,36,Avancé,Presentiel,100,0.68,4.3,7
+USR0508,client,Design,11,Monastir,20,Intermédiaire,Hybride,150,0.82,3.3,13
+USR0509,client,Développement,12,Sousse,31,Avancé,Indifférent,0,0.54,3.7,17
+USR0510,client,Développement,10,Sousse,40,Intermédiaire,Indifférent,100,0.94,4.6,17
+USR0511,client,Les deux,11,Bizerte,34,Intermédiaire,Indifférent,50,0.59,3.0,10
+USR0512,client,Design,10,Sousse,41,Avancé,Online,50,0.58,3.2,9
+USR0513,client,Développement,7,Bizerte,19,Débutant,Indifférent,200,0.88,3.2,5
+USR0514,client,Développement,2,Tunis,38,Intermédiaire,Hybride,50,0.62,3.6,4
+USR0515,client,Design,2,Bizerte,44,Débutant,Online,0,0.83,4.7,15
+USR0516,client,Développement,7,Monastir,45,Avancé,Hybride,200,0.72,4.9,14
+USR0517,client,Design,2,Bizerte,37,Intermédiaire,Indifférent,200,0.82,4.1,13
+USR0518,client,Les deux,7,Bizerte,25,Débutant,Indifférent,100,0.68,3.5,11
+USR0519,client,Développement,0,Bizerte,44,Débutant,Hybride,100,0.73,3.0,6
+USR0520,client,Les deux,12,Monastir,27,Débutant,Indifférent,100,0.8,4.6,6
+USR0521,client,Design,3,Monastir,35,Intermédiaire,Indifférent,50,0.58,4.5,5
+USR0522,client,Développement,6,Sfax,26,Débutant,Indifférent,250,0.62,4.5,8
+USR0523,client,Les deux,12,Sousse,27,Avancé,Hybride,150,0.59,3.1,8
+USR0524,client,Développement,1,Monastir,37,Intermédiaire,Hybride,250,0.81,3.4,13
+USR0525,client,Développement,0,Bizerte,18,Débutant,Online,100,0.63,4.4,6
+USR0526,client,Design,3,Tunis,22,Débutant,Indifférent,50,0.67,3.6,14
+USR0527,client,Les deux,5,Monastir,40,Débutant,Hybride,0,0.92,4.9,10
+USR0528,client,Développement,12,Monastir,20,Avancé,Indifférent,50,0.6,4.7,14
+USR0529,client,Les deux,0,Tunis,42,Avancé,Presentiel,150,0.89,3.9,8
+USR0530,client,Design,0,Sfax,32,Avancé,Online,200,0.83,3.4,8
+USR0531,client,Développement,4,Sousse,23,Avancé,Online,250,0.97,4.0,4
+USR0532,client,Développement,10,Sousse,24,Intermédiaire,Online,250,0.61,3.2,14
+USR0533,client,Design,5,Tunis,23,Intermédiaire,Online,150,0.89,3.0,13
+USR0534,client,Développement,12,Monastir,40,Avancé,Presentiel,100,0.89,3.5,13
+USR0535,client,Design,10,Bizerte,28,Avancé,Online,0,0.68,3.3,9
+USR0536,client,Design,1,Sfax,33,Débutant,Hybride,200,0.89,4.5,8
+USR0537,client,Les deux,7,Sfax,18,Avancé,Indifférent,100,0.86,3.5,15
+USR0538,client,Développement,11,Monastir,35,Intermédiaire,Indifférent,50,0.78,4.1,6
+USR0539,client,Développement,7,Sousse,45,Avancé,Presentiel,0,0.77,3.9,10
+USR0540,client,Les deux,8,Sousse,32,Débutant,Indifférent,250,0.59,3.0,11
+USR0541,client,Les deux,12,Bizerte,25,Intermédiaire,Online,250,0.98,4.6,9
+USR0542,client,Développement,10,Monastir,42,Avancé,Presentiel,200,0.64,3.8,7
+USR0543,client,Développement,1,Bizerte,39,Débutant,Online,50,0.59,3.1,10
+USR0544,client,Développement,3,Tunis,19,Avancé,Indifférent,250,0.74,4.2,8
+USR0545,client,Design,0,Sousse,25,Avancé,Online,0,0.97,3.4,4
+USR0546,client,Design,1,Monastir,43,Avancé,Online,100,0.78,4.9,6
+USR0547,client,Design,5,Tunis,44,Avancé,Hybride,200,0.52,3.1,5
+USR0548,client,Développement,3,Bizerte,21,Débutant,Presentiel,200,0.69,3.4,9
+USR0549,client,Design,9,Sfax,35,Avancé,Indifférent,250,0.55,4.3,11
+USR0550,client,Développement,7,Monastir,21,Débutant,Presentiel,200,0.7,3.7,4
+USR0551,client,Développement,9,Monastir,29,Intermédiaire,Hybride,100,0.71,4.3,2
+USR0552,client,Les deux,5,Bizerte,25,Avancé,Presentiel,150,0.88,4.9,5
+USR0553,client,Développement,7,Monastir,30,Débutant,Online,100,0.8,4.0,5
+USR0554,client,Les deux,4,Tunis,27,Débutant,Presentiel,100,0.51,4.6,11
+USR0555,client,Design,4,Bizerte,34,Avancé,Presentiel,0,0.52,3.7,5
+USR0556,client,Développement,5,Bizerte,25,Débutant,Hybride,100,0.55,3.8,10
+USR0557,client,Les deux,11,Tunis,41,Intermédiaire,Indifférent,50,0.74,4.8,6
+USR0558,client,Design,1,Bizerte,38,Intermédiaire,Online,250,0.9,3.8,3
+USR0559,client,Les deux,12,Sousse,29,Intermédiaire,Indifférent,0,0.93,3.5,15
+USR0560,client,Design,9,Tunis,38,Avancé,Indifférent,0,0.65,3.1,10
+USR0561,client,Design,2,Sousse,34,Avancé,Presentiel,50,0.53,4.5,12
+USR0562,client,Développement,7,Bizerte,36,Avancé,Online,50,0.72,4.6,11
+USR0563,client,Développement,5,Tunis,33,Avancé,Online,200,0.7,3.2,2
+USR0564,client,Design,12,Sfax,42,Débutant,Indifférent,200,0.6,3.8,7
+USR0565,client,Design,8,Bizerte,41,Avancé,Presentiel,50,0.54,4.6,9
+USR0566,client,Développement,9,Tunis,21,Avancé,Indifférent,150,0.68,3.4,11
+USR0567,client,Développement,10,Tunis,42,Intermédiaire,Presentiel,100,0.81,5.0,9
+USR0568,client,Design,2,Monastir,19,Débutant,Presentiel,250,0.69,4.5,15
+USR0569,client,Les deux,1,Tunis,25,Avancé,Presentiel,100,0.51,4.4,9
+USR0570,client,Développement,7,Monastir,18,Intermédiaire,Presentiel,250,0.77,3.4,10
+USR0571,client,Design,4,Bizerte,33,Avancé,Presentiel,250,0.85,3.0,5
+USR0572,client,Design,10,Bizerte,19,Intermédiaire,Presentiel,0,0.64,4.6,11
+USR0573,client,Design,0,Monastir,38,Débutant,Online,150,0.83,4.3,9
+USR0574,client,Les deux,5,Tunis,18,Intermédiaire,Indifférent,50,0.99,4.0,2
+USR0575,client,Design,5,Monastir,45,Avancé,Online,50,0.6,4.9,4
+USR0576,client,Design,11,Tunis,19,Débutant,Hybride,100,0.74,4.5,15
+USR0577,client,Développement,10,Sousse,29,Avancé,Hybride,50,1.0,5.0,7
+USR0578,client,Développement,0,Sousse,30,Débutant,Hybride,50,0.58,4.8,6
+USR0579,client,Design,1,Monastir,34,Avancé,Presentiel,150,0.62,3.3,13
+USR0580,client,Les deux,9,Sousse,32,Avancé,Presentiel,50,0.83,4.2,12
+USR0581,client,Design,3,Sfax,27,Avancé,Presentiel,150,1.0,5.0,6
+USR0582,client,Développement,9,Sfax,28,Débutant,Online,50,0.66,4.8,13
+USR0583,client,Design,12,Sousse,31,Intermédiaire,Hybride,150,0.87,4.6,8
+USR0584,client,Design,11,Sousse,22,Débutant,Online,50,0.59,4.5,10
+USR0585,client,Design,4,Bizerte,36,Avancé,Presentiel,200,0.62,4.4,14
+USR0586,client,Développement,11,Monastir,22,Avancé,Indifférent,250,0.82,3.4,5
+USR0587,client,Développement,7,Sfax,23,Débutant,Presentiel,0,0.7,4.9,9
+USR0588,client,Les deux,6,Sfax,41,Avancé,Presentiel,50,0.53,4.9,8
+USR0589,client,Les deux,9,Monastir,40,Intermédiaire,Indifférent,50,0.71,4.6,9
+USR0590,client,Design,6,Sousse,30,Avancé,Online,200,0.55,3.9,8
+USR0591,client,Les deux,3,Bizerte,35,Intermédiaire,Online,200,0.69,4.5,10
+USR0592,client,Les deux,3,Sousse,32,Intermédiaire,Hybride,100,0.73,3.8,2
+USR0593,client,Design,0,Bizerte,22,Intermédiaire,Indifférent,0,0.86,3.2,13
+USR0594,client,Les deux,11,Bizerte,22,Intermédiaire,Indifférent,100,0.73,3.4,6
+USR0595,client,Design,11,Sfax,32,Débutant,Hybride,100,0.85,4.8,9
+USR0596,client,Les deux,11,Tunis,20,Débutant,Indifférent,250,0.68,4.0,15
+USR0597,client,Développement,12,Bizerte,37,Débutant,Indifférent,200,0.69,4.5,13
+USR0598,client,Les deux,9,Sfax,23,Débutant,Presentiel,250,0.53,3.6,2
+USR0599,client,Design,7,Sousse,38,Débutant,Online,50,0.98,3.0,6
+USR0600,client,Les deux,0,Monastir,33,Intermédiaire,Online,200,0.94,3.5,9
+USR0601,freelancer,Design,7,Monastir,31,Intermédiaire,Online,200,0.8,3.5,16
+USR0602,freelancer,Design,9,Bizerte,44,Débutant,Online,50,0.57,4.3,7
+USR0603,freelancer,Développement,0,Bizerte,44,Avancé,Hybride,100,0.96,3.1,5
+USR0604,freelancer,Design,2,Sfax,39,Intermédiaire,Presentiel,150,0.87,3.7,10
+USR0605,freelancer,Développement,12,Sousse,28,Intermédiaire,Indifférent,0,0.88,4.7,6
+USR0606,freelancer,Développement,7,Sfax,21,Avancé,Hybride,100,0.76,4.0,10
+USR0607,freelancer,Design,9,Tunis,21,Avancé,Online,150,0.86,4.2,4
+USR0608,freelancer,Les deux,11,Sousse,31,Avancé,Hybride,100,0.76,5.0,11
+USR0609,freelancer,Développement,2,Bizerte,36,Intermédiaire,Indifférent,150,0.9,4.8,10
+USR0610,freelancer,Développement,4,Sfax,18,Débutant,Online,150,0.81,3.2,10
+USR0611,freelancer,Les deux,12,Bizerte,31,Intermédiaire,Online,100,0.67,4.6,7
+USR0612,freelancer,Développement,10,Sfax,40,Intermédiaire,Hybride,0,0.65,4.0,9
+USR0613,freelancer,Développement,0,Tunis,39,Intermédiaire,Hybride,150,0.86,4.2,2
+USR0614,freelancer,Développement,2,Sfax,28,Intermédiaire,Indifférent,150,0.9,4.3,8
+USR0615,freelancer,Design,10,Monastir,45,Avancé,Hybride,150,0.89,3.8,5
+USR0616,freelancer,Design,8,Sousse,36,Avancé,Hybride,200,0.77,3.4,9
+USR0617,freelancer,Design,12,Sousse,20,Débutant,Hybride,0,0.67,3.8,11
+USR0618,freelancer,Design,2,Bizerte,37,Intermédiaire,Presentiel,200,0.56,4.6,9
+USR0619,freelancer,Développement,5,Tunis,26,Intermédiaire,Online,150,0.94,3.7,12
+USR0620,freelancer,Les deux,4,Sfax,34,Intermédiaire,Presentiel,0,0.69,3.1,11
+USR0621,freelancer,Développement,1,Monastir,34,Débutant,Indifférent,200,0.58,3.7,9
+USR0622,freelancer,Design,8,Sousse,42,Intermédiaire,Presentiel,0,0.91,4.9,15
+USR0623,freelancer,Design,2,Sfax,41,Débutant,Indifférent,150,0.86,4.0,14
+USR0624,freelancer,Développement,0,Bizerte,45,Débutant,Hybride,150,0.94,3.2,2
+USR0625,freelancer,Les deux,11,Sousse,18,Avancé,Hybride,250,0.95,3.6,12
+USR0626,freelancer,Développement,4,Bizerte,28,Intermédiaire,Online,100,0.57,3.5,17
+USR0627,freelancer,Développement,9,Bizerte,34,Débutant,Presentiel,200,0.68,3.6,16
+USR0628,freelancer,Développement,11,Sousse,36,Débutant,Presentiel,0,0.66,4.8,10
+USR0629,freelancer,Design,0,Sfax,18,Intermédiaire,Online,0,0.69,3.2,3
+USR0630,freelancer,Développement,11,Bizerte,36,Avancé,Indifférent,200,0.68,3.7,10
+USR0631,freelancer,Développement,12,Bizerte,20,Intermédiaire,Presentiel,0,0.91,4.8,17
+USR0632,freelancer,Design,7,Sousse,39,Avancé,Indifférent,150,0.62,3.4,17
+USR0633,freelancer,Les deux,9,Sousse,29,Intermédiaire,Presentiel,250,0.96,3.7,5
+USR0634,freelancer,Les deux,5,Monastir,33,Débutant,Online,150,0.56,4.0,8
+USR0635,freelancer,Les deux,4,Sousse,37,Avancé,Presentiel,200,0.55,4.6,14
+USR0636,freelancer,Les deux,5,Bizerte,38,Débutant,Hybride,200,0.73,4.2,2
+USR0637,freelancer,Développement,3,Bizerte,23,Intermédiaire,Indifférent,0,0.67,4.6,7
+USR0638,freelancer,Design,12,Monastir,36,Intermédiaire,Presentiel,50,0.83,3.2,12
+USR0639,freelancer,Les deux,9,Monastir,21,Avancé,Indifférent,100,0.78,4.6,8
+USR0640,freelancer,Développement,6,Tunis,37,Débutant,Indifférent,100,0.75,4.3,13
+USR0641,freelancer,Développement,2,Bizerte,42,Avancé,Online,50,0.83,3.9,17
+USR0642,freelancer,Développement,9,Bizerte,32,Débutant,Presentiel,250,0.94,3.6,12
+USR0643,freelancer,Les deux,10,Sousse,31,Avancé,Hybride,0,0.79,4.2,11
+USR0644,freelancer,Design,2,Sousse,19,Intermédiaire,Online,0,0.85,4.6,7
+USR0645,freelancer,Développement,4,Tunis,25,Intermédiaire,Indifférent,250,0.66,3.8,6
+USR0646,freelancer,Développement,8,Sfax,39,Débutant,Indifférent,50,0.59,3.8,14
+USR0647,freelancer,Les deux,6,Sfax,27,Avancé,Presentiel,50,0.51,4.3,9
+USR0648,freelancer,Développement,7,Monastir,22,Débutant,Presentiel,250,0.9,4.7,10
+USR0649,freelancer,Les deux,11,Bizerte,31,Avancé,Presentiel,150,0.75,4.1,4
+USR0650,freelancer,Design,5,Sfax,23,Intermédiaire,Online,200,0.75,4.5,10
+USR0651,freelancer,Design,4,Monastir,35,Avancé,Hybride,0,0.99,4.1,15
+USR0652,freelancer,Design,1,Bizerte,33,Avancé,Online,50,0.87,4.1,11
+USR0653,freelancer,Les deux,12,Sousse,32,Avancé,Online,200,0.94,3.2,12
+USR0654,freelancer,Design,11,Tunis,39,Avancé,Hybride,200,0.53,3.7,3
+USR0655,freelancer,Les deux,7,Monastir,34,Intermédiaire,Hybride,150,0.68,5.0,5
+USR0656,freelancer,Développement,2,Tunis,40,Avancé,Hybride,250,0.89,3.5,5
+USR0657,freelancer,Design,9,Sfax,36,Débutant,Hybride,250,0.81,3.6,15
+USR0658,freelancer,Développement,8,Tunis,45,Intermédiaire,Hybride,50,0.81,3.6,16
+USR0659,freelancer,Développement,11,Tunis,37,Débutant,Presentiel,250,0.72,4.6,7
+USR0660,freelancer,Développement,11,Sfax,33,Débutant,Online,100,0.99,4.9,10
+USR0661,freelancer,Design,2,Monastir,42,Intermédiaire,Indifférent,50,0.83,4.5,9
+USR0662,freelancer,Développement,9,Sousse,19,Avancé,Hybride,0,0.53,3.9,6
+USR0663,freelancer,Design,7,Bizerte,25,Intermédiaire,Indifférent,150,0.63,4.1,16
+USR0664,freelancer,Design,4,Monastir,30,Avancé,Hybride,200,0.84,3.1,5
+USR0665,freelancer,Les deux,10,Sousse,45,Intermédiaire,Hybride,100,0.64,4.6,6
+USR0666,freelancer,Développement,9,Monastir,32,Avancé,Presentiel,250,0.84,4.5,7
+USR0667,freelancer,Design,10,Sfax,28,Avancé,Online,250,0.5,3.1,10
+USR0668,freelancer,Design,8,Tunis,39,Intermédiaire,Hybride,50,0.86,3.5,10
+USR0669,freelancer,Développement,9,Tunis,19,Avancé,Presentiel,200,0.82,4.4,11
+USR0670,freelancer,Développement,9,Sfax,30,Avancé,Presentiel,0,0.85,3.5,7
+USR0671,freelancer,Design,1,Monastir,26,Intermédiaire,Hybride,100,0.58,3.1,12
+USR0672,freelancer,Les deux,6,Monastir,28,Débutant,Hybride,100,0.59,3.1,5
+USR0673,freelancer,Les deux,3,Bizerte,30,Débutant,Indifférent,0,0.57,4.5,3
+USR0674,freelancer,Développement,10,Tunis,32,Avancé,Hybride,0,0.52,3.1,10
+USR0675,freelancer,Design,12,Monastir,18,Intermédiaire,Presentiel,250,0.82,4.9,15
+USR0676,freelancer,Design,4,Sfax,40,Intermédiaire,Indifférent,200,0.5,4.4,9
+USR0677,freelancer,Les deux,7,Monastir,30,Avancé,Online,200,0.61,3.8,12
+USR0678,freelancer,Design,12,Monastir,21,Avancé,Hybride,100,0.84,3.8,5
+USR0679,freelancer,Design,10,Tunis,29,Avancé,Hybride,0,0.92,4.5,6
+USR0680,freelancer,Développement,3,Sfax,35,Débutant,Indifférent,250,0.6,4.4,9
+USR0681,freelancer,Les deux,10,Sousse,33,Débutant,Indifférent,250,0.59,3.1,8
+USR0682,freelancer,Développement,9,Sfax,33,Intermédiaire,Online,200,0.82,4.0,11
+USR0683,freelancer,Les deux,12,Monastir,18,Débutant,Hybride,0,0.67,4.4,7
+USR0684,freelancer,Design,3,Bizerte,32,Avancé,Presentiel,250,0.79,4.8,13
+USR0685,freelancer,Développement,2,Monastir,38,Débutant,Indifférent,200,0.52,4.4,16
+USR0686,freelancer,Développement,2,Tunis,27,Débutant,Indifférent,200,0.59,4.2,14
+USR0687,freelancer,Les deux,1,Tunis,33,Avancé,Presentiel,0,0.9,3.9,4
+USR0688,freelancer,Les deux,11,Monastir,28,Débutant,Presentiel,100,0.92,4.6,13
+USR0689,freelancer,Les deux,9,Sfax,28,Débutant,Online,100,0.57,3.8,7
+USR0690,freelancer,Design,8,Sfax,32,Débutant,Online,50,0.55,4.7,14
+USR0691,freelancer,Design,12,Sfax,18,Intermédiaire,Online,0,0.5,4.9,5
+USR0692,freelancer,Design,9,Sousse,31,Avancé,Indifférent,250,0.56,3.3,8
+USR0693,freelancer,Développement,7,Monastir,25,Débutant,Online,200,0.59,4.0,5
+USR0694,freelancer,Les deux,10,Sousse,29,Intermédiaire,Online,200,0.62,3.2,5
+USR0695,freelancer,Design,1,Bizerte,29,Avancé,Presentiel,150,0.89,4.3,14
+USR0696,freelancer,Développement,3,Tunis,43,Débutant,Indifférent,150,0.59,4.3,6
+USR0697,freelancer,Développement,10,Sousse,27,Débutant,Indifférent,100,0.67,4.6,4
+USR0698,freelancer,Les deux,0,Tunis,41,Débutant,Presentiel,50,0.89,4.0,5
+USR0699,freelancer,Développement,3,Monastir,36,Avancé,Hybride,150,0.6,4.4,13
+USR0700,freelancer,Développement,12,Tunis,28,Débutant,Online,50,0.87,4.7,15
+USR0701,freelancer,Développement,3,Tunis,33,Avancé,Indifférent,0,0.95,3.3,11
+USR0702,freelancer,Les deux,7,Sfax,30,Intermédiaire,Presentiel,150,0.86,4.3,4
+USR0703,freelancer,Les deux,3,Sousse,22,Débutant,Online,100,0.57,4.7,10
+USR0704,freelancer,Design,2,Sousse,25,Intermédiaire,Presentiel,250,0.98,4.8,5
+USR0705,freelancer,Design,8,Sfax,20,Intermédiaire,Indifférent,50,0.8,4.7,10
+USR0706,freelancer,Développement,11,Monastir,41,Débutant,Presentiel,100,0.72,3.4,10
+USR0707,freelancer,Les deux,2,Bizerte,18,Intermédiaire,Online,0,1.0,4.5,15
+USR0708,freelancer,Design,6,Bizerte,30,Intermédiaire,Online,150,0.75,3.2,15
+USR0709,freelancer,Les deux,11,Monastir,24,Débutant,Hybride,100,0.62,5.0,15
+USR0710,freelancer,Développement,10,Sousse,23,Avancé,Indifférent,200,0.87,3.0,4
+USR0711,freelancer,Design,12,Sfax,45,Avancé,Indifférent,50,0.89,3.7,7
+USR0712,freelancer,Design,10,Tunis,45,Avancé,Online,150,0.95,3.7,9
+USR0713,freelancer,Développement,6,Sousse,40,Avancé,Presentiel,250,0.54,4.8,14
+USR0714,freelancer,Design,0,Bizerte,39,Intermédiaire,Online,0,0.69,3.9,12
+USR0715,freelancer,Développement,5,Sfax,38,Avancé,Online,200,0.85,3.4,14
+USR0716,freelancer,Les deux,3,Bizerte,21,Avancé,Indifférent,250,0.97,4.2,4
+USR0717,freelancer,Les deux,3,Sfax,28,Intermédiaire,Hybride,200,0.84,3.6,12
+USR0718,freelancer,Développement,5,Monastir,33,Avancé,Online,150,0.85,4.4,5
+USR0719,freelancer,Design,4,Monastir,37,Intermédiaire,Online,50,0.95,3.9,15
+USR0720,freelancer,Développement,2,Sousse,20,Débutant,Presentiel,100,0.56,3.3,7
+USR0721,freelancer,Développement,3,Bizerte,38,Débutant,Hybride,150,0.98,4.1,12
+USR0722,freelancer,Développement,5,Monastir,32,Avancé,Online,100,0.59,3.0,13
+USR0723,freelancer,Les deux,8,Sousse,31,Avancé,Hybride,250,0.82,3.7,12
+USR0724,freelancer,Design,11,Bizerte,44,Avancé,Indifférent,150,0.65,3.3,13
+USR0725,freelancer,Les deux,2,Sousse,25,Intermédiaire,Hybride,100,0.88,3.1,10
+USR0726,freelancer,Développement,7,Sfax,37,Débutant,Hybride,50,0.99,4.7,13
+USR0727,freelancer,Design,10,Sfax,23,Débutant,Online,0,1.0,4.1,10
+USR0728,freelancer,Design,5,Sfax,24,Avancé,Online,250,0.66,3.7,9
+USR0729,freelancer,Développement,8,Sfax,35,Intermédiaire,Online,0,0.7,4.0,14
+USR0730,freelancer,Développement,7,Sousse,22,Débutant,Hybride,250,0.85,3.9,2
+USR0731,freelancer,Développement,12,Bizerte,39,Débutant,Indifférent,100,0.84,4.5,9
+USR0732,freelancer,Les deux,2,Bizerte,21,Intermédiaire,Online,150,0.81,3.4,6
+USR0733,freelancer,Développement,5,Tunis,37,Avancé,Presentiel,200,0.76,4.6,12
+USR0734,freelancer,Les deux,3,Tunis,20,Avancé,Indifférent,250,0.84,3.2,10
+USR0735,freelancer,Design,3,Monastir,28,Avancé,Online,250,0.68,3.3,8
+USR0736,freelancer,Les deux,5,Monastir,29,Débutant,Hybride,100,0.68,5.0,12
+USR0737,freelancer,Les deux,1,Sfax,41,Intermédiaire,Indifférent,150,0.64,4.6,6
+USR0738,freelancer,Les deux,6,Monastir,22,Avancé,Online,50,0.6,3.9,12
+USR0739,freelancer,Les deux,5,Tunis,36,Intermédiaire,Online,0,0.7,4.8,11
+USR0740,freelancer,Design,8,Monastir,40,Avancé,Presentiel,50,0.59,3.8,5
+USR0741,freelancer,Design,0,Sousse,44,Avancé,Hybride,150,0.78,3.9,12
+USR0742,freelancer,Développement,0,Sfax,26,Intermédiaire,Indifférent,0,0.83,4.8,4
+USR0743,freelancer,Design,7,Sfax,18,Débutant,Hybride,150,1.0,3.1,5
+USR0744,freelancer,Design,9,Monastir,36,Intermédiaire,Hybride,250,0.84,4.9,8
+USR0745,freelancer,Les deux,5,Bizerte,41,Avancé,Online,100,0.58,3.1,14
+USR0746,freelancer,Développement,11,Sfax,29,Débutant,Online,100,0.68,4.3,6
+USR0747,freelancer,Les deux,0,Sousse,27,Avancé,Online,200,0.6,4.3,3
+USR0748,freelancer,Les deux,9,Sfax,35,Intermédiaire,Hybride,250,0.9,3.5,5
+USR0749,freelancer,Design,5,Tunis,35,Avancé,Hybride,50,0.51,4.0,8
+USR0750,freelancer,Développement,7,Monastir,28,Débutant,Online,50,0.58,3.4,5
+USR0751,freelancer,Développement,8,Bizerte,40,Avancé,Online,150,0.73,3.2,2
+USR0752,freelancer,Les deux,0,Monastir,29,Intermédiaire,Hybride,50,0.91,4.8,13
+USR0753,freelancer,Design,12,Sousse,23,Avancé,Hybride,0,0.87,3.2,12
+USR0754,freelancer,Développement,11,Sfax,40,Débutant,Hybride,50,0.6,5.0,9
+USR0755,freelancer,Design,12,Tunis,20,Débutant,Indifférent,150,0.52,3.2,14
+USR0756,freelancer,Les deux,8,Bizerte,19,Intermédiaire,Online,100,0.52,3.6,6
+USR0757,freelancer,Développement,1,Tunis,37,Débutant,Presentiel,50,0.84,3.1,5
+USR0758,freelancer,Développement,11,Sousse,36,Intermédiaire,Hybride,50,0.93,4.6,12
+USR0759,freelancer,Design,8,Bizerte,20,Débutant,Online,200,0.61,3.4,12
+USR0760,freelancer,Développement,12,Bizerte,18,Avancé,Online,50,0.96,4.7,2
+USR0761,freelancer,Design,11,Bizerte,23,Intermédiaire,Online,50,0.92,5.0,17
+USR0762,freelancer,Design,8,Sfax,31,Débutant,Hybride,0,0.73,4.0,8
+USR0763,freelancer,Design,5,Sousse,35,Avancé,Online,0,0.66,3.2,11
+USR0764,freelancer,Développement,9,Sousse,39,Intermédiaire,Presentiel,200,0.7,5.0,13
+USR0765,freelancer,Design,1,Monastir,39,Intermédiaire,Presentiel,0,1.0,4.0,7
+USR0766,freelancer,Développement,7,Bizerte,39,Avancé,Online,0,0.57,3.8,9
+USR0767,freelancer,Design,1,Sfax,20,Intermédiaire,Presentiel,100,0.6,4.7,14
+USR0768,freelancer,Design,3,Monastir,41,Intermédiaire,Hybride,250,0.88,4.2,5
+USR0769,freelancer,Les deux,12,Monastir,29,Intermédiaire,Indifférent,150,0.76,3.3,8
+USR0770,freelancer,Design,1,Sousse,33,Intermédiaire,Presentiel,250,0.97,3.1,5
+USR0771,freelancer,Design,1,Monastir,39,Débutant,Presentiel,150,0.8,3.7,10
+USR0772,freelancer,Développement,9,Tunis,42,Débutant,Indifférent,150,0.6,4.3,4
+USR0773,freelancer,Design,4,Bizerte,28,Avancé,Online,0,1.0,4.8,16
+USR0774,freelancer,Développement,7,Sousse,45,Intermédiaire,Indifférent,150,0.52,3.4,11
+USR0775,freelancer,Design,12,Sousse,40,Débutant,Indifférent,150,0.57,4.4,8
+USR0776,freelancer,Design,1,Bizerte,39,Intermédiaire,Indifférent,150,0.78,3.3,11
+USR0777,freelancer,Développement,4,Monastir,36,Intermédiaire,Hybride,100,0.66,3.1,7
+USR0778,freelancer,Développement,5,Sousse,43,Avancé,Online,250,0.67,3.2,5
+USR0779,freelancer,Développement,5,Monastir,29,Débutant,Presentiel,50,0.62,3.6,12
+USR0780,freelancer,Développement,11,Tunis,45,Intermédiaire,Online,100,0.58,4.1,12
+USR0781,freelancer,Développement,10,Monastir,36,Avancé,Indifférent,100,0.51,3.9,12
+USR0782,freelancer,Développement,5,Monastir,36,Intermédiaire,Hybride,200,0.55,4.0,14
+USR0783,freelancer,Design,3,Sousse,33,Avancé,Hybride,50,0.81,3.7,11
+USR0784,freelancer,Design,7,Tunis,44,Avancé,Presentiel,100,0.63,3.6,12
+USR0785,freelancer,Design,12,Sfax,37,Avancé,Online,250,0.92,3.2,10
+USR0786,freelancer,Développement,1,Bizerte,43,Avancé,Indifférent,150,0.6,4.6,15
+USR0787,freelancer,Design,4,Bizerte,43,Intermédiaire,Indifférent,250,0.77,3.4,11
+USR0788,freelancer,Design,9,Bizerte,32,Avancé,Presentiel,0,0.81,4.0,14
+USR0789,freelancer,Développement,7,Sfax,39,Avancé,Indifférent,100,0.97,4.1,12
+USR0790,freelancer,Design,12,Monastir,36,Avancé,Online,200,0.6,3.9,5
+USR0791,freelancer,Développement,11,Sousse,45,Intermédiaire,Indifférent,100,0.93,4.8,14
+USR0792,freelancer,Design,6,Sousse,44,Intermédiaire,Presentiel,100,0.84,3.5,8
+USR0793,freelancer,Développement,2,Sfax,18,Débutant,Hybride,150,0.74,5.0,6
+USR0794,freelancer,Design,0,Sfax,23,Intermédiaire,Presentiel,0,0.63,4.6,14
+USR0795,freelancer,Design,2,Tunis,41,Intermédiaire,Online,0,0.93,3.2,12
+USR0796,freelancer,Design,1,Monastir,29,Avancé,Online,150,0.97,4.4,16
+USR0797,freelancer,Développement,1,Bizerte,41,Avancé,Online,200,0.83,4.2,8
+USR0798,freelancer,Les deux,8,Sousse,33,Débutant,Presentiel,200,0.56,4.6,11
+USR0799,freelancer,Développement,9,Monastir,43,Avancé,Presentiel,150,0.61,3.2,13
+USR0800,freelancer,Développement,4,Monastir,31,Intermédiaire,Online,150,0.77,4.4,16
+USR0801,freelancer,Développement,8,Monastir,33,Avancé,Presentiel,100,0.94,4.9,12
+USR0802,freelancer,Développement,11,Sousse,44,Intermédiaire,Online,250,0.98,4.2,13
+USR0803,freelancer,Les deux,10,Tunis,40,Avancé,Presentiel,100,0.78,3.6,6
+USR0804,freelancer,Les deux,5,Tunis,35,Débutant,Indifférent,150,0.5,4.9,2
+USR0805,freelancer,Les deux,4,Sousse,20,Débutant,Hybride,50,0.93,3.3,13
+USR0806,freelancer,Design,5,Monastir,43,Débutant,Hybride,0,0.91,4.9,12
+USR0807,freelancer,Design,6,Sousse,40,Intermédiaire,Online,50,0.85,4.0,16
+USR0808,freelancer,Développement,9,Bizerte,41,Intermédiaire,Indifférent,250,0.51,3.1,4
+USR0809,freelancer,Design,10,Monastir,43,Avancé,Presentiel,0,0.7,4.3,8
+USR0810,freelancer,Développement,1,Tunis,23,Débutant,Presentiel,200,0.84,4.6,5
+USR0811,freelancer,Développement,7,Sfax,26,Débutant,Hybride,100,0.6,3.8,12
+USR0812,freelancer,Développement,6,Bizerte,25,Débutant,Online,200,0.82,4.3,6
+USR0813,freelancer,Les deux,7,Sfax,26,Avancé,Presentiel,0,0.7,3.9,11
+USR0814,freelancer,Développement,1,Sousse,23,Avancé,Online,0,0.86,3.9,3
+USR0815,freelancer,Les deux,7,Monastir,21,Débutant,Presentiel,50,0.97,4.6,10
+USR0816,freelancer,Développement,11,Monastir,30,Débutant,Indifférent,50,0.8,5.0,7
+USR0817,freelancer,Développement,10,Sfax,31,Débutant,Indifférent,50,0.51,5.0,9
+USR0818,freelancer,Développement,7,Sfax,29,Avancé,Indifférent,0,0.51,3.3,5
+USR0819,freelancer,Développement,11,Monastir,39,Débutant,Indifférent,250,0.71,4.2,9
+USR0820,freelancer,Développement,8,Tunis,19,Intermédiaire,Presentiel,150,0.95,5.0,6
+USR0821,freelancer,Les deux,12,Bizerte,40,Avancé,Online,0,0.63,4.2,8
+USR0822,freelancer,Développement,6,Sousse,22,Avancé,Online,200,0.59,3.3,10
+USR0823,freelancer,Design,5,Monastir,22,Débutant,Hybride,250,0.77,3.3,12
+USR0824,freelancer,Développement,0,Sfax,33,Intermédiaire,Hybride,150,0.64,4.8,4
+USR0825,freelancer,Design,12,Sousse,34,Intermédiaire,Indifférent,50,0.66,5.0,14
+USR0826,freelancer,Les deux,2,Bizerte,45,Avancé,Indifférent,0,0.59,3.1,7
+USR0827,freelancer,Développement,7,Sousse,23,Avancé,Indifférent,150,0.56,4.8,6
+USR0828,freelancer,Design,7,Sousse,40,Avancé,Indifférent,150,0.75,4.7,12
+USR0829,freelancer,Les deux,1,Sousse,20,Débutant,Hybride,50,0.92,4.5,12
+USR0830,freelancer,Les deux,9,Bizerte,24,Avancé,Online,200,0.88,3.4,2
+USR0831,freelancer,Les deux,3,Monastir,39,Débutant,Hybride,0,0.64,5.0,13
+USR0832,freelancer,Développement,5,Bizerte,21,Intermédiaire,Presentiel,0,0.54,4.7,11
+USR0833,freelancer,Design,7,Sousse,37,Avancé,Online,100,0.98,4.3,17
+USR0834,freelancer,Les deux,5,Bizerte,22,Débutant,Online,250,0.64,4.6,12
+USR0835,freelancer,Design,8,Bizerte,30,Débutant,Indifférent,100,0.59,4.9,8
+USR0836,freelancer,Les deux,1,Tunis,45,Débutant,Presentiel,150,0.89,3.6,14
+USR0837,freelancer,Les deux,10,Sfax,21,Intermédiaire,Indifférent,150,0.87,4.8,9
+USR0838,freelancer,Les deux,9,Sfax,29,Avancé,Online,100,0.76,4.0,12
+USR0839,freelancer,Les deux,7,Sousse,36,Avancé,Indifférent,0,0.88,4.6,6
+USR0840,freelancer,Design,6,Monastir,20,Débutant,Hybride,150,0.84,4.3,12
+USR0841,freelancer,Design,7,Bizerte,38,Avancé,Online,100,0.73,3.2,12
+USR0842,freelancer,Les deux,4,Sfax,22,Avancé,Hybride,50,0.76,3.6,6
+USR0843,freelancer,Développement,1,Tunis,34,Débutant,Indifférent,150,0.55,4.3,4
+USR0844,freelancer,Design,4,Sousse,26,Avancé,Online,200,0.51,4.5,16
+USR0845,freelancer,Design,12,Sfax,44,Intermédiaire,Online,0,0.71,4.4,5
+USR0846,freelancer,Développement,11,Monastir,42,Avancé,Indifférent,200,0.9,3.7,10
+USR0847,freelancer,Les deux,12,Sfax,24,Débutant,Online,250,0.99,3.5,15
+USR0848,freelancer,Design,6,Bizerte,18,Débutant,Indifférent,0,0.51,4.3,15
+USR0849,freelancer,Design,6,Bizerte,41,Intermédiaire,Hybride,200,0.91,4.2,14
+USR0850,freelancer,Design,11,Monastir,43,Intermédiaire,Online,50,0.57,3.4,11
+USR0851,freelancer,Les deux,11,Sfax,45,Débutant,Presentiel,150,0.82,4.3,2
+USR0852,freelancer,Design,10,Bizerte,24,Débutant,Hybride,150,0.57,3.8,11
+USR0853,freelancer,Développement,2,Monastir,33,Intermédiaire,Online,150,0.79,3.4,14
+USR0854,freelancer,Design,6,Tunis,28,Débutant,Online,250,0.92,3.9,8
+USR0855,freelancer,Design,7,Bizerte,37,Avancé,Hybride,0,0.74,4.0,14
+USR0856,freelancer,Design,9,Monastir,25,Avancé,Online,200,0.51,4.2,5
+USR0857,freelancer,Design,4,Monastir,33,Débutant,Indifférent,200,0.97,3.7,3
+USR0858,freelancer,Design,0,Sfax,27,Avancé,Presentiel,150,0.67,3.5,14
+USR0859,freelancer,Développement,10,Sousse,37,Avancé,Indifférent,50,0.94,4.4,15
+USR0860,freelancer,Développement,6,Sousse,43,Intermédiaire,Presentiel,200,0.6,4.4,4
+USR0861,freelancer,Développement,7,Sfax,23,Débutant,Presentiel,200,0.75,4.6,13
+USR0862,freelancer,Les deux,7,Sousse,25,Débutant,Online,0,0.68,3.5,11
+USR0863,freelancer,Design,2,Bizerte,19,Débutant,Hybride,150,0.56,3.5,14
+USR0864,freelancer,Design,7,Sousse,28,Intermédiaire,Online,200,0.63,3.3,5
+USR0865,freelancer,Design,8,Bizerte,39,Débutant,Online,150,0.9,4.9,17
+USR0866,freelancer,Les deux,1,Bizerte,37,Débutant,Online,200,0.55,4.3,3
+USR0867,freelancer,Les deux,5,Sfax,41,Intermédiaire,Indifférent,200,0.75,4.7,3
+USR0868,freelancer,Développement,5,Sousse,44,Débutant,Online,50,0.72,3.8,12
+USR0869,freelancer,Les deux,3,Monastir,28,Intermédiaire,Presentiel,0,0.63,4.4,11
+USR0870,freelancer,Design,10,Sfax,22,Avancé,Indifférent,50,0.57,3.9,12
+USR0871,freelancer,Les deux,7,Bizerte,43,Avancé,Hybride,0,0.72,4.5,10
+USR0872,freelancer,Design,8,Tunis,20,Intermédiaire,Hybride,150,0.99,3.3,10
+USR0873,freelancer,Développement,12,Tunis,39,Avancé,Presentiel,200,0.53,4.3,17
+USR0874,freelancer,Design,10,Bizerte,27,Intermédiaire,Indifférent,250,0.85,4.7,8
+USR0875,freelancer,Design,5,Sousse,18,Intermédiaire,Presentiel,250,0.7,4.3,8
+USR0876,freelancer,Les deux,9,Bizerte,38,Intermédiaire,Hybride,250,0.7,3.4,11
+USR0877,freelancer,Développement,0,Bizerte,28,Intermédiaire,Presentiel,200,1.0,3.6,5
+USR0878,freelancer,Développement,8,Sousse,34,Intermédiaire,Presentiel,0,0.51,4.6,10
+USR0879,freelancer,Design,3,Sousse,41,Intermédiaire,Online,250,0.53,3.7,4
+USR0880,freelancer,Design,5,Tunis,19,Avancé,Online,150,0.65,4.5,7
+USR0881,freelancer,Design,3,Bizerte,36,Avancé,Presentiel,100,0.65,4.3,2
+USR0882,freelancer,Les deux,9,Sfax,40,Intermédiaire,Presentiel,0,0.66,4.2,2
+USR0883,freelancer,Les deux,5,Monastir,21,Débutant,Indifférent,150,0.54,3.1,15
+USR0884,freelancer,Les deux,7,Sfax,32,Débutant,Hybride,250,0.76,4.2,9
+USR0885,freelancer,Design,6,Sousse,36,Intermédiaire,Indifférent,150,0.84,4.9,10
+USR0886,freelancer,Design,6,Sfax,22,Avancé,Presentiel,150,0.86,3.3,3
+USR0887,freelancer,Design,8,Tunis,40,Débutant,Indifférent,150,0.52,3.3,8
+USR0888,freelancer,Design,1,Bizerte,45,Intermédiaire,Online,0,0.68,3.6,8
+USR0889,freelancer,Design,1,Sousse,27,Intermédiaire,Hybride,100,0.74,4.6,14
+USR0890,freelancer,Développement,9,Monastir,19,Intermédiaire,Hybride,50,0.59,4.5,5
+USR0891,freelancer,Développement,8,Sousse,20,Débutant,Indifférent,150,0.79,4.1,3
+USR0892,freelancer,Les deux,12,Monastir,33,Avancé,Presentiel,50,0.75,3.9,6
+USR0893,freelancer,Design,7,Sfax,45,Avancé,Hybride,0,0.9,4.3,9
+USR0894,freelancer,Design,3,Monastir,28,Avancé,Online,250,0.95,4.5,2
+USR0895,freelancer,Design,2,Tunis,36,Avancé,Hybride,200,0.82,4.3,10
+USR0896,freelancer,Développement,9,Bizerte,36,Débutant,Presentiel,150,0.75,3.0,6
+USR0897,freelancer,Design,8,Sfax,18,Intermédiaire,Presentiel,50,0.91,4.7,12
+USR0898,freelancer,Design,1,Bizerte,37,Intermédiaire,Indifférent,200,0.52,4.7,7
+USR0899,freelancer,Développement,6,Sfax,31,Débutant,Hybride,150,0.63,3.2,14
+USR0900,freelancer,Développement,2,Sousse,22,Débutant,Hybride,0,0.58,4.9,11
+USR0901,freelancer,Design,0,Bizerte,28,Débutant,Online,250,0.53,3.8,14
+USR0902,freelancer,Développement,6,Sousse,26,Intermédiaire,Online,0,0.6,4.5,12
+USR0903,freelancer,Design,7,Bizerte,42,Avancé,Indifférent,0,0.63,3.6,13
+USR0904,freelancer,Design,1,Monastir,18,Intermédiaire,Presentiel,0,0.63,4.9,17
+USR0905,freelancer,Design,3,Bizerte,38,Débutant,Hybride,200,0.7,3.2,17
+USR0906,freelancer,Design,3,Sfax,29,Avancé,Presentiel,50,0.77,3.8,3
+USR0907,freelancer,Les deux,7,Tunis,18,Intermédiaire,Hybride,250,0.99,3.0,9
+USR0908,freelancer,Les deux,7,Sousse,37,Intermédiaire,Indifférent,100,0.92,3.4,13
+USR0909,freelancer,Les deux,4,Tunis,23,Avancé,Online,100,0.54,4.4,14
+USR0910,freelancer,Les deux,11,Bizerte,26,Intermédiaire,Presentiel,200,0.75,4.6,10
+USR0911,freelancer,Les deux,5,Sousse,42,Avancé,Indifférent,100,0.62,5.0,3
+USR0912,freelancer,Développement,7,Bizerte,28,Débutant,Presentiel,250,0.96,4.2,5
+USR0913,freelancer,Développement,0,Sfax,31,Avancé,Indifférent,150,0.77,4.6,13
+USR0914,freelancer,Design,1,Bizerte,18,Avancé,Indifférent,250,0.56,4.9,7
+USR0915,freelancer,Développement,9,Sousse,30,Débutant,Online,0,0.73,4.9,5
+USR0916,freelancer,Design,3,Tunis,42,Intermédiaire,Hybride,50,0.54,4.2,9
+USR0917,freelancer,Développement,11,Sfax,25,Intermédiaire,Hybride,0,0.64,4.8,12
+USR0918,freelancer,Design,3,Tunis,24,Avancé,Indifférent,0,0.93,4.1,13
+USR0919,freelancer,Design,8,Sfax,39,Avancé,Presentiel,0,0.79,4.5,7
+USR0920,freelancer,Développement,9,Sfax,34,Avancé,Hybride,50,0.92,3.0,14
+USR0921,freelancer,Les deux,10,Bizerte,37,Intermédiaire,Indifférent,0,0.97,4.3,14
+USR0922,freelancer,Les deux,0,Sousse,31,Intermédiaire,Hybride,0,0.84,3.9,12
+USR0923,freelancer,Développement,12,Tunis,41,Débutant,Online,100,0.96,4.1,8
+USR0924,freelancer,Développement,6,Sfax,28,Débutant,Online,250,0.61,4.4,16
+USR0925,freelancer,Les deux,3,Sfax,23,Intermédiaire,Hybride,0,0.81,3.2,9
+USR0926,freelancer,Design,12,Tunis,36,Avancé,Hybride,100,0.62,3.9,3
+USR0927,freelancer,Les deux,0,Sousse,34,Débutant,Online,200,0.81,4.5,7
+USR0928,freelancer,Design,9,Tunis,20,Débutant,Online,150,0.66,4.7,14
+USR0929,freelancer,Développement,2,Tunis,43,Intermédiaire,Online,100,0.81,3.9,4
+USR0930,freelancer,Développement,0,Bizerte,19,Intermédiaire,Indifférent,150,0.55,4.5,9
+USR0931,freelancer,Développement,9,Bizerte,18,Intermédiaire,Indifférent,150,0.9,4.8,7
+USR0932,freelancer,Design,5,Tunis,32,Avancé,Hybride,200,0.6,3.2,13
+USR0933,freelancer,Design,1,Bizerte,43,Débutant,Presentiel,250,0.75,3.7,8
+USR0934,freelancer,Design,9,Monastir,23,Débutant,Presentiel,0,0.53,3.6,10
+USR0935,freelancer,Design,10,Sousse,27,Avancé,Presentiel,50,0.73,4.2,15
+USR0936,freelancer,Développement,0,Bizerte,36,Avancé,Presentiel,0,0.62,4.6,5
+USR0937,freelancer,Design,0,Monastir,29,Débutant,Presentiel,250,0.95,4.6,3
+USR0938,freelancer,Développement,10,Monastir,40,Avancé,Indifférent,200,0.85,4.7,14
+USR0939,freelancer,Design,5,Bizerte,27,Intermédiaire,Hybride,50,0.55,4.8,8
+USR0940,freelancer,Les deux,7,Sfax,18,Avancé,Presentiel,250,0.62,4.2,13
+USR0941,freelancer,Développement,11,Sousse,43,Avancé,Indifférent,50,0.7,4.7,6
+USR0942,freelancer,Développement,0,Tunis,29,Débutant,Online,50,0.65,3.4,11
+USR0943,freelancer,Design,12,Sousse,19,Débutant,Presentiel,50,0.64,3.4,7
+USR0944,freelancer,Développement,2,Sousse,45,Avancé,Presentiel,50,0.6,3.4,7
+USR0945,freelancer,Développement,1,Tunis,44,Avancé,Presentiel,150,0.83,4.8,9
+USR0946,freelancer,Développement,3,Sousse,32,Débutant,Hybride,100,0.83,4.9,9
+USR0947,freelancer,Les deux,9,Monastir,40,Débutant,Online,50,0.94,3.3,15
+USR0948,freelancer,Développement,8,Monastir,40,Intermédiaire,Hybride,200,0.71,4.3,9
+USR0949,freelancer,Les deux,12,Bizerte,36,Débutant,Hybride,50,0.66,3.1,2
+USR0950,freelancer,Les deux,2,Bizerte,36,Intermédiaire,Presentiel,250,0.54,3.9,3
+USR0951,freelancer,Design,1,Sfax,34,Intermédiaire,Hybride,150,0.76,3.4,15
+USR0952,freelancer,Design,8,Monastir,40,Intermédiaire,Indifférent,100,0.79,4.3,11
+USR0953,freelancer,Les deux,10,Tunis,24,Débutant,Presentiel,150,0.93,3.8,15
+USR0954,freelancer,Développement,6,Bizerte,23,Intermédiaire,Hybride,200,0.54,4.5,10
+USR0955,freelancer,Développement,8,Sousse,25,Avancé,Online,150,0.76,3.7,16
+USR0956,freelancer,Design,6,Monastir,29,Intermédiaire,Hybride,100,0.69,3.4,7
+USR0957,freelancer,Développement,10,Tunis,29,Débutant,Hybride,200,0.76,4.3,14
+USR0958,freelancer,Les deux,3,Tunis,21,Débutant,Hybride,0,0.77,3.7,14
+USR0959,freelancer,Design,4,Sousse,41,Avancé,Hybride,50,0.85,5.0,6
+USR0960,freelancer,Les deux,12,Bizerte,26,Débutant,Hybride,100,0.91,4.6,10
+USR0961,freelancer,Design,6,Bizerte,42,Avancé,Online,150,0.83,5.0,6
+USR0962,freelancer,Les deux,6,Sfax,25,Avancé,Presentiel,150,0.62,4.2,5
+USR0963,freelancer,Design,7,Monastir,28,Débutant,Hybride,50,0.71,4.9,14
+USR0964,freelancer,Design,7,Monastir,45,Avancé,Online,100,0.57,4.7,11
+USR0965,freelancer,Développement,11,Tunis,33,Avancé,Hybride,100,0.61,3.9,13
+USR0966,freelancer,Les deux,12,Bizerte,27,Intermédiaire,Online,200,0.89,4.8,2
+USR0967,freelancer,Développement,5,Bizerte,38,Avancé,Indifférent,150,0.6,3.8,13
+USR0968,freelancer,Design,3,Monastir,21,Intermédiaire,Indifférent,250,0.95,3.2,10
+USR0969,freelancer,Développement,8,Sfax,19,Avancé,Indifférent,0,0.59,3.1,14
+USR0970,freelancer,Les deux,4,Sfax,25,Intermédiaire,Online,150,0.53,4.0,10
+USR0971,freelancer,Développement,6,Monastir,23,Débutant,Presentiel,200,0.71,4.5,15
+USR0972,freelancer,Développement,3,Sfax,45,Débutant,Hybride,150,0.91,4.3,2
+USR0973,freelancer,Développement,9,Sousse,36,Débutant,Indifférent,100,0.6,5.0,10
+USR0974,freelancer,Design,6,Bizerte,43,Débutant,Hybride,200,0.94,3.9,10
+USR0975,freelancer,Design,11,Tunis,27,Avancé,Indifférent,100,0.85,4.4,14
+USR0976,freelancer,Développement,9,Sfax,31,Débutant,Presentiel,200,0.87,3.9,8
+USR0977,freelancer,Les deux,2,Bizerte,21,Intermédiaire,Online,50,0.94,3.3,9
+USR0978,freelancer,Les deux,8,Sousse,39,Débutant,Presentiel,150,0.71,4.5,3
+USR0979,freelancer,Développement,5,Tunis,42,Débutant,Hybride,150,0.73,3.5,7
+USR0980,freelancer,Design,7,Tunis,20,Avancé,Indifférent,150,0.67,3.8,4
+USR0981,freelancer,Développement,0,Tunis,26,Débutant,Presentiel,100,0.84,3.9,5
+USR0982,freelancer,Design,1,Bizerte,39,Débutant,Indifférent,50,0.74,3.6,5
+USR0983,freelancer,Développement,0,Bizerte,21,Débutant,Hybride,0,0.77,3.8,10
+USR0984,freelancer,Développement,12,Tunis,39,Intermédiaire,Presentiel,150,0.68,3.4,9
+USR0985,freelancer,Développement,10,Bizerte,24,Intermédiaire,Online,250,0.91,4.3,11
+USR0986,freelancer,Design,1,Monastir,40,Intermédiaire,Indifférent,0,0.8,3.1,7
+USR0987,freelancer,Développement,3,Sfax,29,Débutant,Presentiel,0,0.51,3.1,16
+USR0988,freelancer,Développement,3,Tunis,25,Débutant,Presentiel,250,0.58,3.8,3
+USR0989,freelancer,Développement,5,Sousse,35,Avancé,Presentiel,200,0.6,4.1,12
+USR0990,freelancer,Les deux,1,Sfax,24,Débutant,Hybride,100,0.59,3.8,10
+USR0991,freelancer,Développement,6,Sfax,32,Débutant,Online,250,0.91,4.3,7
+USR0992,freelancer,Développement,1,Sfax,31,Intermédiaire,Indifférent,0,0.86,4.6,10
+USR0993,freelancer,Les deux,9,Sfax,26,Débutant,Hybride,250,0.85,4.4,7
+USR0994,freelancer,Les deux,11,Sfax,28,Débutant,Hybride,250,0.74,3.7,2
+USR0995,freelancer,Design,9,Monastir,30,Avancé,Presentiel,200,0.79,5.0,12
+USR0996,freelancer,Développement,9,Tunis,27,Débutant,Indifférent,50,0.81,3.1,17
+USR0997,freelancer,Développement,4,Sfax,22,Intermédiaire,Presentiel,250,0.52,4.8,17
+USR0998,freelancer,Design,7,Sousse,22,Intermédiaire,Hybride,250,0.89,3.1,9
+USR0999,freelancer,Les deux,6,Sousse,42,Débutant,Presentiel,250,0.67,3.5,14
+USR1000,freelancer,Design,10,Sfax,43,Avancé,Presentiel,200,0.94,4.0,11
+USR1001,freelancer,Développement,10,Tunis,20,Intermédiaire,Online,50,0.53,5.0,7
+USR1002,freelancer,Les deux,2,Tunis,23,Avancé,Presentiel,50,0.75,3.9,6
+USR1003,freelancer,Design,2,Sfax,25,Intermédiaire,Presentiel,200,0.62,3.6,4
+USR1004,freelancer,Design,10,Sfax,26,Intermédiaire,Online,100,0.7,3.3,8
+USR1005,freelancer,Design,8,Bizerte,41,Intermédiaire,Presentiel,150,0.51,3.8,4
+USR1006,freelancer,Les deux,12,Sousse,37,Avancé,Presentiel,200,0.86,3.5,2
+USR1007,freelancer,Design,7,Sousse,30,Avancé,Indifférent,0,0.67,4.4,14
+USR1008,freelancer,Développement,3,Tunis,18,Avancé,Hybride,150,0.7,3.8,13
+USR1009,freelancer,Développement,11,Sousse,30,Intermédiaire,Hybride,250,0.99,3.1,17
+USR1010,freelancer,Les deux,1,Monastir,36,Débutant,Presentiel,150,0.98,4.5,4
+USR1011,freelancer,Les deux,5,Bizerte,40,Intermédiaire,Hybride,250,0.53,3.8,11
+USR1012,freelancer,Design,3,Sfax,33,Débutant,Hybride,250,0.85,3.1,10
+USR1013,freelancer,Design,2,Sousse,37,Intermédiaire,Presentiel,100,0.62,4.2,4
+USR1014,freelancer,Design,2,Tunis,21,Débutant,Indifférent,150,0.85,4.9,10
+USR1015,freelancer,Développement,3,Monastir,23,Intermédiaire,Hybride,250,0.65,4.9,3
+USR1016,freelancer,Design,6,Bizerte,27,Avancé,Indifférent,250,0.93,3.2,13
+USR1017,freelancer,Design,12,Sousse,44,Débutant,Hybride,250,0.6,4.5,10
+USR1018,freelancer,Design,0,Sfax,44,Intermédiaire,Online,0,0.53,4.4,5
+USR1019,freelancer,Design,10,Sousse,41,Intermédiaire,Presentiel,50,0.69,4.4,12
+USR1020,freelancer,Développement,2,Bizerte,21,Intermédiaire,Presentiel,50,0.6,4.5,16
+USR1021,freelancer,Les deux,3,Sousse,45,Intermédiaire,Indifférent,250,0.96,3.2,14
+USR1022,freelancer,Design,1,Sousse,20,Intermédiaire,Online,100,0.53,3.1,11
+USR1023,freelancer,Développement,7,Tunis,18,Débutant,Hybride,0,0.83,4.6,6
+USR1024,freelancer,Développement,3,Bizerte,43,Débutant,Indifférent,200,0.76,4.9,9
+USR1025,freelancer,Développement,7,Monastir,42,Intermédiaire,Indifférent,100,0.69,4.8,6
+USR1026,freelancer,Les deux,3,Sousse,39,Intermédiaire,Indifférent,200,0.53,3.7,6
+USR1027,freelancer,Développement,1,Tunis,32,Avancé,Indifférent,250,0.92,4.9,11
+USR1028,freelancer,Développement,1,Bizerte,26,Avancé,Presentiel,100,0.73,4.4,9
+USR1029,freelancer,Les deux,8,Monastir,39,Débutant,Online,250,0.98,4.6,8
+USR1030,freelancer,Développement,5,Tunis,43,Avancé,Hybride,250,0.72,4.2,5
+USR1031,freelancer,Design,9,Tunis,29,Intermédiaire,Indifférent,250,0.93,4.8,2
+USR1032,freelancer,Design,4,Bizerte,24,Avancé,Presentiel,200,0.94,4.6,13
+USR1033,freelancer,Design,0,Sfax,33,Débutant,Hybride,250,1.0,5.0,2
+USR1034,freelancer,Design,7,Tunis,33,Avancé,Presentiel,50,0.61,4.5,5
+USR1035,freelancer,Design,1,Tunis,31,Avancé,Online,50,0.96,3.7,11
+USR1036,freelancer,Développement,4,Sfax,41,Intermédiaire,Indifférent,250,0.56,3.3,5
+USR1037,freelancer,Design,11,Monastir,20,Avancé,Hybride,50,0.97,4.5,14
+USR1038,freelancer,Design,10,Sousse,30,Avancé,Indifférent,250,0.82,4.1,12
+USR1039,freelancer,Les deux,12,Sfax,25,Intermédiaire,Online,100,0.54,3.2,7
+USR1040,freelancer,Design,3,Tunis,36,Intermédiaire,Presentiel,100,0.98,4.2,4
+USR1041,freelancer,Développement,0,Bizerte,35,Débutant,Indifférent,150,0.66,3.7,12
+USR1042,freelancer,Design,12,Sfax,34,Avancé,Presentiel,0,0.7,4.1,10
+USR1043,freelancer,Design,2,Sousse,44,Débutant,Indifférent,250,0.73,4.2,12
+USR1044,freelancer,Développement,10,Tunis,37,Intermédiaire,Hybride,200,1.0,3.2,8
+USR1045,freelancer,Les deux,11,Bizerte,33,Avancé,Presentiel,150,0.65,4.9,5
+USR1046,freelancer,Développement,12,Sousse,22,Avancé,Presentiel,250,0.97,3.5,12
+USR1047,freelancer,Design,12,Sfax,45,Intermédiaire,Indifférent,100,0.99,4.3,14
+USR1048,freelancer,Les deux,0,Bizerte,30,Intermédiaire,Indifférent,250,0.74,3.7,2
+USR1049,freelancer,Développement,1,Bizerte,41,Intermédiaire,Hybride,250,0.96,4.4,6
+USR1050,freelancer,Design,1,Sfax,28,Avancé,Online,250,0.65,4.3,4
+USR1051,freelancer,Design,7,Monastir,27,Débutant,Presentiel,50,0.9,3.4,14
+USR1052,freelancer,Design,5,Bizerte,21,Avancé,Presentiel,150,0.98,3.9,15
+USR1053,freelancer,Les deux,0,Tunis,29,Intermédiaire,Presentiel,0,0.56,4.0,14
+USR1054,freelancer,Développement,6,Sfax,38,Avancé,Indifférent,50,0.52,3.5,6
+USR1055,freelancer,Design,11,Bizerte,23,Avancé,Indifférent,250,1.0,4.3,9
+USR1056,freelancer,Développement,7,Monastir,26,Avancé,Indifférent,100,0.51,3.2,13
+USR1057,freelancer,Développement,10,Bizerte,25,Débutant,Indifférent,100,0.85,3.2,6
+USR1058,freelancer,Design,6,Monastir,38,Avancé,Indifférent,100,0.79,3.2,11
+USR1059,freelancer,Développement,12,Bizerte,23,Intermédiaire,Online,150,0.78,4.1,12
+USR1060,freelancer,Les deux,7,Tunis,34,Avancé,Online,50,0.98,4.8,11
+USR1061,freelancer,Développement,9,Sfax,18,Avancé,Indifférent,100,0.56,3.3,2
+USR1062,freelancer,Développement,2,Tunis,35,Intermédiaire,Online,0,0.99,4.0,4
+USR1063,freelancer,Développement,8,Sfax,31,Avancé,Online,50,0.65,4.9,10
+USR1064,freelancer,Design,12,Sousse,39,Avancé,Indifférent,50,0.79,4.4,5
+USR1065,freelancer,Design,5,Bizerte,35,Avancé,Presentiel,250,0.55,4.6,16
+USR1066,freelancer,Développement,3,Sfax,27,Débutant,Presentiel,200,0.78,4.2,6
+USR1067,freelancer,Développement,11,Bizerte,31,Débutant,Hybride,100,0.69,4.8,7
+USR1068,freelancer,Design,1,Sousse,39,Intermédiaire,Presentiel,200,0.6,4.3,14
+USR1069,freelancer,Développement,10,Sfax,40,Intermédiaire,Presentiel,150,0.91,3.6,5
+USR1070,freelancer,Les deux,6,Tunis,37,Débutant,Online,100,0.56,3.2,5
+USR1071,freelancer,Design,1,Sousse,38,Débutant,Hybride,100,0.89,3.3,14
+USR1072,freelancer,Les deux,4,Tunis,21,Intermédiaire,Presentiel,150,0.98,4.6,15
+USR1073,freelancer,Développement,8,Sousse,36,Intermédiaire,Online,200,0.67,4.1,3
+USR1074,freelancer,Développement,4,Bizerte,21,Débutant,Presentiel,100,0.97,3.8,8
+USR1075,freelancer,Développement,11,Bizerte,35,Avancé,Indifférent,150,0.8,3.5,9
+USR1076,freelancer,Design,11,Sfax,39,Débutant,Presentiel,150,0.78,3.5,8
+USR1077,freelancer,Les deux,10,Sousse,40,Débutant,Indifférent,250,0.73,3.9,9
+USR1078,freelancer,Développement,7,Bizerte,27,Intermédiaire,Indifférent,200,0.97,4.8,10
+USR1079,freelancer,Les deux,4,Tunis,27,Intermédiaire,Hybride,0,0.82,3.2,4
+USR1080,freelancer,Développement,1,Sfax,36,Débutant,Online,250,0.64,4.9,16
+USR1081,freelancer,Les deux,0,Monastir,39,Avancé,Presentiel,150,0.75,4.4,3
+USR1082,freelancer,Design,8,Tunis,30,Débutant,Presentiel,250,0.5,3.8,3
+USR1083,freelancer,Design,5,Sfax,41,Avancé,Online,200,0.72,3.3,17
+USR1084,freelancer,Les deux,12,Bizerte,25,Débutant,Online,100,0.92,4.0,14
+USR1085,freelancer,Les deux,6,Monastir,30,Débutant,Hybride,0,0.67,4.4,6
+USR1086,freelancer,Les deux,12,Tunis,27,Intermédiaire,Indifférent,100,0.63,3.0,10
+USR1087,freelancer,Design,6,Sfax,27,Avancé,Online,150,0.95,4.7,10
+USR1088,freelancer,Développement,0,Bizerte,32,Intermédiaire,Hybride,100,0.55,3.7,16
+USR1089,freelancer,Design,6,Sousse,18,Débutant,Indifférent,150,0.6,4.1,14
+USR1090,freelancer,Les deux,6,Tunis,33,Débutant,Presentiel,250,0.63,3.9,10
+USR1091,freelancer,Développement,5,Monastir,23,Avancé,Hybride,0,0.99,4.3,16
+USR1092,freelancer,Design,2,Sousse,41,Intermédiaire,Online,100,0.94,4.4,7
+USR1093,freelancer,Développement,4,Tunis,22,Intermédiaire,Indifférent,250,0.67,3.1,15
+USR1094,freelancer,Design,7,Sousse,21,Intermédiaire,Indifférent,200,0.75,4.4,14
+USR1095,freelancer,Développement,12,Monastir,34,Avancé,Indifférent,50,0.55,3.2,15
+USR1096,freelancer,Développement,2,Sousse,34,Débutant,Presentiel,0,0.84,3.7,15
+USR1097,freelancer,Les deux,11,Tunis,31,Intermédiaire,Hybride,100,0.74,4.5,11
+USR1098,freelancer,Développement,2,Bizerte,23,Débutant,Hybride,0,0.93,5.0,14
+USR1099,freelancer,Développement,6,Sfax,33,Avancé,Online,250,0.87,4.2,12
+USR1100,freelancer,Développement,9,Sfax,25,Débutant,Presentiel,150,0.52,5.0,8
+USR1101,freelancer,Les deux,6,Tunis,37,Débutant,Online,0,0.69,4.0,5
+USR1102,freelancer,Design,3,Sfax,28,Intermédiaire,Indifférent,0,0.75,4.3,17
+USR1103,freelancer,Développement,4,Sousse,26,Intermédiaire,Indifférent,50,0.66,3.1,3
+USR1104,freelancer,Développement,0,Sousse,24,Intermédiaire,Indifférent,100,0.95,3.2,11
+USR1105,freelancer,Développement,7,Sousse,28,Intermédiaire,Online,0,0.83,4.4,9
+USR1106,freelancer,Les deux,2,Sousse,29,Avancé,Hybride,250,0.89,4.1,15
+USR1107,freelancer,Développement,10,Sousse,24,Avancé,Indifférent,0,0.94,3.3,11
+USR1108,freelancer,Design,1,Tunis,36,Avancé,Presentiel,50,0.85,4.9,13
+USR1109,freelancer,Développement,8,Bizerte,28,Intermédiaire,Indifférent,50,0.77,3.3,4
+USR1110,freelancer,Développement,6,Bizerte,40,Intermédiaire,Hybride,100,0.72,4.4,6
+USR1111,freelancer,Les deux,1,Monastir,31,Avancé,Online,50,0.8,4.4,12
+USR1112,freelancer,Développement,0,Bizerte,19,Avancé,Presentiel,250,0.91,4.0,17
+USR1113,freelancer,Design,8,Tunis,23,Intermédiaire,Indifférent,200,0.89,3.8,2
+USR1114,freelancer,Développement,2,Tunis,23,Avancé,Presentiel,200,0.85,4.8,6
+USR1115,freelancer,Les deux,7,Bizerte,40,Avancé,Hybride,100,0.93,3.6,2
+USR1116,freelancer,Développement,1,Sfax,25,Débutant,Presentiel,100,0.52,3.3,10
+USR1117,freelancer,Les deux,2,Sousse,45,Débutant,Presentiel,50,0.77,3.0,11
+USR1118,freelancer,Développement,9,Sousse,28,Débutant,Hybride,250,0.57,4.8,11
+USR1119,freelancer,Développement,0,Tunis,44,Intermédiaire,Presentiel,250,0.98,3.4,17
+USR1120,freelancer,Les deux,8,Bizerte,21,Avancé,Indifférent,250,0.63,4.3,14
+USR1121,freelancer,Design,3,Monastir,25,Intermédiaire,Hybride,50,0.79,4.6,4
+USR1122,freelancer,Les deux,2,Monastir,25,Avancé,Indifférent,100,0.57,4.0,8
+USR1123,freelancer,Design,7,Sfax,44,Débutant,Presentiel,200,0.75,4.5,5
+USR1124,freelancer,Design,0,Sousse,23,Débutant,Indifférent,250,0.8,3.1,7
+USR1125,freelancer,Développement,3,Monastir,38,Intermédiaire,Online,250,0.76,4.5,5
+USR1126,freelancer,Les deux,9,Tunis,30,Intermédiaire,Online,0,0.91,4.5,6
+USR1127,freelancer,Design,0,Sfax,25,Débutant,Hybride,50,0.97,4.2,4
+USR1128,freelancer,Les deux,0,Tunis,35,Avancé,Hybride,250,0.54,3.3,12
+USR1129,freelancer,Les deux,7,Sfax,27,Intermédiaire,Indifférent,50,0.62,4.1,10
+USR1130,freelancer,Développement,8,Tunis,18,Débutant,Online,200,0.65,4.0,11
+USR1131,freelancer,Les deux,2,Tunis,25,Débutant,Presentiel,150,0.69,3.7,7
+USR1132,freelancer,Développement,10,Monastir,39,Avancé,Online,150,0.58,3.2,13
+USR1133,freelancer,Développement,4,Sousse,20,Avancé,Hybride,0,0.68,4.8,8
+USR1134,freelancer,Développement,0,Bizerte,22,Débutant,Indifférent,200,0.67,3.4,15
+USR1135,freelancer,Design,10,Sousse,37,Intermédiaire,Hybride,0,0.64,4.0,14
+USR1136,freelancer,Développement,4,Tunis,43,Débutant,Presentiel,250,0.57,3.3,4
+USR1137,freelancer,Design,12,Monastir,44,Débutant,Online,200,0.71,4.5,9
+USR1138,freelancer,Développement,5,Sfax,23,Intermédiaire,Hybride,100,0.75,4.0,7
+USR1139,freelancer,Les deux,9,Sousse,22,Avancé,Presentiel,150,0.71,4.0,13
+USR1140,freelancer,Design,8,Bizerte,44,Débutant,Indifférent,0,0.79,3.8,15
+USR1141,freelancer,Design,11,Sfax,40,Débutant,Presentiel,100,0.5,5.0,14
+USR1142,freelancer,Développement,8,Monastir,22,Débutant,Online,100,0.68,4.7,8
+USR1143,freelancer,Les deux,2,Sousse,32,Débutant,Indifférent,50,0.61,3.4,2
+USR1144,freelancer,Design,1,Sfax,30,Avancé,Online,250,0.98,3.7,7
+USR1145,freelancer,Design,10,Bizerte,20,Intermédiaire,Presentiel,0,0.57,3.3,12
+USR1146,freelancer,Développement,0,Bizerte,44,Intermédiaire,Presentiel,50,0.73,3.3,11
+USR1147,freelancer,Design,4,Monastir,31,Avancé,Hybride,150,0.89,4.4,12
+USR1148,freelancer,Développement,2,Tunis,38,Débutant,Presentiel,200,0.58,3.8,15
+USR1149,freelancer,Design,7,Bizerte,40,Intermédiaire,Hybride,250,0.61,4.9,15
+USR1150,freelancer,Développement,1,Bizerte,30,Débutant,Presentiel,150,0.81,3.4,10
+USR1151,freelancer,Développement,11,Bizerte,37,Débutant,Indifférent,150,0.66,4.3,4
+USR1152,freelancer,Les deux,2,Tunis,43,Intermédiaire,Indifférent,50,0.63,3.2,4
+USR1153,freelancer,Développement,12,Sousse,18,Débutant,Hybride,50,0.77,3.1,3
+USR1154,freelancer,Design,12,Sousse,24,Avancé,Presentiel,250,0.96,3.5,14
+USR1155,freelancer,Développement,9,Bizerte,19,Avancé,Indifférent,0,0.52,3.2,5
+USR1156,freelancer,Développement,5,Sousse,30,Avancé,Presentiel,100,0.88,4.5,6
+USR1157,freelancer,Les deux,11,Tunis,28,Intermédiaire,Online,200,0.9,3.3,5
+USR1158,freelancer,Design,6,Monastir,36,Débutant,Hybride,50,0.58,3.9,12
+USR1159,freelancer,Les deux,1,Sfax,24,Avancé,Presentiel,250,0.58,4.9,2
+USR1160,freelancer,Design,11,Bizerte,38,Avancé,Hybride,150,0.89,3.7,5
+USR1161,freelancer,Développement,6,Tunis,40,Avancé,Indifférent,50,0.6,4.2,9
+USR1162,freelancer,Développement,2,Bizerte,38,Intermédiaire,Online,0,0.57,4.7,15
+USR1163,freelancer,Design,12,Tunis,33,Débutant,Indifférent,100,0.58,3.6,16
+USR1164,freelancer,Développement,9,Sousse,29,Débutant,Online,50,0.86,3.9,15
+USR1165,freelancer,Les deux,4,Monastir,38,Débutant,Online,200,0.74,3.7,4
+USR1166,freelancer,Développement,6,Bizerte,39,Débutant,Indifférent,100,0.76,4.2,9
+USR1167,freelancer,Développement,1,Monastir,34,Intermédiaire,Hybride,250,0.52,5.0,8
+USR1168,freelancer,Développement,12,Sfax,40,Avancé,Online,50,0.93,3.6,14
+USR1169,freelancer,Développement,6,Tunis,25,Intermédiaire,Indifférent,250,0.55,3.9,12
+USR1170,freelancer,Design,7,Tunis,20,Débutant,Online,150,0.88,3.4,3
+USR1171,freelancer,Développement,5,Sousse,37,Intermédiaire,Presentiel,250,0.87,3.2,7
+USR1172,freelancer,Design,8,Sfax,33,Débutant,Presentiel,100,0.78,5.0,13
+USR1173,freelancer,Les deux,0,Sousse,43,Intermédiaire,Indifférent,50,0.53,4.7,10
+USR1174,freelancer,Les deux,10,Monastir,26,Intermédiaire,Presentiel,0,0.57,3.5,11
+USR1175,freelancer,Développement,11,Monastir,45,Intermédiaire,Presentiel,250,0.95,3.4,8
+USR1176,freelancer,Développement,6,Sousse,42,Intermédiaire,Presentiel,50,0.67,3.8,12
+USR1177,freelancer,Design,11,Sfax,40,Intermédiaire,Hybride,250,0.79,4.6,8
+USR1178,freelancer,Design,9,Sfax,20,Avancé,Presentiel,100,0.83,4.6,3
+USR1179,freelancer,Design,11,Sousse,18,Débutant,Indifférent,50,0.75,3.6,14
+USR1180,freelancer,Les deux,10,Monastir,26,Avancé,Online,150,0.97,4.7,7
+USR1181,freelancer,Design,10,Bizerte,21,Débutant,Presentiel,250,0.99,3.8,5
+USR1182,freelancer,Design,2,Bizerte,30,Débutant,Hybride,50,0.98,4.9,17
+USR1183,freelancer,Design,0,Sousse,44,Intermédiaire,Online,100,0.95,4.0,7
+USR1184,freelancer,Les deux,11,Monastir,38,Intermédiaire,Indifférent,150,0.68,4.7,15
+USR1185,freelancer,Design,12,Sousse,21,Débutant,Indifférent,150,0.69,4.1,6
+USR1186,freelancer,Développement,6,Monastir,27,Avancé,Indifférent,250,0.64,4.2,12
+USR1187,freelancer,Les deux,1,Tunis,43,Débutant,Online,250,0.51,4.9,4
+USR1188,freelancer,Développement,11,Bizerte,35,Débutant,Indifférent,200,0.79,3.1,8
+USR1189,freelancer,Développement,6,Sfax,25,Intermédiaire,Indifférent,0,0.6,3.9,16
+USR1190,freelancer,Développement,12,Monastir,31,Avancé,Indifférent,0,0.97,4.6,15
+USR1191,freelancer,Design,4,Sousse,27,Intermédiaire,Presentiel,0,0.95,3.8,7
+USR1192,freelancer,Développement,2,Sousse,44,Avancé,Hybride,100,0.59,4.1,2
+USR1193,freelancer,Design,8,Monastir,24,Avancé,Indifférent,0,0.9,4.2,13
+USR1194,freelancer,Développement,10,Monastir,41,Débutant,Indifférent,100,0.76,3.9,4
+USR1195,freelancer,Développement,12,Sfax,34,Débutant,Indifférent,250,0.96,4.7,11
+USR1196,freelancer,Développement,5,Sfax,20,Débutant,Online,150,0.51,4.5,5
+USR1197,freelancer,Développement,9,Bizerte,20,Avancé,Indifférent,0,0.87,3.3,6
+USR1198,freelancer,Design,10,Sousse,23,Débutant,Presentiel,100,0.6,4.7,5
+USR1199,freelancer,Design,12,Monastir,42,Intermédiaire,Online,100,0.54,3.3,6
+USR1200,freelancer,Développement,9,Tunis,21,Intermédiaire,Online,0,0.57,3.5,14

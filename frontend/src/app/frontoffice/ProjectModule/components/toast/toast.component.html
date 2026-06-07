@@ -1,0 +1,24 @@
+<div class="toast-container">
+  <div *ngFor="let toast of toasts" class="toast toast--{{ toast.type }}">
+
+    <!-- Bande colorée en haut (comme modal confirm) -->
+    <div class="toast-glow-bar"></div>
+
+    <div class="toast-inner">
+      <!-- Icône cercle (comme modal confirm) -->
+      <div class="toast-icon-circle">
+        <span>{{ getIcon(toast.type) }}</span>
+      </div>
+
+      <div class="toast-body">
+        <p class="toast-title">{{ getTitle(toast.type) }}</p>
+        <p class="toast-message">{{ toast.message }}</p>
+      </div>
+
+      <button class="toast-close" (click)="remove(toast.id)">×</button>
+    </div>
+
+    <!-- Barre de progression -->
+    <div class="toast-progress"></div>
+  </div>
+</div>

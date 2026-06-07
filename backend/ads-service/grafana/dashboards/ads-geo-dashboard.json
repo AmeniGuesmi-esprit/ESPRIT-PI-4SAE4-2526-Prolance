@@ -1,0 +1,408 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Ad Events - Tunisia Geo Map",
+      "description": "Geographic distribution of ad interactions (views, clicks, hovers, creations)",
+      "type": "geomap",
+      "gridPos": { "h": 14, "w": 16, "x": 0, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT latitude, longitude, city, type, count(*) as event_count FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 24 HOUR GROUP BY latitude, longitude, city, type ORDER BY event_count DESC",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "view": {
+          "id": "coords",
+          "lat": 34.5,
+          "lon": 9.5,
+          "zoom": 6.5
+        },
+        "basemap": {
+          "type": "default",
+          "name": "OpenStreetMap"
+        },
+        "layers": [
+          {
+            "type": "markers",
+            "name": "Ad Events",
+            "config": {
+              "showLegend": true,
+              "style": {
+                "size": { "field": "event_count", "min": 5, "max": 30, "fixed": 10 },
+                "color": { "field": "type", "fixed": "#FF6600" },
+                "opacity": 0.8,
+                "symbol": { "fixed": "img/icons/marker/circle.svg" }
+              }
+            },
+            "location": {
+              "mode": "coords",
+              "latitude": "latitude",
+              "longitude": "longitude"
+            },
+            "tooltip": true
+          }
+        ],
+        "tooltip": { "mode": "details" }
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "title": "Events by City (Top 15)",
+      "type": "barchart",
+      "gridPos": { "h": 14, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT city, count(*) as events FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 24 HOUR GROUP BY city ORDER BY events DESC LIMIT 15",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "showValue": "always",
+        "barWidth": 0.8,
+        "groupWidth": 0.7,
+        "stacking": "none",
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "single" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "title": "Event Type Breakdown",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 14 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT type, count(*) as total FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 24 HOUR GROUP BY type ORDER BY total DESC",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "pieType": "donut",
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
+        "tooltip": { "mode": "single" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "title": "Events Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 14 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT toStartOfMinute(event_time) as time, type, count(*) as events FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 1 HOUR GROUP BY time, type ORDER BY time ASC",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20,
+            "pointSize": 5,
+            "showPoints": "auto"
+          },
+          "color": { "mode": "palette-classic" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "title": "Moderation - Geo Map",
+      "description": "Geographic distribution of content moderation results",
+      "type": "geomap",
+      "gridPos": { "h": 12, "w": 12, "x": 0, "y": 22 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT latitude, longitude, city, categoryCode, count(*) as log_count FROM ads_analytics.moderation_logs WHERE event_time >= now() - INTERVAL 24 HOUR GROUP BY latitude, longitude, city, categoryCode ORDER BY log_count DESC",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "view": {
+          "id": "coords",
+          "lat": 34.5,
+          "lon": 9.5,
+          "zoom": 6.5
+        },
+        "basemap": {
+          "type": "default",
+          "name": "OpenStreetMap"
+        },
+        "layers": [
+          {
+            "type": "markers",
+            "name": "Moderation Logs",
+            "config": {
+              "showLegend": true,
+              "style": {
+                "size": { "field": "log_count", "min": 5, "max": 25, "fixed": 8 },
+                "color": { "field": "categoryCode", "fixed": "#FF0000" },
+                "opacity": 0.8,
+                "symbol": { "fixed": "img/icons/marker/circle.svg" }
+              }
+            },
+            "location": {
+              "mode": "coords",
+              "latitude": "latitude",
+              "longitude": "longitude"
+            },
+            "tooltip": true
+          }
+        ],
+        "tooltip": { "mode": "details" }
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "title": "Moderation Verdicts",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 22 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT categoryCode, count(*) as total FROM ads_analytics.moderation_logs WHERE event_time >= now() - INTERVAL 24 HOUR GROUP BY categoryCode ORDER BY total DESC",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "auto",
+        "orientation": "horizontal"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 7,
+      "title": "Flagged Users & Alerts",
+      "type": "table",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 28 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT userId, email, violationCount, status, city, ip, event_time FROM ads_analytics.flagged_users WHERE event_time >= now() - INTERVAL 24 HOUR ORDER BY event_time DESC LIMIT 50",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "sortBy": [{ "displayName": "event_time", "desc": true }]
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      }
+    },
+    {
+      "id": 8,
+      "title": "Total Ad Events (24h)",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 6, "x": 0, "y": 34 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT count(*) as total FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 24 HOUR",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "blue", "mode": "fixed" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 9,
+      "title": "Unique Cities (24h)",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 6, "x": 6, "y": 34 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT uniq(city) as cities FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 24 HOUR",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "green", "mode": "fixed" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 10,
+      "title": "Unique IPs (24h)",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 6, "x": 12, "y": 34 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT uniq(ip) as ips FROM ads_analytics.ad_events WHERE event_time >= now() - INTERVAL 24 HOUR",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "fixedColor": "orange", "mode": "fixed" }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 11,
+      "title": "Unsafe Content Detections (24h)",
+      "type": "stat",
+      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 34 },
+      "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+      "targets": [
+        {
+          "datasource": { "type": "grafana-clickhouse-datasource", "uid": "clickhouse-ads" },
+          "queryType": "sql",
+          "rawSql": "SELECT count(*) as unsafe FROM ads_analytics.moderation_logs WHERE event_time >= now() - INTERVAL 24 HOUR AND categoryCode != 'SAFE'",
+          "refId": "A",
+          "format": 1
+        }
+      ],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "area"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "red" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      }
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["ads", "kafka", "geo", "clickhouse"],
+  "templating": {
+    "list": []
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Ads Service - Geo Analytics",
+  "uid": "ads-geo-analytics",
+  "version": 1
+}

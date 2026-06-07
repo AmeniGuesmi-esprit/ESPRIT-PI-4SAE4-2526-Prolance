@@ -1,0 +1,186 @@
+<!-- MODAL OVERLAY -->
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div class="header-title-group">
+        <span class="header-icon">📋</span>
+        <h2 class="modal-title">{{ project?.id ? 'Edit Project' : 'New Project' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+
+    <!-- AI SECTION -->
+    <div class="ai-bar">
+      <div class="ai-input-row">
+        <input type="text" class="ai-prompt-input" [(ngModel)]="aiPrompt"
+          placeholder="Décris ton projet (optionnel)...">
+        <button type="button" class="btn-ai-generate" (click)="generateWithAI()" [disabled]="isGenerating">
+          <span *ngIf="!isGenerating">✨ Generate with AI</span>
+          <span *ngIf="isGenerating" class="ai-loading">⏳ Génération...</span>
+        </button>
+      </div>
+      <div class="ai-error" *ngIf="aiError">⚠️ {{ aiError }}</div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-bar">
+      <button class="tab-btn" [class.active]="selectedTab === 'details'" (click)="selectedTab = 'details'">
+        📄 Details
+      </button>
+      <button class="tab-btn" [class.active]="selectedTab === 'tasks'" (click)="selectedTab = 'tasks'">
+        📌 Tasks
+        <span class="tasks-count" *ngIf="tasks.length > 0">{{ tasks.length }}</span>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+      <form [formGroup]="form">
+
+        <!-- ===== DETAILS TAB ===== -->
+        <div *ngIf="selectedTab === 'details'" class="tab-content">
+          <div class="form-group title-group">
+            <div class="input-wrapper">
+              <input type="text" formControlName="title" class="form-title-input"
+                placeholder="Write a title..." maxlength="200">
+              <span class="char-count">{{ form.get('title')?.value?.length || 0 }}/200</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <textarea formControlName="description" class="form-description-input"
+              placeholder="What's your project about?" rows="5"></textarea>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label">Budget (TND)</label>
+              <input type="number" formControlName="budget" class="form-input" placeholder="5000">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <div class="category-tabs">
+                <button type="button" class="category-tab"
+                  [class.active]="form.get('category')?.value === 'DEV'"
+                  (click)="form.get('category')?.setValue('DEV')">💻 Dev</button>
+                <button type="button" class="category-tab"
+                  [class.active]="form.get('category')?.value === 'DESIGN'"
+                  (click)="form.get('category')?.setValue('DESIGN')">🎨 Design</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row-2col">
+            <div class="form-group">
+              <label class="form-label">Start Date</label>
+              <input type="date" formControlName="startDate" [min]="minDate" [max]="maxDate"
+                (change)="validateDates()" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">End Date</label>
+              <input type="date" formControlName="endDate" [min]="minDate" [max]="maxDate"
+                (change)="validateDates()" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-error" *ngIf="dateError">⚠️ {{ dateError }}</div>
+        </div>
+
+        <!-- ===== TASKS TAB ===== -->
+        <div *ngIf="selectedTab === 'tasks'" class="tab-content">
+
+          <!-- AI GENERATE TASKS BUTTON -->
+          <div class="ai-tasks-section">
+            <div class="ai-tasks-header">
+              <div class="ai-tasks-info">
+                <span class="ai-tasks-title">✨ Generate Tasks with AI</span>
+                <span class="ai-tasks-subtitle">Based on your project title & description</span>
+              </div>
+              <button type="button" class="btn-ai-tasks" (click)="generateTasksOnly()" [disabled]="isGeneratingTasks">
+                <span *ngIf="!isGeneratingTasks">⚡ Auto-generate Tasks</span>
+                <span *ngIf="isGeneratingTasks" class="ai-loading">⏳ Generating tasks...</span>
+              </button>
+            </div>
+            <div class="ai-tasks-error" *ngIf="tasksAiError">⚠️ {{ tasksAiError }}</div>
+          </div>
+
+          <!-- DIVIDER -->
+          <div class="tasks-divider">
+            <span>or add manually</span>
+          </div>
+
+          <!-- MANUAL ADD TASK -->
+          <div class="add-task-section">
+            <h4 class="add-task-title">➕ Add Task Manually</h4>
+            <div class="form-group">
+              <input type="text" [(ngModel)]="newTaskName" [ngModelOptions]="{standalone: true}"
+                class="form-input" placeholder="Task name...">
+            </div>
+            <div class="form-group">
+              <textarea [(ngModel)]="newTaskDescription" [ngModelOptions]="{standalone: true}"
+                class="form-input" placeholder="Task description..." rows="2"></textarea>
+            </div>
+            <div class="form-row-2col">
+              <div class="form-group">
+                <label class="form-label">Priority</label>
+                <select [(ngModel)]="newTaskPriority" [ngModelOptions]="{standalone: true}" class="form-input">
+                  <option value="LOW">🟢 Low</option>
+                  <option value="MEDIUM">🟡 Medium</option>
+                  <option value="HIGH">🔴 High</option>
+                </select>
+              </div>
+              <div class="form-group" style="display:flex;align-items:flex-end;">
+                <button type="button" class="btn-add-task" (click)="addTask()">+ Add Task</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- TASKS LIST -->
+          <div class="tasks-list" *ngIf="tasks.length > 0">
+            <div class="tasks-list-header">
+              <h4 class="tasks-count-title">📋 Tasks ({{ tasks.length }})</h4>
+              <button type="button" class="btn-clear-tasks" (click)="tasks = []">🗑️ Clear all</button>
+            </div>
+            <div class="task-item" *ngFor="let task of tasks; let i = index">
+              <div class="task-num">{{ i + 1 }}</div>
+              <div class="task-content">
+                <div class="task-info">
+                  <h5 class="task-name">{{ task.taskName }}</h5>
+                  <p class="task-desc" *ngIf="task.description">{{ task.description }}</p>
+                </div>
+                <div class="task-meta">
+                  <span class="task-priority" [ngClass]="'priority-' + (task.priority | lowercase)">{{ task.priority }}</span>
+                  <button type="button" class="btn-remove" (click)="removeTask(i)">🗑️</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EMPTY TASKS -->
+          <div class="empty-tasks" *ngIf="tasks.length === 0 && !isGeneratingTasks">
+            <div class="empty-tasks-icon">📌</div>
+            <p>No tasks yet. Use AI to generate them or add manually.</p>
+          </div>
+
+          <!-- LOADING STATE -->
+          <div class="tasks-loading" *ngIf="isGeneratingTasks">
+            <div class="loading-spinner"></div>
+            <p>AI is generating tasks for your project...</p>
+          </div>
+
+        </div>
+      </form>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+      <button type="button" class="btn-publish" (click)="submit()" [disabled]="!isFormValid() || isSubmitting">
+        {{ isSubmitting ? '⏳ Publishing...' : (project?.id ? 'Update Project' : 'Publish') }}
+      </button>
+    </div>
+
+  </div>
+</div>

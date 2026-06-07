@@ -1,0 +1,232 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+            exposedHeaders:
+              - Authorization
+      routes:
+        # â”€â”€ USER SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: user-service-auth
+          uri: lb://user-service
+          predicates: [Path=/api/auth/**]
+          filters: [StripPrefix=0]
+
+        - id: user-service-users
+          uri: lb://user-service
+          predicates: [Path=/users/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ OAUTH2 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: user-service-oauth2-callback
+          uri: lb://user-service
+          predicates: [Path=/login/oauth2/**]
+          filters: [StripPrefix=0]
+
+        - id: user-service-oauth2-redirect
+          uri: lb://user-service
+          predicates: [Path=/oauth2/**]
+          filters: [StripPrefix=0]
+
+        - id: ai-service
+          uri: lb://user-service
+          predicates: [Path=/api/ai/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ USER SERVICE (API USERS) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: user-service-api-users
+          uri: lb://user-service
+          predicates: [Path=/api/users/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ COMMENTAIRE SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: commentaire-service
+          uri: lb://commentaire-service
+          predicates: [Path=/api/commentaires/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ REACTION SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: reaction-service
+          uri: lb://reaction-service
+          predicates: [Path=/api/reactions/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ SUBSCRIPTION SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: subscription-service-plans
+          uri: lb://subscription-service
+          predicates: [Path=/api/subscriptions/**]
+          filters: [StripPrefix=0]
+
+        - id: subscription-service-user-subs
+          uri: lb://subscription-service
+          predicates: [Path=/api/user-subscriptions/**]
+          filters: [StripPrefix=0]
+
+        - id: subscription-service-stats
+          uri: lb://subscription-service
+          predicates: [Path=/api/stats/**]
+          filters: [StripPrefix=0]
+
+        - id: subscription-service-churn
+          uri: lb://subscription-service
+          predicates: [Path=/api/churn-prediction/**]
+          filters: [StripPrefix=0]
+
+        - id: subscription-service-recommendations
+          uri: lb://subscription-service
+          predicates: [Path=/api/recommendations/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ PROMO SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: promo-service-promos
+          uri: lb://promo-service
+          predicates: [Path=/api/promos/**]
+          filters: [StripPrefix=0]
+
+        - id: promo-service-payments
+          uri: lb://promo-service
+          predicates: [Path=/api/payments/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ PROJECT SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: project-service
+          uri: lb://project-service
+          predicates: [Path=/api/projects/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ APPLICATION SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: application-service
+          uri: lb://application-service
+          predicates: [Path=/api/applications/**]
+          filters: [StripPrefix=0]
+
+        - id: application-service-uploads
+          uri: lb://application-service
+          predicates: [Path=/uploads/cover-letters/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ SKILL SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: skill-service
+          uri: lb://skill-service
+          predicates: [Path=/api/skills/**]
+          filters: [StripPrefix=0]
+
+        - id: skill-service-uploads
+          uri: lb://skill-service
+          predicates: [Path=/uploads/resumes/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ PUBLICATION SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: publication-service
+          uri: lb://publication-service
+          predicates: [Path=/api/publications/**]
+          filters: [StripPrefix=0]
+
+        - id: publication-uploads
+          uri: lb://publication-service
+          predicates: [Path=/uploads/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ EVENT SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: event-service
+          uri: lb://event-service
+          predicates: [Path=/api/events/**]
+          filters: [StripPrefix=0]
+
+        - id: event-service-public
+          uri: lb://event-service
+          predicates: [Path=/api/public-events/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ INSCRIPTION SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: inscription-service
+          uri: lb://inscription-service
+          predicates: [Path=/api/inscriptions/**]
+          filters: [StripPrefix=0]
+
+        - id: inscription-service-public
+          uri: lb://inscription-service
+          predicates: [Path=/api/inscriptions-public/**]
+          filters: [StripPrefix=0]
+
+        # â”€â”€ ACTIVITY SERVICE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        - id: activity-service
+          uri: lb://activity-service
+          predicates: [Path=/api/activities/**]
+          filters: [StripPrefix=0]
+
+        - id: activity-service-public
+          uri: lb://activity-service
+          predicates: [Path=/api/activities-public/**]
+          filters: [StripPrefix=0]
+
+
+        # -- ADS SERVICE -----------------------------------------------
+        - id: ads-service-plans
+          uri: lb://ads-service
+          predicates:
+            - Path=/api/plans,/api/plans/**
+          filters:
+            - RewritePath=/api(?<segment>.*), /ads-service/api$\{segment}
+
+        - id: ads-service-campaigns
+          uri: lb://ads-service
+          predicates:
+            - Path=/api/campaigns,/api/campaigns/**
+          filters:
+            - RewritePath=/api(?<segment>.*), /ads-service/api$\{segment}
+
+        - id: ads-service-ads
+          uri: lb://ads-service
+          predicates:
+            - Path=/api/ads,/api/ads/**
+          filters:
+            - RewritePath=/api(?<segment>.*), /ads-service/api$\{segment}
+
+        # -- ADS SERVICE — RAG ----------------------------------------
+        - id: ads-service-rag
+          uri: lb://ads-service
+          predicates:
+            - Path=/api/rag/**
+          filters:
+            - RewritePath=/api(?<segment>.*), /ads-service/api$\{segment}
+server:
+  port: 8222
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

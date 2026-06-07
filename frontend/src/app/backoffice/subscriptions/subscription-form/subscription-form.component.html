@@ -1,0 +1,114 @@
+<div class="form-container">
+  <h1>{{ isEditMode ? 'Edit Plan' : 'Create New Plan' }}</h1>
+
+  <div class="loading" *ngIf="loading">
+    <p>Loading...</p>
+  </div>
+
+  <form (ngSubmit)="onSubmit()" *ngIf="!loading">
+
+    <!-- Row 1: Name + Type -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Plan Name *</label>
+        <input type="text" [(ngModel)]="subscription.name" name="name"
+               placeholder="e.g. Pro Freelancer"
+               [class.error]="formErrors['name']" />
+        <span class="error-text" *ngIf="formErrors['name']">{{ formErrors['name'] }}</span>
+      </div>
+      <div class="form-group">
+        <label>Type *</label>
+        <select [(ngModel)]="subscription.type" name="type"
+                [class.error]="formErrors['type']">
+          <option value="FREELANCER">FREELANCER</option>
+          <option value="CLIENT">CLIENT</option>
+        </select>
+        <span class="error-text" *ngIf="formErrors['type']">{{ formErrors['type'] }}</span>
+      </div>
+    </div>
+
+    <!-- Row 2: Price + Cycle -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Price (DT) *</label>
+        <input type="number" [(ngModel)]="subscription.price" name="price"
+               placeholder="29.99" step="0.01"
+               [class.error]="formErrors['price']" />
+        <span class="error-text" *ngIf="formErrors['price']">{{ formErrors['price'] }}</span>
+      </div>
+      <div class="form-group">
+        <label>Billing Cycle *</label>
+        <select [(ngModel)]="subscription.billingCycle" name="billingCycle"
+                [class.error]="formErrors['billingCycle']">
+          <option value="SEMESTRIELLE">SEMI-ANNUAL</option>
+          <option value="ANNUELLE">ANNUAL</option>
+        </select>
+        <span class="error-text" *ngIf="formErrors['billingCycle']">{{ formErrors['billingCycle'] }}</span>
+      </div>
+    </div>
+
+    <!-- Row 3: Description + Max Projects -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Description</label>
+        <input type="text" [(ngModel)]="subscription.description" name="description"
+               placeholder="Plan description..." />
+      </div>
+      <div class="form-group">
+        <label>Max Projects</label>
+        <input type="number" [(ngModel)]="subscription.maxProjects" name="maxProjects"
+               placeholder="20" />
+      </div>
+    </div>
+
+    <!-- Row 4: Max Proposals + Max Jobs -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>Max Proposals</label>
+        <input type="number" [(ngModel)]="subscription.maxProposals" name="maxProposals"
+               placeholder="50" />
+      </div>
+      <div class="form-group">
+        <label>Max Active Jobs</label>
+        <input type="number" [(ngModel)]="subscription.maxActiveJobs" name="maxActiveJobs"
+               placeholder="10" />
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="options-section">
+      <h3>Additional Options</h3>
+      <div class="options-row">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="subscription.featuredListing" name="featuredListing" />
+          Featured Listing
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="subscription.prioritySupport" name="prioritySupport" />
+          Priority Support
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="subscription.analyticsAccess" name="analyticsAccess" />
+          Analytics Access
+        </label>
+      </div>
+    </div>
+
+    <!-- Global error -->
+    <div class="global-error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Validation error -->
+    <div class="validation-error" *ngIf="formErrors['name']">
+      {{ formErrors['name'] }}
+    </div>
+
+    <!-- Buttons -->
+    <div class="form-actions">
+      <button type="submit" class="btn-save">Save</button>
+      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+    </div>
+
+  </form>
+</div>

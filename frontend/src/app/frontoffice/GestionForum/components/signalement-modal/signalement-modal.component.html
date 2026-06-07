@@ -1,0 +1,56 @@
+<!-- signalement-modal.component.html -->
+<!-- À placer dans : src/app/features/forum/components/signalement-modal/ -->
+
+<div class="signal-overlay" (click)="onCancel()">
+  <div class="signal-box" (click)="$event.stopPropagation()">
+
+    <div class="signal-header">
+      <span class="signal-icon">🚩</span>
+      <h3 class="signal-title">Report this publication</h3>
+      <button class="signal-close" (click)="onCancel()">✕</button>
+    </div>
+
+    <p class="signal-subtitle">
+      Please select a reason for reporting <strong>«&nbsp;{{ pubTitre }}&nbsp;»</strong>.
+    </p>
+
+    <!-- Preset reasons -->
+    <div class="signal-reasons">
+      <button
+        *ngFor="let r of presetReasons"
+        type="button"
+        class="signal-reason-btn"
+        [class.selected]="selectedReason === r"
+        (click)="selectReason(r)">
+        {{ r }}
+      </button>
+    </div>
+
+    <!-- Custom reason textarea -->
+    <div class="signal-custom">
+      <label class="signal-custom-label">Or describe the problem (optional) :</label>
+      <textarea
+        class="signal-textarea"
+        [(ngModel)]="customReason"
+        placeholder="Explain why you are reporting this post…"
+        rows="3"
+        maxlength="300"
+        (input)="onCustomInput()">
+      </textarea>
+      <span class="signal-char-hint">{{ customReason.length }}/300</span>
+    </div>
+
+    <!-- Error -->
+    <p class="signal-error" *ngIf="showError">Please select or enter a reason before submitting.</p>
+
+    <!-- Footer -->
+    <div class="signal-footer">
+      <button class="signal-btn-cancel" (click)="onCancel()" [disabled]="loading">Cancel</button>
+      <button class="signal-btn-submit" (click)="onSubmit()" [disabled]="loading">
+        <span *ngIf="!loading">🚩 Submit Report</span>
+        <span *ngIf="loading" class="signal-spinner"></span>
+      </button>
+    </div>
+
+  </div>
+</div>

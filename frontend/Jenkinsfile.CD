@@ -1,0 +1,120 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// PIPELINE CD — Prolance Frontend
+// ─────────────────────────────────────────────────────────────────────────────
+
+pipeline {
+
+    agent any
+
+    environment {
+        LOCAL_REGISTRY   = '172.24.254.13:5000'           // Local registry
+        DOCKER_IMAGE     = "${LOCAL_REGISTRY}/prolance-frontend"
+        DOCKER_TAG       = 'latest'
+        HUB_IMAGE        = 'farrahamami/prolance-frontend' // Fallback
+        CONTAINER_NAME   = 'prolance-frontend'
+        APP_PORT         = '80'
+        HOST_IP          = '172.24.254.13'
+    }
+
+    triggers {
+        upstream(
+            upstreamProjects: 'Prolance-Frontend-CI',
+            threshold: hudson.model.Result.SUCCESS
+        )
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Deploying ${DOCKER_IMAGE}:${DOCKER_TAG}"
+            }
+        }
+
+        stage('Pull Docker Image') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh """
+                            # Try local registry first (fast)
+                            echo "Trying local registry at ${LOCAL_REGISTRY}..."
+                            docker pull ${DOCKER_IMAGE}:${DOCKER_TAG} || {
+                                echo "Local registry failed, falling back to Docker Hub..."
+                                echo \$DOCKER_PASS | docker login -u \$DOCKER_USER --password-stdin
+                                docker pull ${HUB_IMAGE}:${DOCKER_TAG}
+                                docker tag ${HUB_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:${DOCKER_TAG}
+                                docker logout
+                            }
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                sh """
+                    docker stop ${CONTAINER_NAME} || true
+                    docker rm   ${CONTAINER_NAME} || true
+                """
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh """
+                    docker run -d \
+                        --name ${CONTAINER_NAME} \
+                        -p ${APP_PORT}:80 \
+                        --restart unless-stopped \
+                        ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    
+                    echo "✅ Conteneur démarré avec succès"
+                """
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    echo "Vérification de l'application..."
+                    retry(12) {
+                        sleep(time: 5, unit: 'SECONDS')
+                        sh """
+                            docker ps | grep ${CONTAINER_NAME} || exit 1
+                            curl -f http://${HOST_IP}:${APP_PORT} > /dev/null || exit 1
+                        """
+                    }
+                    echo "✅ Application opérationnelle sur http://${HOST_IP}:${APP_PORT}"
+                }
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker image prune -f'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🚀 Déploiement réussi — ${DOCKER_IMAGE}:${DOCKER_TAG} est en ligne"
+        }
+        failure {
+            echo "💥 Échec du déploiement"
+            sh """
+                echo "=== Logs du conteneur ==="
+                docker logs ${CONTAINER_NAME} --tail 50 || true
+            """
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

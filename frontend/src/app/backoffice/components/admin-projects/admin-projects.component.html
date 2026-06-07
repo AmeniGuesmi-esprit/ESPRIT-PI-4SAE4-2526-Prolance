@@ -1,0 +1,250 @@
+<div class="admin-container">
+  <!-- HEADER -->
+  <div class="admin-header">
+    <div class="header-content">
+      <h1 class="header-title">Projects Management</h1>
+      <p class="header-subtitle">Review, manage and monitor all projects on the platform</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-card">
+        <span class="stat-icon">📊</span>
+        <div class="stat-info">
+          <p class="stat-label">Total Projects</p>
+          <p class="stat-value">{{ projects.length }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">⏳</span>
+        <div class="stat-info">
+          <p class="stat-label">In Progress</p>
+          <p class="stat-value">{{ getProjectCountByStatus('IN_PROGRESS') }}</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✅</span>
+        <div class="stat-info">
+          <p class="stat-label">Completed</p>
+          <p class="stat-value">{{ getProjectCountByStatus('COMPLETED') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="admin-content">
+    <!-- LEFT SIDE -->
+    <div class="projects-panel">
+      <div class="filters-bar">
+        <div class="search-box">
+          <input type="text" placeholder="Search projects..."
+            [value]="searchQuery"
+            (input)="onSearchChange($any($event.target).value)"
+            class="search-input">
+          <span class="search-icon">🔍</span>
+        </div>
+        <div class="filter-chips">
+          <select (change)="onStatusChange($any($event.target).value)" [value]="statusFilter" class="filter-select">
+            <option *ngFor="let status of statusOptions" [value]="status">
+              {{ status === 'ALL' ? 'All Status' : status }}
+            </option>
+          </select>
+          <select (change)="onCategoryChange($any($event.target).value)" [value]="categoryFilter" class="filter-select">
+            <option *ngFor="let cat of categoryOptions" [value]="cat">
+              {{ cat === 'ALL' ? 'All Categories' : cat }}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Loading projects...</p>
+      </div>
+
+      <!-- Projects list — paginated -->
+      <div *ngIf="!loading && filteredProjects.length > 0" class="projects-list">
+        <div *ngFor="let project of paginatedProjects"
+          class="project-item"
+          [class.active]="selectedProject?.id === project.id"
+          (click)="selectProject(project)">
+          <div class="project-header">
+            <div class="project-title-group">
+              <span class="category-badge">{{ getCategoryIcon(project.category) }} {{ project.category }}</span>
+              <h3 class="project-title">{{ project.title }}</h3>
+            </div>
+            <span class="status-badge" [style.background-color]="getStatusColor(project.status)">
+              {{ project.status }}
+            </span>
+          </div>
+          <p class="project-description">{{ project.description | slice:0:80 }}...</p>
+          <div class="project-meta">
+            <span class="meta-item">💰 {{ project.budget | number:'1.0-0' }} TND</span>
+            <span class="meta-item">👤 {{ project.client?.name }}</span>
+            <span class="meta-item">📝 {{ project.tasks?.length || 0 }} tasks</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="!loading && totalPages > 1" class="pagination">
+        <button class="page-btn page-btn--nav"
+          (click)="goToPage(currentPage - 1)"
+          [disabled]="currentPage === 1">
+          ‹
+        </button>
+
+        <button *ngFor="let page of pageNumbers"
+          class="page-btn"
+          [class.page-btn--active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{ page }}
+        </button>
+
+        <button class="page-btn page-btn--nav"
+          (click)="goToPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages">
+          ›
+        </button>
+      </div>
+
+      <!-- Page info -->
+      <div *ngIf="!loading && filteredProjects.length > 0" class="pagination-info">
+        {{ (currentPage - 1) * PAGE_SIZE + 1 }}–{{ currentPage * PAGE_SIZE > filteredProjects.length ? filteredProjects.length : currentPage * PAGE_SIZE }} of {{ filteredProjects.length }} projects
+      </div>
+
+      <div *ngIf="!loading && filteredProjects.length === 0" class="empty-state">
+        <p>No projects found</p>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="details-panel" *ngIf="selectedProject; else noSelection">
+      <div class="details-header">
+        <h2 class="details-title">{{ selectedProject.title }}</h2>
+        <button class="close-btn" (click)="closeProject()">✕</button>
+      </div>
+      <div class="details-content">
+        <div class="detail-section">
+          <h4 class="section-title">Project Information</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Client</span>
+              <span class="info-value">{{ selectedProject.client?.name }} {{ selectedProject.client?.lastName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Budget</span>
+              <span class="info-value">{{ selectedProject.budget | number:'1.0-0' }} TND</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Category</span>
+              <span class="info-value">{{ selectedProject.category }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Status</span>
+              <span class="info-value" [style.color]="getStatusColor(selectedProject.status)">{{ selectedProject.status }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Start Date</span>
+              <span class="info-value">{{ selectedProject.startDate | date:'short' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">End Date</span>
+              <span class="info-value">{{ selectedProject.endDate | date:'short' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4 class="section-title">Description</h4>
+          <p class="description-text">{{ selectedProject.description }}</p>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedProject.tasks && selectedProject.tasks.length > 0">
+          <h4 class="section-title">Tasks ({{ selectedProject.tasks.length }})</h4>
+          <div class="tasks-list">
+            <div *ngFor="let task of selectedProject.tasks" class="task-card">
+              <div class="task-header">
+                <h5 class="task-name">{{ task.taskName }}</h5>
+                <span class="task-priority" [ngClass]="'priority-' + (task.priority | lowercase)">{{ task.priority }}</span>
+              </div>
+              <p class="task-description">{{ task.description }}</p>
+              <div class="task-dates">
+                <span>📅 {{ task.startDate | date:'short' }} - {{ task.endDate | date:'short' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          <button *ngIf="selectedProject?.status === 'IN_PROGRESS'"
+            class="btn-action btn-approve"
+            (click)="approveProject(selectedProject)"
+            [disabled]="approvingProjectId === selectedProject?.id">
+            <span *ngIf="approvingProjectId !== selectedProject?.id">✅ Validate</span>
+            <span *ngIf="approvingProjectId === selectedProject?.id" class="btn-loading">
+              <span class="btn-spinner"></span> Validating...
+            </span>
+          </button>
+          <button class="btn-action btn-delete" (click)="deleteProject(selectedProject)">
+            🗑️ Delete
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noSelection>
+      <div class="details-panel empty">
+        <div class="empty-placeholder">
+          <p class="empty-icon">👈</p>
+          <p class="empty-text">Select a project to view details</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMATION -->
+<div class="modal-backdrop" *ngIf="showConfirmModal" (click)="cancelConfirm()">
+  <div class="modal-box confirm-modal" (click)="$event.stopPropagation()">
+    <div class="modal-icon" [ngClass]="confirmModalType === 'approve' ? 'icon-approve' : 'icon-delete'">
+      {{ confirmModalType === 'approve' ? '✅' : '🗑️' }}
+    </div>
+    <h3 class="modal-title">
+      {{ confirmModalType === 'approve' ? 'Validate this project?' : 'Delete this project?' }}
+    </h3>
+    <p class="modal-subtitle"><strong>{{ pendingProject?.title }}</strong></p>
+    <p class="modal-desc" *ngIf="confirmModalType === 'approve'">
+      Le projet sera approuvé et publié. Un email de confirmation sera envoyé au client.
+    </p>
+    <p class="modal-desc danger-text" *ngIf="confirmModalType === 'delete'">
+      Cette action est irréversible. Le projet sera définitivement supprimé.
+    </p>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-cancel" (click)="cancelConfirm()">Annuler</button>
+      <button class="modal-btn"
+        [ngClass]="confirmModalType === 'approve' ? 'modal-btn-approve' : 'modal-btn-delete'"
+        (click)="confirmAction()">
+        {{ confirmModalType === 'approve' ? '✅ Oui, valider' : '🗑️ Oui, supprimer' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUCCESS -->
+<div class="modal-backdrop" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
+  <div class="modal-box success-modal" (click)="$event.stopPropagation()">
+    <div class="success-animation">
+      <div class="success-ring"></div>
+      <div class="success-icon">✅</div>
+    </div>
+    <h3 class="modal-title">{{ successModalTitle }}</h3>
+    <p class="modal-subtitle"><strong>{{ successModalMessage }}</strong></p>
+    <div class="email-sent-badge" *ngIf="successModalEmail">
+      <span class="email-icon">📧</span>
+      <span>Email envoyé à <strong>{{ successModalEmail }}</strong></span>
+    </div>
+    <button class="modal-btn modal-btn-approve full-width" (click)="closeSuccessModal()">
+      OK, fermer
+    </button>
+  </div>
+</div>

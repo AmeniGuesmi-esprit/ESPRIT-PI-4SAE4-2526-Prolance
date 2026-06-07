@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'IMAGE_TAG', defaultValue: 'latest', description: 'Docker image tag to deploy')
+    }
+
+    environment {
+        REGISTRY    = "172.22.191.1:5000"
+        IMAGE_NAME  = "ads-service"
+        K8S_NS      = "prolance"
+        SERVICE_DIR = "ads-service"
+        KUBECONFIG  = "/home/fawzi/.kube/config"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Helm Deploy') {
+            steps {
+                sh """
+                  helm upgrade --install ads-service ${SERVICE_DIR}/helm/ads-service \
+                    --namespace ${K8S_NS} \
+                    --set image.tag=${params.IMAGE_TAG} \
+                    --set image.repository=${REGISTRY}/${IMAGE_NAME} \
+                    --kubeconfig ${KUBECONFIG} \
+                    --wait --timeout 180s
+                """
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh "kubectl --kubeconfig=${KUBECONFIG} -n ${K8S_NS} get pods -l app=ads-service"
+                sh "kubectl --kubeconfig=${KUBECONFIG} -n ${K8S_NS} get svc ads-service"
+                sh "helm list -n ${K8S_NS} --kubeconfig ${KUBECONFIG}"
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "CD done — ads-service:${params.IMAGE_TAG} running in namespace ${K8S_NS}."
+        }
+        failure {
+            sh "kubectl --kubeconfig=${KUBECONFIG} -n ${K8S_NS} describe pods -l app=ads-service || true"
+        }
+    }
+}

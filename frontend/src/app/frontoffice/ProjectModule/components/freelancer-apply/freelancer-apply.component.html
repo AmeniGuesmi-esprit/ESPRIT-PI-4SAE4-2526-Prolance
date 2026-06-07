@@ -1,0 +1,262 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <div class="header-icon">🚀</div>
+        <div>
+          <h2 class="modal-title">Apply to Project</h2>
+          <p class="modal-subtitle">{{ project?.title }}</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+      <div class="progress-step" [class.active]="true" [class.done]="currentStep === 'application'">
+        <div class="step-circle">1</div>
+        <span>Select Skills</span>
+      </div>
+      <div class="progress-line" [class.filled]="currentStep === 'application'"></div>
+      <div class="progress-step" [class.active]="currentStep === 'application'">
+        <div class="step-circle">2</div>
+        <span>Cover Letter</span>
+      </div>
+    </div>
+
+    <!-- Scrollable body -->
+    <div class="modal-body">
+
+      <!-- ─── STEP 1: Select skills ─── -->
+      <div *ngIf="currentStep === 'skills'">
+
+        <div class="required-box" *ngIf="project?.requiredSkills?.length">
+          <span class="required-box-label">📌 Project requires:</span>
+          <div class="tags-row">
+            <span *ngFor="let s of project?.requiredSkills" class="tag required">{{ s.skillName }}</span>
+          </div>
+        </div>
+
+        <div class="section-label">
+          <span class="section-dot"></span>
+          YOUR SKILLS — Select those relevant to this project
+        </div>
+
+        <div *ngIf="loadingSkills" class="loading-msg">Loading your skills...</div>
+        <div *ngIf="!loadingSkills && mySkills.length === 0" class="empty-msg">
+          No skills found. Please add skills to your profile first.
+        </div>
+
+        <div class="skills-grid" *ngIf="!loadingSkills && mySkills.length > 0">
+          <button
+            *ngFor="let skill of mySkills"
+            class="skill-card"
+            [class.selected]="isSkillSelected(skill)"
+            (click)="toggleSkill(skill)"
+            type="button">
+            <div class="skill-card-icon">
+              <img
+                *ngIf="getSkillIcon(skill.skillName)"
+                [src]="getSkillIcon(skill.skillName)!"
+                [alt]="skill.skillName"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" />
+              <span class="skill-initial" [style.display]="getSkillIcon(skill.skillName) ? 'none' : 'flex'">
+                {{ getInitial(skill.skillName) }}
+              </span>
+            </div>
+            <div class="skill-card-info">
+              <span class="skill-card-name">{{ skill.skillName }}</span>
+              <span class="skill-card-level">{{ skill.level }}</span>
+              <span class="skill-card-exp">{{ skill.yearsExperience }} yr{{ skill.yearsExperience !== 1 ? 's' : '' }}</span>
+            </div>
+            <div class="skill-check" *ngIf="isSkillSelected(skill)">✓</div>
+          </button>
+        </div>
+
+        <div class="selected-summary" *ngIf="selectedSkills.length > 0">
+          <span class="selected-count">✅ {{ selectedSkills.length }} selected</span>
+          <div class="tags-row">
+            <span *ngFor="let s of selectedSkills" class="tag selected">{{ s.skillName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── STEP 2: Cover Letter ─── -->
+      <div *ngIf="currentStep === 'application'">
+
+        <div class="skills-recap">
+          <span class="recap-label">Selected skills:</span>
+          <div class="tags-row">
+            <span *ngFor="let s of selectedSkills" class="tag selected-sm">
+              <img *ngIf="getSkillIcon(s.skillName)" [src]="getSkillIcon(s.skillName)!" class="tag-icon"
+                onerror="this.style.display='none'" />
+              {{ s.skillName }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Inline error -->
+        <div class="error-banner" *ngIf="errorMessage">⚠️ {{ errorMessage }}</div>
+
+        <div class="section-label mt">
+          <span class="section-dot orange"></span>
+          COVER LETTER — Choose how to provide it
+        </div>
+
+        <!-- Mode selector -->
+        <div class="mode-cards">
+          <button type="button" class="mode-card" [class.active]="coverLetterMode === 'text'"
+            (click)="coverLetterMode = 'text'">
+            <span class="mode-icon">✏️</span>
+            <span class="mode-title">Write it</span>
+            <span class="mode-sub">Type your letter</span>
+          </button>
+          <button type="button" class="mode-card" [class.active]="coverLetterMode === 'upload'"
+            (click)="coverLetterMode = 'upload'">
+            <span class="mode-icon">📤</span>
+            <span class="mode-title">Upload PDF</span>
+            <span class="mode-sub">Use your own file</span>
+          </button>
+          <button type="button" class="mode-card" [class.active]="coverLetterMode === 'generate'"
+            (click)="coverLetterMode = 'generate'">
+            <span class="mode-icon">⚡</span>
+            <span class="mode-title">Auto-generate</span>
+            <span class="mode-sub">From your CV & skills</span>
+          </button>
+        </div>
+
+        <!-- ── Write mode ── -->
+        <div *ngIf="coverLetterMode === 'text'" class="mode-content">
+          <textarea
+            [formControl]="$any(form.get('coverLetter'))"
+            class="cover-textarea"
+            rows="6"
+            placeholder="Dear client,&#10;&#10;I'm excited to apply for this project because...">
+          </textarea>
+          <div class="char-count">{{ form.value.coverLetter?.length || 0 }} / min. 20 chars</div>
+        </div>
+
+        <!-- ── Upload mode ── -->
+        <div *ngIf="coverLetterMode === 'upload'" class="mode-content">
+
+          <!-- Already uploaded -->
+          <div *ngIf="coverLetterRelativePath" class="upload-success">
+            <span class="upload-success-icon">✅</span>
+            <div class="upload-success-body">
+              <p class="upload-success-title">PDF uploaded successfully!</p>
+              <a [href]="coverLetterPreviewUrl" target="_blank" class="preview-link-small">Preview PDF →</a>
+            </div>
+            <button type="button" class="btn-reupload"
+              (click)="coverLetterRelativePath = null; coverLetterPreviewUrl = null; coverLetterFileName = ''; coverLetterFile = null">
+              Change file
+            </button>
+          </div>
+
+          <!-- Not yet uploaded — drop zone -->
+          <div *ngIf="!coverLetterRelativePath">
+            <label class="drop-zone" [class.drop-zone--selected]="coverLetterFile">
+              <input type="file" accept=".pdf" (change)="onCoverLetterFileChange($event)" hidden />
+
+              <!-- Empty state -->
+              <div class="drop-empty" *ngIf="!coverLetterFile">
+                <div class="drop-icon-big">📄</div>
+                <span class="drop-text">Click to choose a PDF</span>
+                <span class="drop-hint">Cover letter in PDF format</span>
+              </div>
+
+              <!-- File selected preview -->
+              <div class="drop-preview" *ngIf="coverLetterFile">
+                <div class="pdf-thumb">
+                  <span class="pdf-ext">PDF</span>
+                </div>
+                <div class="drop-preview-info">
+                  <span class="drop-preview-name">{{ coverLetterFileName }}</span>
+                  <span class="drop-preview-size">{{ (coverLetterFile.size / 1024).toFixed(0) }} KB</span>
+                </div>
+                <span class="drop-change-btn">Change</span>
+              </div>
+            </label>
+
+            <button
+              type="button"
+              class="btn-do-upload-full"
+              (click)="uploadCoverLetterFile()"
+              [disabled]="!coverLetterFile || isUploadingFile">
+              <span *ngIf="!isUploadingFile">⬆️ Upload PDF</span>
+              <span *ngIf="isUploadingFile">⏳ Uploading...</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Generate mode ── -->
+        <div *ngIf="coverLetterMode === 'generate'" class="mode-content">
+          <div class="generate-info">
+            <p>We'll generate a personalized cover letter based on your skills and the project requirements.</p>
+            <button type="button" class="btn-generate" (click)="generateCoverLetter()"
+              [disabled]="isGeneratingLetter">
+              {{ isGeneratingLetter ? '⏳ Generating...' : '⚡ Generate Cover Letter' }}
+            </button>
+            <div class="success-badge" *ngIf="generatedRelativePath && !isGeneratingLetter">
+              ✅ Letter generated!
+              <a [href]="generatedPreviewUrl" target="_blank" class="preview-link">Preview PDF →</a>
+              <br><small>It will be submitted with your application.</small>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- end modal-body -->
+
+    <!-- STICKY Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn-back"
+        (click)="currentStep === 'application' ? currentStep = 'skills' : closeModal()">
+        {{ currentStep === 'application' ? '← Back' : 'Cancel' }}
+      </button>
+      <button type="button" *ngIf="currentStep === 'skills'" class="btn-next"
+        (click)="nextStep()" [disabled]="selectedSkills.length === 0">
+        Next →
+      </button>
+      <button type="button" *ngIf="currentStep === 'application'" class="btn-submit"
+        (click)="submitApplication()" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Submitting...' : '🚀 Submit Application' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Success Modal — centré par-dessus tout ────────────────── -->
+<div class="success-overlay" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
+  <div class="success-box" (click)="$event.stopPropagation()">
+
+    <div class="success-circle">
+      <span>✓</span>
+    </div>
+
+    <h2 class="success-title">Application Submitted!</h2>
+
+    <p class="success-message">
+      Your application for <strong>{{ project?.title }}</strong> has been
+      successfully sent. The client will review it shortly.
+    </p>
+
+    <div class="success-info-box">
+      <div class="success-info-item">
+        <span class="success-info-dot">●</span>
+        You will be notified when the client responds to your application.
+      </div>
+      <div class="success-info-item">
+        <span class="success-info-dot">●</span>
+        You can track all your applications from your dashboard.
+      </div>
+    </div>
+
+    <button class="btn-success-close" (click)="closeSuccessModal()">
+      🚀 Great, let's go!
+    </button>
+
+  </div>
+</div>

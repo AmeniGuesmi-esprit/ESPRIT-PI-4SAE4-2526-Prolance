@@ -1,0 +1,270 @@
+/* signalement-modal.component.css */
+
+.signal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 16px;
+}
+
+.signal-box {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: slideUp 0.22s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Header ── */
+.signal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.signal-icon {
+  font-size: 1.5rem;
+}
+
+.signal-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1c1e21;
+}
+
+.signal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #888;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+.signal-close:hover { background: #f5f5f5; color: #333; }
+
+/* ── Subtitle ── */
+.signal-subtitle {
+  padding: 14px 20px 6px;
+  font-size: 0.88rem;
+  color: #555;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Preset reasons ── */
+.signal-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 20px;
+}
+
+.signal-reason-btn {
+  padding: 7px 13px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #fafafa;
+  font-size: 0.82rem;
+  color: #444;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.signal-reason-btn:hover {
+  border-color: #f43f5e;
+  background: #fff1f2;
+  color: #f43f5e;
+}
+.signal-reason-btn.selected {
+  border-color: #f43f5e;
+  background: #fff1f2;
+  color: #e11d48;
+  font-weight: 600;
+}
+
+/* ── Custom textarea ── */
+.signal-custom {
+  padding: 10px 20px 4px;
+  position: relative;
+}
+
+.signal-custom-label {
+  display: block;
+  font-size: 0.82rem;
+  color: #666;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.signal-textarea {
+  width: 100%;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  color: #1c1e21;
+  background: #fafafa;
+}
+.signal-textarea:focus {
+  outline: none;
+  border-color: #f43f5e;
+  background: #fff;
+}
+
+.signal-char-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: #aaa;
+  text-align: right;
+  margin-top: 3px;
+}
+
+/* ── Error ── */
+.signal-error {
+  margin: 4px 20px 0;
+  color: #e11d48;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* ── Footer ── */
+.signal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 10px;
+}
+
+.signal-btn-cancel {
+  padding: 9px 18px;
+  border-radius: 10px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  color: #555;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.signal-btn-cancel:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.signal-btn-submit {
+  padding: 9px 20px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  font-family: inherit;
+  min-width: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.signal-btn-submit:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.signal-btn-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* ── Spinner ── */
+.signal-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Styles pour les raisons dans gestion-forum (admin) ── */
+.pub-raisons {
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: #fff8f8;
+  border-left: 3px solid #f43f5e;
+  border-radius: 0 8px 8px 0;
+}
+.pub-raisons-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e11d48;
+  margin: 0 0 6px;
+}
+.pub-raisons-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pub-raison-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #444;
+}
+.raison-index {
+  font-weight: 700;
+  color: #f43f5e;
+  min-width: 20px;
+}
+.raison-text { flex: 1; }
+
+/* Warned users — raisons */
+.warn-post-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+.warn-post-signals {
+  font-size: 0.75rem;
+  color: #f59e0b;
+  font-weight: 600;
+}
+.warn-raisons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.warn-raison-chip {
+  font-size: 0.73rem;
+  background: #fff8f8;
+  border: 1px solid #fecaca;
+  color: #e11d48;
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-style: italic;
+}

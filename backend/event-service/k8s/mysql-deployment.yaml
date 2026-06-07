@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: event-mysql-secret
+  namespace: default
+type: Opaque
+stringData:
+  mysql-root-password: "root1234"
+  mysql-database: "pidev_events"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-mysql
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-mysql
+  template:
+    metadata:
+      labels:
+        app: event-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: event-mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: event-mysql-secret
+                  key: mysql-database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-mysql
+  namespace: default
+spec:
+  selector:
+    app: event-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306

@@ -1,0 +1,227 @@
+<div class="plans-page">
+
+  <!-- HERO HEADER -->
+  <div class="plans-hero">
+    <div class="hero-bg-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="hero-content" @fadeSlide>
+      <span class="hero-badge">
+        {{ selectedType === 'FREELANCER' ? '💼 Freelancer' : '🏢 Client' }}
+      </span>
+      <h1>
+        Find the
+        <span class="gradient-text">perfect</span>
+        plan for you
+      </h1>
+      <p class="hero-subtitle">
+        {{ selectedType === 'FREELANCER'
+          ? 'Boost your visibility and land more projects'
+          : 'Recruit the best talent for your projects' }}
+      </p>
+
+      <div class="billing-toggle">
+        <button
+          [class.active]="billingCycle === 'SEMESTRIELLE'"
+          (click)="setBillingCycle('SEMESTRIELLE')">
+          Semi-annual
+        </button>
+        <button
+          [class.active]="billingCycle === 'ANNUELLE'"
+          (click)="setBillingCycle('ANNUELLE')">
+          Annual
+          <span class="save-tag" *ngIf="billingCycle !== 'ANNUELLE'">SAVE</span>
+        </button>
+        <div class="toggle-slider" [class.right]="billingCycle === 'ANNUELLE'"></div>
+      </div>
+
+      <!-- 🤖 PROMO SUGGESTIONS IA -->
+      <app-promo-suggestion
+        [userType]="selectedType"
+        [planTier]="'PRO'"
+        (promoSelected)="onPromoSelected($event)">
+      </app-promo-suggestion>
+
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+      <div class="loader-ring"></div>
+    </div>
+    <p>Loading plans...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-state" *ngIf="errorMessage" @fadeSlide>
+    <div class="error-card">
+      <span class="error-icon">⚠️</span>
+      <h3>Oops!</h3>
+      <p>{{ errorMessage }}</p>
+      <button class="btn-retry" (click)="loadPlans()">
+        <span>↻</span> Retry
+      </button>
+    </div>
+  </div>
+
+  <!-- PLANS GRID -->
+  <div class="plans-section" *ngIf="!loading && !errorMessage && filteredPlans.length > 0">
+    <div class="plans-grid" @staggerCards>
+
+      <div
+        class="plan-card"
+        *ngFor="let plan of filteredPlans; let i = index"
+        [class.popular]="isPopular(plan)"
+        [attr.data-tier]="getPlanTier(plan)">
+
+        <div class="popular-ribbon" *ngIf="isPopular(plan)">
+          <span>⭐ POPULAR</span>
+        </div>
+
+        <div class="savings-badge" *ngIf="getSavingsPercent(plan) as savings">
+          Save {{ savings }}%
+        </div>
+
+        <div class="card-header" [attr.data-tier]="getPlanTier(plan)">
+          <span class="plan-icon">{{ getPlanIcon(plan) }}</span>
+          <h2 class="plan-name-title">{{ plan.name }}</h2>
+          <p class="plan-desc" *ngIf="plan.description">{{ plan.description }}</p>
+        </div>
+
+        <div class="price-block">
+          <div class="price-main">
+            <span class="currency">DT</span>
+            <span class="amount">{{ plan.price }}</span>
+          </div>
+          <span class="price-period">/ {{ getDuration(plan) }}</span>
+          <span class="price-monthly">≈ {{ getMonthlyPrice(plan) }} DT/month</span>
+        </div>
+
+        <div class="social-proof" *ngIf="plan.activeSubscribersCount && plan.activeSubscribersCount > 0">
+          <span class="proof-dot"></span>
+          {{ plan.activeSubscribersCount }} active subscribers
+        </div>
+
+        <ul class="features-list">
+          <li
+            *ngFor="let feature of getFeatures(plan)"
+            [class.highlighted]="feature.highlight">
+            <span class="feature-check" [attr.data-tier]="getPlanTier(plan)">✓</span>
+            <span>{{ feature.text }}</span>
+          </li>
+        </ul>
+
+        <button
+          class="btn-subscribe"
+          [attr.data-tier]="getPlanTier(plan)"
+          (click)="onSubscribe(plan)">
+          Get started now
+        </button>
+      </div>
+
+    </div>
+
+    <!-- COMPARISON TABLE -->
+    <div class="comparison-section">
+      <button class="btn-compare" (click)="toggleComparison()">
+        {{ showComparison ? 'Hide' : 'View' }} detailed comparison
+        <span class="compare-arrow" [class.rotated]="showComparison">▼</span>
+      </button>
+
+      <div class="comparison-table-wrapper" *ngIf="showComparison" @fadeSlide>
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th class="feature-col">Feature</th>
+              <th *ngFor="let plan of filteredPlans" [attr.data-tier]="getPlanTier(plan)">
+                {{ plan.name }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Price</td>
+              <td *ngFor="let plan of filteredPlans">
+                <strong>{{ plan.price }} DT</strong>/{{ getDuration(plan) }}
+              </td>
+            </tr>
+            <tr>
+              <td>{{ selectedType === 'FREELANCER' ? 'Max Projects' : 'Listings' }}</td>
+              <td *ngFor="let plan of filteredPlans">
+                {{ plan.maxProjects && plan.maxProjects >= 999 ? '∞ Unlimited' : plan.maxProjects || '—' }}
+              </td>
+            </tr>
+            <tr>
+              <td>Proposals</td>
+              <td *ngFor="let plan of filteredPlans">
+                {{ plan.maxProposals && plan.maxProposals >= 999 ? '∞ Unlimited' : plan.maxProposals || '—' }}
+              </td>
+            </tr>
+            <tr>
+              <td>{{ selectedType === 'FREELANCER' ? 'Active Jobs' : 'Recruitments' }}</td>
+              <td *ngFor="let plan of filteredPlans">
+                {{ plan.maxActiveJobs && plan.maxActiveJobs >= 999 ? '∞ Unlimited' : plan.maxActiveJobs || '—' }}
+              </td>
+            </tr>
+            <tr>
+              <td>{{ selectedType === 'FREELANCER' ? 'Featured Profile' : 'AI Matching' }}</td>
+              <td *ngFor="let plan of filteredPlans">
+                <span [class.check-yes]="plan.featuredListing" [class.check-no]="!plan.featuredListing">
+                  {{ plan.featuredListing ? '✓' : '✗' }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Priority Support</td>
+              <td *ngFor="let plan of filteredPlans">
+                <span [class.check-yes]="plan.prioritySupport" [class.check-no]="!plan.prioritySupport">
+                  {{ plan.prioritySupport ? '✓' : '✗' }}
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td>Analytics</td>
+              <td *ngFor="let plan of filteredPlans">
+                <span [class.check-yes]="plan.analyticsAccess" [class.check-no]="!plan.analyticsAccess">
+                  {{ plan.analyticsAccess ? '✓' : '✗' }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- No plans -->
+  <div class="empty-state" *ngIf="!loading && !errorMessage && filteredPlans.length === 0" @fadeSlide>
+    <span class="empty-icon">📋</span>
+    <p>No plans available for this selection.</p>
+    <button class="btn-retry" (click)="loadPlans()">Refresh</button>
+  </div>
+
+  <!-- CONFIRMATION MODAL -->
+  <app-confirm-modal
+    [plan]="selectedPlan"
+    [selectedType]="selectedType"
+    [isVisible]="showModal"
+    (confirmed)="onModalConfirmed($event)"
+    (cancelled)="onModalCancelled()">
+  </app-confirm-modal>
+
+  <!-- SUCCESS MODAL -->
+  <app-success-modal
+    [isVisible]="showSuccess"
+    [planName]="successPlanName"
+    [planTier]="successPlanTier"
+    [userType]="selectedType"
+    (closed)="onSuccessClosed()"
+    (downloadInvoice)="downloadInvoice()">
+  </app-success-modal>
+
+</div>

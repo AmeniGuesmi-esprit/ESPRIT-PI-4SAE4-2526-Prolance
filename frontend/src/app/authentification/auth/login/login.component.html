@@ -1,0 +1,384 @@
+<!-- ========== LOGIN PAGE ========== -->
+<div class="auth-wrapper">
+  <div class="auth-overlay"></div>
+
+  <div class="auth-container">
+    <div class="card auth-card">
+
+      <!-- Floating icon badge -->
+      <div class="card-header card-header-icon card-header-primary text-center">
+        <div class="card-icon">
+          <i class="material-icons">
+            {{ view === 'forgot' || view === 'forgot-sent' ? 'lock_reset'
+              : view === '2fa' ? 'verified_user'
+              : view === 'face-login' ? 'face'
+              : 'lock_open' }}
+          </i>
+        </div>
+      </div>
+
+      <div class="card-body">
+
+        <!-- ══ SUCCESS BANNER ══ -->
+        <div class="banner-success" *ngIf="registeredSuccess">
+          <i class="material-icons">check_circle</i>
+          Registration successful! You can now sign in.
+        </div>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- VIEW: LOGIN                                    -->
+        <!-- ══════════════════════════════════════════════ -->
+        <ng-container *ngIf="view === 'login'">
+
+          <h3 class="auth-title">Welcome Back</h3>
+          <p class="auth-subtitle text-muted">Sign in to your Prolance account</p>
+
+          <!-- Face sign-in shortcut (only shown when enrolled) -->
+          <div class="face-login-cta" *ngIf="hasFaceEnrolled">
+            <button type="button" class="btn-face-full" (click)="switchView('face-login')">
+              <i class="material-icons">face</i>
+              <span>Sign in with Face ID</span>
+              <span class="face-badge">Quick</span>
+            </button>
+          </div>
+
+          <!-- Google -->
+          <div class="social-login" [class.mt-0]="hasFaceEnrolled">
+            <button type="button" class="btn-google-full"
+                    (click)="loginWithGoogle()"
+                    [disabled]="googleLoading || isLoading">
+              <span class="google-spinner" *ngIf="googleLoading">
+                <i class="material-icons spinner-icon">autorenew</i>
+              </span>
+              <svg *ngIf="!googleLoading" width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.2l6.8-6.8C35.7 2.2 30.2 0 24 0 14.7 0 6.7 5.4 2.8 13.3l7.9 6.1C12.6 13 17.9 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.8-2.2 5.2-4.7 6.8l7.3 5.7c4.3-4 6.9-9.9 7.2-16.5z"/>
+                <path fill="#FBBC05" d="M10.7 28.6A14.6 14.6 0 0 1 9.5 24c0-1.6.3-3.2.8-4.6L2.4 13.3A23.9 23.9 0 0 0 0 24c0 3.8.9 7.4 2.5 10.6l8.2-6z"/>
+                <path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.5l-7.3-5.7c-2 1.4-4.6 2.2-7.9 2.2-6.1 0-11.4-3.5-13.3-8.5l-7.9 6.1C6.7 42.6 14.7 48 24 48z"/>
+              </svg>
+              <span>{{ googleLoading ? 'Connecting...' : 'Continue with Google' }}</span>
+            </button>
+          </div>
+
+          <div class="divider"><span>or sign in with email</span></div>
+
+          <!-- Error / lockout banners -->
+          <div class="banner-error" *ngIf="loginError">
+            <i class="material-icons">warning</i> {{ loginError }}
+          </div>
+          <div class="banner-lockout" *ngIf="isLockedOut">
+            <i class="material-icons">timer</i>
+            Account temporarily locked. Try again in {{ lockoutSeconds }}s.
+          </div>
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+            <!-- Email -->
+            <div class="form-group bmd-form-group"
+                 [class.has-success]="loginForm.get('email')?.valid && loginForm.get('email')?.touched"
+                 [class.has-danger]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">email</i></span>
+                </div>
+                <input type="email" class="form-control" placeholder="Email Address" formControlName="email">
+                <div class="input-group-append" *ngIf="loginForm.get('email')?.touched">
+                  <span class="input-group-text status-icon">
+                    <i class="material-icons">{{ loginForm.get('email')?.valid ? 'check_circle' : 'error' }}</i>
+                  </span>
+                </div>
+              </div>
+              <small class="text-danger" *ngIf="loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched">Email is required</small>
+              <small class="text-danger" *ngIf="loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched">Enter a valid email</small>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group bmd-form-group"
+                 [class.has-success]="loginForm.get('password')?.valid && loginForm.get('password')?.touched"
+                 [class.has-danger]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">lock</i></span>
+                </div>
+                <input [type]="showPassword ? 'text' : 'password'"
+                       class="form-control" placeholder="Password" formControlName="password">
+                <div class="input-group-append">
+                  <span class="input-group-text toggle-password" (click)="togglePassword()">
+                    <i class="material-icons">{{ showPassword ? 'visibility_off' : 'visibility' }}</i>
+                  </span>
+                </div>
+              </div>
+              <small class="text-danger" *ngIf="loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched">Password is required</small>
+              <small class="text-danger" *ngIf="loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched">At least 6 characters</small>
+            </div>
+
+            <!-- Captcha -->
+            <div class="captcha-group">
+              <div class="captcha-question">
+                <i class="material-icons">calculate</i>
+                <span>{{ captchaQuestion }}</span>
+                <button type="button" class="btn-refresh-captcha" (click)="refreshCaptcha()" title="Refresh">
+                  <i class="material-icons">refresh</i>
+                </button>
+              </div>
+              <div class="form-group bmd-form-group captcha-input-wrap"
+                   [class.has-danger]="loginForm.get('captcha')?.touched && !isCaptchaCorrect()">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="material-icons">tag</i></span>
+                  </div>
+                  <input type="number" class="form-control" placeholder="Your answer" formControlName="captcha">
+                </div>
+              </div>
+            </div>
+
+            <!-- Remember + Forgot -->
+            <div class="auth-options">
+              <div class="form-check">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="checkbox" formControlName="rememberMe">
+                  <span class="form-check-sign"><span class="check"></span></span>
+                  Remember Me
+                </label>
+              </div>
+              <button type="button" class="btn-link-inline" (click)="switchView('forgot')">
+                Forgot Password?
+              </button>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg auth-submit"
+                    [disabled]="isLoading || isLockedOut">
+              <span *ngIf="!isLoading">
+                <i class="material-icons btn-icon">login</i> Sign In
+              </span>
+              <span *ngIf="isLoading" class="spinner-wrap">
+                <i class="material-icons spinner-icon">autorenew</i> Signing in...
+              </span>
+            </button>
+
+          </form>
+
+          <!-- Face ID hint: not enrolled → point to profile -->
+          <div class="face-enroll-hint" *ngIf="!hasFaceEnrolled">
+            <i class="material-icons">face</i>
+            <span>Want faster logins? Set up Face ID in your </span>
+            <a routerLink="/app/profile" class="btn-link-inline">Profile settings</a>
+          </div>
+
+          <p class="auth-switch text-center">
+            Don't have an account?
+            <a routerLink="/register" class="text-primary font-weight-bold">Create one</a>
+          </p>
+        </ng-container>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- VIEW: FACE LOGIN                               -->
+        <!-- ══════════════════════════════════════════════ -->
+        <ng-container *ngIf="view === 'face-login'">
+
+          <h3 class="auth-title">Face Sign-In</h3>
+          <p class="auth-subtitle text-muted">Hold still and look at the camera</p>
+
+          <div class="face-cam-frame">
+            <div class="face-cam-oval" [class.scanning]="faceRingState === 'scanning'"
+                                       [class.success]="faceRingState === 'success'"
+                                       [class.error]="faceRingState === 'error'">
+              <video #faceVideo autoplay muted playsinline></video>
+            </div>
+            <div class="face-cam-ring" [class]="faceRingState"></div>
+          </div>
+
+          <div class="face-status-pill" [class]="faceStatusType">
+            <span class="face-dot" [class.blink]="faceStatusType === 'working'"></span>
+            <span>{{ faceStatus || 'Initializing…' }}</span>
+          </div>
+
+          <p class="auth-switch text-center" style="margin-top: 1rem;">
+            <button type="button" class="btn-link-inline" (click)="switchView('login')">
+              <i class="material-icons" style="font-size:14px;vertical-align:middle">arrow_back</i>
+              Use email instead
+            </button>
+          </p>
+
+        </ng-container>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- VIEW: FORGOT PASSWORD                          -->
+        <!-- ══════════════════════════════════════════════ -->
+        <ng-container *ngIf="view === 'forgot'">
+
+          <h3 class="auth-title">Reset Password</h3>
+          <p class="auth-subtitle text-muted">Enter your email and we'll send a reset link</p>
+
+          <form [formGroup]="forgotForm" (ngSubmit)="onForgotSubmit()" novalidate>
+
+            <div class="form-group bmd-form-group"
+                 [class.has-success]="forgotForm.get('forgotEmail')?.valid && forgotForm.get('forgotEmail')?.touched"
+                 [class.has-danger]="forgotForm.get('forgotEmail')?.invalid && forgotForm.get('forgotEmail')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">email</i></span>
+                </div>
+                <input type="email" class="form-control"
+                       placeholder="Your email address"
+                       formControlName="forgotEmail">
+              </div>
+              <small class="text-danger" *ngIf="forgotForm.get('forgotEmail')?.hasError('required') && forgotForm.get('forgotEmail')?.touched">Email is required</small>
+              <small class="text-danger" *ngIf="forgotForm.get('forgotEmail')?.hasError('email') && forgotForm.get('forgotEmail')?.touched">Enter a valid email</small>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg auth-submit"
+                    [disabled]="isLoading">
+              <span *ngIf="!isLoading">
+                <i class="material-icons btn-icon">send</i> Send Reset Link
+              </span>
+              <span *ngIf="isLoading" class="spinner-wrap">
+                <i class="material-icons spinner-icon">autorenew</i> Sending...
+              </span>
+            </button>
+
+          </form>
+
+          <p class="auth-switch text-center">
+            <button type="button" class="btn-link-inline" (click)="switchView('login')">
+              <i class="material-icons" style="font-size:14px;vertical-align:middle">arrow_back</i>
+              Back to Sign In
+            </button>
+          </p>
+        </ng-container>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- VIEW: FORGOT SENT                              -->
+        <!-- ══════════════════════════════════════════════ -->
+        <ng-container *ngIf="view === 'forgot-sent'">
+          <div class="sent-state">
+            <div class="sent-icon">
+              <i class="material-icons">mark_email_read</i>
+            </div>
+            <h3 class="auth-title">Check your inbox</h3>
+            <p class="auth-subtitle text-muted">
+              We sent a password reset link to<br>
+              <strong>{{ forgotForm.value.forgotEmail }}</strong>
+            </p>
+            <p class="sent-hint">Didn't receive it? Check your spam folder or</p>
+            <button type="button" class="btn-link-inline" (click)="switchView('forgot')">
+              try a different email
+            </button>
+          </div>
+          <p class="auth-switch text-center" style="margin-top: 24px">
+            <button type="button" class="btn-link-inline" (click)="switchView('login')">
+              <i class="material-icons" style="font-size:14px;vertical-align:middle">arrow_back</i>
+              Back to Sign In
+            </button>
+          </p>
+        </ng-container>
+
+        <!-- ══════════════════════════════════════════════ -->
+        <!-- VIEW: TWO-FACTOR AUTH                          -->
+        <!-- ══════════════════════════════════════════════ -->
+        <ng-container *ngIf="view === '2fa'">
+          <h3 class="auth-title">Two-Factor Auth</h3>
+          <p class="auth-subtitle text-muted">Enter the 6-digit code sent to your email</p>
+          <div class="twofa-hint">
+            <i class="material-icons">shield</i>
+            This extra step keeps your account secure.
+          </div>
+          <form [formGroup]="twoFactorForm" (ngSubmit)="onTwoFactorSubmit()" novalidate>
+            <div class="form-group bmd-form-group"
+                 [class.has-danger]="twoFactorForm.get('code')?.invalid && twoFactorForm.get('code')?.touched">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"><i class="material-icons">pin</i></span>
+                </div>
+                <input type="text" class="form-control code-input"
+                       placeholder="000000" maxlength="6" formControlName="code">
+              </div>
+              <small class="text-danger" *ngIf="twoFactorForm.get('code')?.hasError('required') && twoFactorForm.get('code')?.touched">Code is required</small>
+              <small class="text-danger" *ngIf="twoFactorForm.get('code')?.hasError('minlength') && twoFactorForm.get('code')?.touched">Must be 6 digits</small>
+            </div>
+            <button type="submit"
+                    class="btn btn-primary btn-round btn-block btn-lg auth-submit"
+                    [disabled]="isLoading">
+              <span *ngIf="!isLoading">
+                <i class="material-icons btn-icon">verified_user</i> Verify Code
+              </span>
+              <span *ngIf="isLoading" class="spinner-wrap">
+                <i class="material-icons spinner-icon">autorenew</i> Verifying...
+              </span>
+            </button>
+          </form>
+          <p class="auth-switch text-center">
+            <button type="button" class="btn-link-inline" (click)="switchView('login')">
+              <i class="material-icons" style="font-size:14px;vertical-align:middle">arrow_back</i>
+              Back to Sign In
+            </button>
+          </p>
+        </ng-container>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="auth-footer">
+    <a class="footer-brand" routerLink="/">
+      <strong>Pro</strong>lance
+    </a>
+    <span class="footer-copy">&copy; {{ currentYear }} Prolance. All rights reserved.</span>
+  </footer>
+</div>
+
+<!-- SUSPENSION MODAL -->
+<div class="suspended-backdrop" *ngIf="showSuspendedModal" (click)="closeSuspendedModal()">
+  <div class="suspended-modal" (click)="$event.stopPropagation()">
+    <div class="suspended-icon-wrap">
+      <div class="suspended-icon-ring"></div>
+      <div class="suspended-icon-ring ring-2"></div>
+      <div class="suspended-icon-core">
+        <i class="material-icons">block</i>
+      </div>
+    </div>
+    <h2 class="suspended-title">Access Restricted</h2>
+    <p class="suspended-subtitle">Your account cannot sign in right now</p>
+    <div class="suspended-message-box">
+      <i class="material-icons">info</i>
+      <span>{{ suspendedMessage }}</span>
+    </div>
+    <p class="suspended-help">If you think this is a mistake, please reach out to our support team.</p>
+    <button class="suspended-close-btn" (click)="closeSuspendedModal()">
+      <i class="material-icons">arrow_back</i>
+      Back to Sign In
+    </button>
+  </div>
+</div>
+
+<!-- EMAIL NOT VERIFIED MODAL -->
+<div class="suspended-backdrop" *ngIf="showNotVerifiedModal" (click)="closeNotVerifiedModal()">
+  <div class="suspended-modal" (click)="$event.stopPropagation()">
+    <div class="suspended-icon-wrap">
+      <div class="suspended-icon-ring"></div>
+      <div class="suspended-icon-ring ring-2"></div>
+      <div class="suspended-icon-core">
+        <i class="material-icons">mark_email_unread</i>
+      </div>
+    </div>
+    <h2 class="suspended-title">Verify Your Email</h2>
+    <p class="suspended-subtitle">Your email address hasn't been verified yet</p>
+    <div class="suspended-message-box">
+      <i class="material-icons">info</i>
+      <span>We sent a verification link to <strong>{{ notVerifiedEmail }}</strong>. Please check your inbox and click the link to activate your account.</span>
+    </div>
+    <p class="suspended-help">Didn't receive the email? Check your spam folder or resend it below.</p>
+    <button class="suspended-close-btn" style="background: linear-gradient(135deg, #9c27b0, #00acc1);" (click)="resendFromLogin()">
+      <i class="material-icons">send</i>
+      Resend Verification Email
+    </button>
+    <button class="suspended-close-btn" style="margin-top: 10px; background: transparent; border: 1px solid #ccc; color: #666;" (click)="closeNotVerifiedModal()">
+      <i class="material-icons">arrow_back</i>
+      Back to Sign In
+    </button>
+  </div>
+</div>

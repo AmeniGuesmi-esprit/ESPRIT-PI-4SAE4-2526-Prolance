@@ -1,0 +1,31 @@
+<div class="overlay" *ngIf="visible" (click)="cancelled.emit()">
+  <div class="dialog" [class]="'dialog--' + type" (click)="$event.stopPropagation()">
+
+    <!-- Icon -->
+    <div class="dialog__icon">
+      <span *ngIf="type === 'warning'">⚠️</span>
+      <span *ngIf="type === 'error'">🚫</span>
+      <span *ngIf="type === 'success'">✅</span>
+    </div>
+
+    <!-- Content -->
+    <h2 class="dialog__title">{{ title }}</h2>
+    <p class="dialog__message">{{ message }}</p>
+
+    <!-- Actions -->
+    <div class="dialog__actions">
+      <button *ngIf="showCancel"
+              class="btn btn--cancel"
+              (click)="cancelled.emit()">
+        {{ cancelText }}
+      </button>
+      <button class="btn"
+              [class.btn--danger]="type === 'warning' || type === 'error'"
+              [class.btn--primary]="type === 'success'"
+              (click)="confirmed.emit()">
+        {{ confirmText }}
+      </button>
+    </div>
+
+  </div>
+</div>

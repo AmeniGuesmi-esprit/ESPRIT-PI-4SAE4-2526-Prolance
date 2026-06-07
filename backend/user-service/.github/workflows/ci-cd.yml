@@ -1,0 +1,137 @@
+name: CI/CD Pipeline — user-service
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  DOCKER_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/user-service
+
+jobs:
+  # ─────────────────────────────────────────
+  # JOB 1 — Build & Test (CI)
+  # ─────────────────────────────────────────
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: pidev_db
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run tests
+        env:
+          # Override DB config for CI environment
+          SPRING_DATASOURCE_URL: jdbc:mysql://localhost:3306/pidev_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: root
+          # Use dummy values for external services in tests
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy
+          SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy
+          SPRING_MAIL_USERNAME: dummy@gmail.com
+          SPRING_MAIL_PASSWORD: dummy
+          EUREKA_CLIENT_ENABLED: false
+          EUREKA_CLIENT_REGISTER_WITH_EUREKA: false
+          EUREKA_CLIENT_FETCH_REGISTRY: false
+        run: mvn test
+
+      - name: Build JAR (no tests)
+        run: mvn package -DskipTests
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: target/*.jar
+
+  # ─────────────────────────────────────────
+  # JOB 2 — Docker Build & Push (CD)
+  # Only runs on push to main
+  # ─────────────────────────────────────────
+  docker-build-push:
+    name: Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: target/
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:latest
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+
+  # ─────────────────────────────────────────
+  # JOB 3 — Deploy (CD)
+  # Deploys to your server via SSH
+  # ─────────────────────────────────────────
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    needs: docker-build-push
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull ${{ env.DOCKER_IMAGE }}:latest
+            docker stop user-service || true
+            docker rm user-service || true
+            docker run -d \
+              --name user-service \
+              --restart unless-stopped \
+              -p 8081:8081 \
+              -e SPRING_DATASOURCE_URL=${{ secrets.DB_URL }} \
+              -e SPRING_DATASOURCE_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -e GROQ_API_KEY=${{ secrets.GROQ_API_KEY }} \
+              -e SPRING_MAIL_USERNAME=${{ secrets.MAIL_USERNAME }} \
+              -e SPRING_MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
+              ${{ env.DOCKER_IMAGE }}:latest

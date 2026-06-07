@@ -1,0 +1,38 @@
+<div class="activity-block" [formGroup]="activityForm">
+
+  <div class="activity-block-header">
+    <span><i class="material-icons">play_circle_outline</i> Activité {{ index + 1 }}</span>
+    <button type="button" class="btn-remove" (click)="onRemove()">
+      <i class="material-icons">delete_outline</i> Supprimer
+    </button>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-8">
+      <label class="form-label">Titre *</label>
+      <input type="text" class="form-control" formControlName="name"
+        placeholder="Titre de l'activité"
+        [class.is-invalid]="isFieldInvalid('name')">
+      <div class="invalid-feedback" *ngIf="isFieldInvalid('name')">Le nom de l'activité est requis.</div>
+    </div>
+    
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Description</label>
+    <input type="text" class="form-control" formControlName="description"
+      placeholder="Courte description de l'activité">
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col-md-8">
+      <label class="form-label">Prérequis *</label>
+      <input type="text" class="form-control" formControlName="requirements"
+        placeholder="Ex : matériel nécessaire, niveau requis..."
+        [class.is-invalid]="isFieldInvalid('requirements')">
+      <div class="invalid-feedback" *ngIf="isFieldInvalid('requirements')">Les prérequis sont requis.</div>
+    </div>
+    
+  </div>
+
+</div>

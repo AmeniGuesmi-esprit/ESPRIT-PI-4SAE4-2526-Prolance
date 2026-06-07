@@ -1,0 +1,98 @@
+pipeline {
+    agent any
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    environment {
+        REGISTRY       = "172.22.191.1:5000"
+        IMAGE_NAME     = "ads-service"
+        IMAGE_TAG      = "${BUILD_NUMBER}"
+        FULL_IMAGE     = "${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+        SERVICE_DIR    = "ads-service"
+        SONAR_HOST_URL = "http://172.22.191.1:9000"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps { checkout scm }
+        }
+
+        stage('Build & Unit Tests') {
+            steps {
+                dir("${SERVICE_DIR}") {
+                    sh 'mvn -B -ntp clean verify'
+                }
+            }
+            post {
+                always {
+                    junit testResults: "${SERVICE_DIR}/target/surefire-reports/*.xml",
+                          allowEmptyResults: true
+                    jacoco(
+                        execPattern:   "${SERVICE_DIR}/target/jacoco.exec",
+                        classPattern:  "${SERVICE_DIR}/target/classes",
+                        sourcePattern: "${SERVICE_DIR}/src/main/java",
+                        exclusionPattern: "**/dto/**,**/config/**,**/security/**,**/exception/**,**/*Application.*"
+                    )
+                    archiveArtifacts artifacts: "${SERVICE_DIR}/target/site/jacoco/**", allowEmptyArchive: true
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            when {
+                expression {
+                    return sh(script: "curl -fs -o /dev/null ${SONAR_HOST_URL}/api/system/status", returnStatus: true) == 0
+                }
+            }
+            steps {
+                dir("${SERVICE_DIR}") {
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh '''
+                          mvn -B -ntp sonar:sonar \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN \
+                            -Dsonar.projectKey=ads-service \
+                            -Dsonar.projectName=ads-service \
+                            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir("${SERVICE_DIR}") {
+                    sh "docker build -t ${FULL_IMAGE} ."
+                }
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                sh "docker push ${FULL_IMAGE}"
+                sh "docker tag ${FULL_IMAGE} ${REGISTRY}/${IMAGE_NAME}:latest"
+                sh "docker push ${REGISTRY}/${IMAGE_NAME}:latest"
+            }
+        }
+
+        stage('Trigger CD') {
+            steps {
+                build job: 'ads-service-CD',
+                      parameters: [string(name: 'IMAGE_TAG', value: "${IMAGE_TAG}")],
+                      wait: true,
+                      propagate: true
+            }
+        }
+    }
+
+    post {
+        success { echo "CI OK - image ${FULL_IMAGE} pushed; CD finished successfully." }
+        failure { echo "CI FAILED - see logs above." }
+        always  { sh "docker rmi ${FULL_IMAGE} || true" }
+    }
+}

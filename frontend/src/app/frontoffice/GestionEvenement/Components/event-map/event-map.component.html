@@ -1,0 +1,22 @@
+<div class="map-container">
+
+  <!-- Géocodage en cours -->
+  <div *ngIf="isGeocoding" class="map-loading">
+    <i class="material-icons spin">autorenew</i>
+    <span>Localisation en cours...</span>
+  </div>
+
+  <!-- Localisation introuvable -->
+  <div *ngIf="!_lat && !_lng && !isGeocoding" class="map-unavailable">
+    <i class="material-icons">location_off</i>
+    <span>Localisation non disponible pour « {{ _locationName }} »</span>
+  </div>
+
+  <!-- Carte Leaflet -->
+  <div #mapEl
+       id="event-map"
+       [style.visibility]="(_lat && _lng) ? 'visible' : 'hidden'">
+  </div>
+
+</div>
+Write to Marah Mabrouk

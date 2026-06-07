@@ -1,0 +1,66 @@
+<configuration>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         APPENDER 1 : Console
+         Logs visibles via "docker logs reaction-service-live"
+         et dans la sortie Jenkins du pipeline CD
+    ═══════════════════════════════════════════════════════════ -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         APPENDER 2 : GELF UDP → Graylog
+         Envoie les logs en UDP GELF vers Graylog sur le port 12201
+         GRAYLOG_HOST est injecté via -e GRAYLOG_HOST=... dans docker run
+         Valeur par défaut : localhost (si variable non fournie)
+    ═══════════════════════════════════════════════════════════ -->
+    <appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>${GRAYLOG_HOST:-localhost}</graylogHost>
+        <graylogPort>12201</graylogPort>
+        <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+            <!-- Nom du service tel qu'il apparaît dans l'interface Graylog -->
+            <originHost>reaction-service</originHost>
+            <!-- Champs additionnels envoyés avec chaque message -->
+            <includeMarker>true</includeMarker>
+            <includeMdcData>true</includeMdcData>
+            <includeCallerData>false</includeCallerData>
+            <includeRootCauseData>true</includeRootCauseData>
+            <includeLevelName>true</includeLevelName>
+            <!-- Champs personnalisés visibles dans les colonnes Graylog -->
+            <additionalField>
+                <key>application</key>
+                <value>reaction-service</value>
+            </additionalField>
+            <additionalField>
+                <key>environment</key>
+                <value>production</value>
+            </additionalField>
+            <additionalField>
+                <key>port</key>
+                <value>8084</value>
+            </additionalField>
+        </encoder>
+    </appender>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         NIVEAU DE LOG PAR PACKAGE
+         Réduit le bruit des librairies tierces dans Graylog
+    ═══════════════════════════════════════════════════════════ -->
+    <logger name="com.esprit.reactionservice" level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.springframework.security" level="WARN"/>
+    <logger name="org.hibernate.SQL" level="WARN"/>
+    <logger name="org.hibernate.type" level="WARN"/>
+    <logger name="com.netflix.eureka" level="WARN"/>
+    <logger name="com.netflix.discovery" level="WARN"/>
+
+    <!-- Root logger : INFO par défaut, envoie vers Console ET Graylog -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="GELF"/>
+    </root>
+
+</configuration>

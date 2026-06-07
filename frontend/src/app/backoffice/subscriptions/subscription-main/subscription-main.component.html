@@ -1,0 +1,79 @@
+<!-- subscription-main.component.html - Version finale -->
+<div class="subscription-main">
+  
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-content">
+      <div class="hero-icon">💳</div>
+      <div>
+        <h1>Gestion des Abonnements</h1>
+        <p>Gérez vos plans, suivez les statistiques et anticipez le churn</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="tabs-container">
+    <div class="tabs-wrapper">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'list'" 
+        (click)="navigateTo('list')">
+        <span class="tab-icon">📋</span>
+        <span>Liste des Abonnements</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'stats'" 
+        (click)="navigateTo('stats')">
+        <span class="tab-icon">📈</span>
+        <span>Statistiques</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'churn'" 
+        (click)="navigateTo('churn')">
+        <span class="tab-icon">🤖</span>
+        <span>AI Churn</span>
+      </button>
+      
+      <button 
+        class="tab-btn" 
+        [class.active]="activeTab === 'promos'" 
+        (click)="navigateTo('promos')">
+        <span class="tab-icon">🎫</span>
+        <span>Codes Promo</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenu dynamique -->
+  <div class="content-container">
+    <div class="content-card">
+      
+      <!-- Liste des abonnements -->
+      <div *ngIf="activeTab === 'list'">
+        <app-subscription-list></app-subscription-list>
+      </div>
+      
+      <!-- Statistiques -->
+      <div *ngIf="activeTab === 'stats'">
+        <app-subscription-stats></app-subscription-stats>
+      </div>
+      
+      <!-- AI Churn -->
+      <div *ngIf="activeTab === 'churn'">
+        <app-churn-prediction></app-churn-prediction>
+      </div>
+      
+      <!-- Codes Promo -->
+      <div *ngIf="activeTab === 'promos'">
+        <app-promo-management></app-promo-management>
+      </div>
+      
+    </div>
+  </div>
+
+</div>

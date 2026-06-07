@@ -1,0 +1,71 @@
+event_id,event_name,category,format,duration_hours,level,price,avg_rating,n_participants_avg,has_certificate,hands_on,language
+EVT001,Python Avancé,Développement,Hybride,2,Débutant,99,3.9,32,0,0,FR/EN
+EVT002,React Workshop,Développement,Presentiel,2,Débutant,29,3.8,79,0,0,FR/EN
+EVT003,DevOps & CI/CD,Développement,Hybride,8,Intermédiaire,79,4.2,50,0,0,FR/EN
+EVT004,API REST Design,Développement,Presentiel,4,Intermédiaire,49,3.8,112,1,0,FR
+EVT005,Machine Learning Intro,Développement,Presentiel,2,Intermédiaire,149,4.4,118,0,1,FR/EN
+EVT006,Docker & Kubernetes,Développement,Online,6,Débutant,99,4.7,94,1,0,FR/EN
+EVT007,Node.js Fullstack,Développement,Online,2,Avancé,79,4.7,25,0,0,AR
+EVT008,Cybersécurité Web,Développement,Presentiel,6,Avancé,149,3.7,60,0,1,FR/EN
+EVT009,Flutter Mobile,Développement,Hybride,2,Avancé,49,4.3,46,0,1,AR
+EVT010,Data Engineering,Développement,Presentiel,8,Débutant,149,4.8,114,0,0,FR
+EVT011,Architecture Microservices,Développement,Presentiel,6,Intermédiaire,29,3.8,87,1,0,FR/EN
+EVT012,Testing & QA,Développement,Presentiel,6,Avancé,249,3.7,32,0,1,FR/EN
+EVT013,Cloud AWS/GCP,Développement,Hybride,6,Avancé,199,4.0,32,1,0,FR
+EVT014,Blockchain Dev,Développement,Online,3,Avancé,49,4.7,69,0,1,AR
+EVT015,GraphQL Masterclass,Développement,Hybride,6,Avancé,99,5.0,16,0,1,FR/EN
+EVT016,FastAPI Workshop,Développement,Presentiel,2,Intermédiaire,199,3.7,15,1,0,FR/EN
+EVT017,TypeScript Deep Dive,Développement,Online,4,Avancé,79,3.7,112,0,0,FR/EN
+EVT018,Git & GitHub Avancé,Développement,Presentiel,6,Débutant,29,4.9,118,1,0,FR
+EVT019,SQL Optimization,Développement,Online,8,Débutant,29,4.6,119,0,0,FR
+EVT020,Vue.js Workshop,Développement,Hybride,6,Avancé,49,3.9,92,1,0,FR/EN
+EVT021,Django REST,Développement,Hybride,3,Avancé,99,4.1,100,1,1,FR/EN
+EVT022,Kubernetes Security,Développement,Presentiel,2,Débutant,79,3.6,17,0,0,FR
+EVT023,Rust Programming,Développement,Online,2,Débutant,29,4.9,57,0,0,AR
+EVT024,Next.js Workshop,Développement,Hybride,6,Débutant,49,4.6,88,1,0,AR
+EVT025,MongoDB Atlas,Développement,Presentiel,3,Débutant,29,4.5,60,1,1,AR
+EVT026,Redis & Caching,Développement,Hybride,2,Avancé,29,3.6,108,1,0,FR
+EVT027,Svelte Workshop,Développement,Online,3,Avancé,249,3.7,38,1,1,FR
+EVT028,WebAssembly,Développement,Online,6,Avancé,29,3.6,84,0,0,FR
+EVT029,OpenAI API,Développement,Online,6,Intermédiaire,249,3.8,66,0,0,AR
+EVT030,Tailwind CSS Dev,Développement,Online,6,Intermédiaire,249,3.9,104,1,0,FR
+EVT031,Figma Masterclass,Design,Presentiel,3,Débutant,0,4.6,22,0,1,FR/EN
+EVT032,UX Research Methods,Design,Hybride,3,Débutant,29,4.8,23,0,0,AR
+EVT033,Design System Creation,Design,Online,8,Débutant,0,4.4,68,1,1,FR
+EVT034,Motion Design,Design,Hybride,4,Débutant,99,4.1,100,1,1,AR
+EVT035,Brand Identity Design,Design,Online,2,Intermédiaire,29,3.6,42,1,0,AR
+EVT036,UI Patterns & Components,Design,Online,3,Intermédiaire,99,3.7,84,1,0,FR/EN
+EVT037,Color Theory & Typography,Design,Hybride,4,Avancé,29,4.9,32,1,0,FR
+EVT038,User Testing Workshop,Design,Hybride,8,Débutant,99,3.9,41,1,0,FR/EN
+EVT039,Prototyping Avancé,Design,Hybride,4,Avancé,249,3.9,21,0,1,AR
+EVT040,Adobe XD Workshop,Design,Online,2,Intermédiaire,49,4.5,48,0,1,FR/EN
+EVT041,Illustration Vectorielle,Design,Hybride,6,Avancé,0,3.7,103,0,0,AR
+EVT042,3D Design Blender,Design,Hybride,8,Débutant,199,3.7,54,1,0,AR
+EVT043,Product Design Sprint,Design,Online,3,Avancé,29,4.0,86,1,0,FR
+EVT044,Accessibility Design,Design,Online,3,Intermédiaire,0,3.8,57,1,0,AR
+EVT045,Design Thinking,Design,Online,2,Intermédiaire,0,4.8,43,0,1,AR
+EVT046,Framer Workshop,Design,Presentiel,3,Débutant,0,4.5,66,1,1,FR
+EVT047,After Effects Animation,Design,Presentiel,4,Avancé,199,4.5,83,1,0,FR
+EVT048,Responsive Web Design,Design,Presentiel,3,Avancé,99,3.6,91,1,1,FR/EN
+EVT049,Design Portfolio,Design,Presentiel,6,Avancé,29,4.1,88,0,1,FR
+EVT050,Sketch App Masterclass,Design,Hybride,6,Débutant,79,4.0,23,1,1,FR/EN
+EVT051,Canva Pro Workshop,Design,Online,4,Avancé,99,4.5,56,1,1,FR/EN
+EVT052,Design Token System,Design,Online,3,Intermédiaire,199,4.5,37,1,1,FR/EN
+EVT053,Dark Mode UI,Design,Online,4,Intermédiaire,79,4.1,89,1,1,AR
+EVT054,Mobile First Design,Design,Presentiel,3,Avancé,249,4.7,116,0,0,AR
+EVT055,Micro-interactions Design,Design,Hybride,8,Intermédiaire,29,4.7,111,0,1,FR
+EVT056,Icon Design,Design,Online,3,Débutant,0,3.9,75,0,1,AR
+EVT057,Visual Storytelling,Design,Hybride,8,Débutant,199,4.2,46,0,0,FR
+EVT058,Design Critique Methods,Design,Presentiel,3,Débutant,249,3.6,46,0,1,FR
+EVT059,AI in Design Tools,Design,Presentiel,8,Avancé,149,4.9,71,1,1,FR
+EVT060,Design Handoff Dev,Design,Hybride,6,Intermédiaire,99,4.6,96,1,1,FR/EN
+EVT061,Freelance Business,Transversal,Online,4,Intermédiaire,29,4.6,45,1,1,AR
+EVT062,Agile & Scrum,Transversal,Hybride,2,Débutant,49,3.8,103,0,0,FR
+EVT063,Communication Client,Transversal,Presentiel,6,Intermédiaire,249,4.1,41,1,1,FR/EN
+EVT064,Pricing & Négociation,Transversal,Hybride,2,Avancé,199,4.2,60,1,1,AR
+EVT065,Portfolio Building,Transversal,Hybride,8,Avancé,79,4.2,49,1,1,FR
+EVT066,Remote Work Best Practices,Transversal,Presentiel,4,Avancé,199,4.6,74,0,0,AR
+EVT067,No-Code Tools,Transversal,Hybride,8,Avancé,0,3.6,69,0,1,FR
+EVT068,Personal Branding,Transversal,Online,4,Intermédiaire,149,3.8,56,1,1,AR
+EVT069,Gestion de Projet,Transversal,Presentiel,4,Débutant,249,3.5,84,0,1,FR
+EVT070,Networking Event,Transversal,Hybride,2,Avancé,0,4.6,46,0,0,FR/EN

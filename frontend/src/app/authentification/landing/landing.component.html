@@ -1,0 +1,932 @@
+<!-- ========== FLOATING BLOBS (depth effect) ========== -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div class="blob blob-3"></div>
+
+<!-- ========== NAVBAR ========== -->
+<nav class="navbar navbar-expand-lg fixed-top"
+     [ngClass]="{'navbar-transparent': navbarTransparent, 'navbar-scrolled': !navbarTransparent}">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">
+      <strong>Pro</strong>lance
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#landingNav"
+            aria-controls="landingNav" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="material-icons">menu</i>
+    </button>
+    <div class="collapse navbar-collapse" id="landingNav">
+      <ul class="navbar-nav ml-auto align-items-center">
+        <li class="nav-item">
+          <a class="nav-link" href="#value-section">Browse Jobs</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#dual-path-section">Find Talent</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-outline-white btn-round btn-sm ml-2" routerLink="/login">
+            Login
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link btn btn-primary btn-round btn-sm ml-2" routerLink="/register">
+            Join Now
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ========== HERO SECTION ========== -->
+<section class="landing-hero" id="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="container hero-content">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        <h1 class="hero-title hero-anim">Connecting Elite Freelancers<br>with Project Leaders</h1>
+        <p class="hero-subtitle hero-anim hero-anim-delay-1">
+          Prolance is the trusted marketplace where top-tier independent talent meets ambitious companies.
+          Find your next opportunity or your next team member — commission-free.
+        </p>
+        <div class="hero-actions hero-anim hero-anim-delay-2">
+          <a class="btn btn-primary btn-round btn-lg btn-pop" routerLink="/register">
+            <i class="material-icons">search</i> Find a Job
+          </a>
+          <a class="btn btn-outline-white btn-round btn-lg btn-pop ml-3" routerLink="/register">
+            <i class="material-icons">group_add</i> Hire Talent
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AD SLOT 1 — After Hero ========== -->
+<section class="partner-zone" *ngIf="landingPageBanners.length > 0">
+  <div class="container">
+    <div class="split-glass-banner reveal">
+      <img [src]="getAdImage(landingPageBanners[0])" class="split-glass-bg" aria-hidden="true" loading="lazy">
+      <a [routerLink]="['/ads', landingPageBanners[0].id]"
+         class="split-glass-inner" 
+         [attr.data-ad-id]="landingPageBanners[0].id"
+         (click)="onAdClick(landingPageBanners[0])"
+         (mouseenter)="onAdMouseEnter(landingPageBanners[0])"
+         (mouseleave)="onAdMouseLeave(landingPageBanners[0])">
+        <img [src]="getAdImage(landingPageBanners[0])" [alt]="landingPageBanners[0].title"
+             class="split-glass-img" loading="lazy" (error)="onImgError($event, landingPageBanners[0])">
+        <div class="split-glass-text">
+          <span class="promo-tag promo-tag-inline">Sponsored</span>
+          <h4>{{ landingPageBanners[0].title }}</h4>
+          <p>{{ landingPageBanners[0].description | slice:0:120 }}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+<!-- Skeleton while loading -->
+<section class="partner-zone" *ngIf="adsLoading">
+  <div class="container"><div class="skeleton-banner reveal"></div></div>
+</section>
+<section class="partner-zone partner-empty-slot" *ngIf="!adsLoading && landingPageBanners.length === 0">
+  <div class="container">
+    <div class="partner-empty-cta reveal">
+      <i class="material-icons">campaign</i>
+      <p>Promote your business to thousands of freelancers &amp; recruiters</p>
+      <a class="btn btn-outline-primary btn-round btn-sm" routerLink="/login">Advertise Here</a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== VALUE PROPOSITION ========== -->
+<section class="landing-section bg-light" id="value-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">Why Freelancers Choose Prolance</h2>
+        <p class="section-subtitle text-muted">
+          We built the platform freelancers actually deserve — transparent, fast, and fair.
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-1">
+        <div class="card feature-card text-center">
+          <div class="card-body">
+            <div class="feature-icon icon-success">
+              <i class="material-icons">money_off</i>
+            </div>
+            <h4 class="card-title">Zero Commission</h4>
+            <p class="card-description text-muted">
+              Keep 100% of what you earn. No hidden fees, no service charges, no surprises on payday.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-2">
+        <div class="card feature-card text-center">
+          <div class="card-body">
+            <div class="feature-icon icon-info">
+              <i class="material-icons">verified_user</i>
+            </div>
+            <h4 class="card-title">Verified Jobs</h4>
+            <p class="card-description text-muted">
+              Every project is vetted by our team. Work with confidence knowing every client is legitimate.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-12 reveal reveal-delay-3">
+        <div class="card feature-card text-center">
+          <div class="card-body">
+            <div class="feature-icon icon-primary">
+              <i class="material-icons">flash_on</i>
+            </div>
+            <h4 class="card-title">Fast Payments</h4>
+            <p class="card-description text-muted">
+              Get paid within 24 hours of milestone approval. No 30-day invoicing cycles.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Dynamic Grid Spotlights (CSS Grid, unlimited) ── -->
+    <!-- Skeleton cards while loading -->
+    <div class="spotlight-grid" *ngIf="adsLoading">
+      <div class="skeleton-card" *ngFor="let s of [1,2,3]"></div>
+    </div>
+    <div class="spotlight-grid" *ngIf="!adsLoading && gridSpotlights.length > 0">
+      <a *ngFor="let ad of gridSpotlights; let i = index"
+         [routerLink]="['/ads', ad.id]"
+         class="card feature-card member-highlight text-center reveal"
+         [class.reveal-delay-1]="i % 3 === 0"
+         [class.reveal-delay-2]="i % 3 === 1"
+         [class.reveal-delay-3]="i % 3 === 2"
+         [class.spotlight-freelancer]="ad.roleType === 'FREELANCER'"
+         [class.spotlight-client]="ad.roleType === 'CLIENT'"
+         [attr.data-ad-id]="ad.id"
+         (click)="onAdClick(ad)"
+         (mouseenter)="onAdMouseEnter(ad)"
+         (mouseleave)="onAdMouseLeave(ad)">
+        <!-- Adaptive media container: 16/9 with mesh gradient fallback -->
+        <div class="media-container"
+             [class.mesh-freelancer]="!hasImage(ad) && ad.roleType === 'FREELANCER'"
+             [class.mesh-client]="!hasImage(ad) && ad.roleType === 'CLIENT'">
+          <img [src]="getAdImage(ad)" [alt]="ad.title" class="member-highlight-img"
+               loading="lazy" (error)="onImgError($event, ad)"
+               [class.dicebear-avatar]="!hasImage(ad)">
+        </div>
+        <div class="card-body">
+          <span class="spotlight-badge"
+                [class.badge-freelancer]="ad.roleType === 'FREELANCER'"
+                [class.badge-client]="ad.roleType === 'CLIENT'">
+            {{ ad.roleType === 'FREELANCER' ? 'Featured Talent' : 'Premium Job' }}
+          </span>
+          <div class="feature-icon"
+               [class.icon-primary]="ad.roleType === 'FREELANCER'"
+               [class.icon-info]="ad.roleType === 'CLIENT'">
+            <i class="material-icons">{{ ad.roleType === 'FREELANCER' ? 'person_pin' : 'work_outline' }}</i>
+          </div>
+          <h4 class="card-title" [ngClass]="getTitleClass(ad.title)">{{ ad.title }}</h4>
+          <p class="card-description text-muted card-desc-clamp">
+            {{ ad.description }}
+          </p>
+          <span class="member-highlight-label">Ad</span>
+          <!-- CTA slides up on hover -->
+          <span class="card-cta-hover">View Details <i class="material-icons">arrow_forward</i></span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HOW IT WORKS – Timeline ========== -->
+<section class="landing-section" id="how-it-works-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle text-muted">
+          From posting to payout — three simple steps.
+        </p>
+      </div>
+    </div>
+    <div class="timeline reveal">
+      <div class="timeline-line"></div>
+      <div class="timeline-step">
+        <div class="timeline-indicator">
+          <i class="material-icons">edit</i>
+        </div>
+        <div class="timeline-content card">
+          <div class="card-body">
+            <span class="timeline-badge">Step 1</span>
+            <h4 class="card-title">Post a Job</h4>
+            <p class="card-description text-muted">
+              Describe your project requirements, set a budget, and publish it to our curated talent pool in under 2 minutes.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-step">
+        <div class="timeline-indicator">
+          <i class="material-icons">group</i>
+        </div>
+        <div class="timeline-content card">
+          <div class="card-body">
+            <span class="timeline-badge">Step 2</span>
+            <h4 class="card-title">Get Matched</h4>
+            <p class="card-description text-muted">
+              Our algorithm matches you with pre-vetted freelancers. Review portfolios, chat, and select your ideal candidate.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="timeline-step">
+        <div class="timeline-indicator">
+          <i class="material-icons">account_balance_wallet</i>
+        </div>
+        <div class="timeline-content card">
+          <div class="card-body">
+            <span class="timeline-badge">Step 3</span>
+            <h4 class="card-title">Get Paid</h4>
+            <p class="card-description text-muted">
+              Milestone-based payments are released within 24 hours of approval. Secure escrow protects both parties.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== HIGHLIGHTED OPPORTUNITY (JOB_FEED banners) ========== -->
+<section class="partner-zone partner-zone-wide" *ngIf="jobFeedBanners.length > 0">
+  <div class="container">
+    <div class="split-glass-banner split-glass-wide reveal">
+      <img [src]="getAdImage(jobFeedBanners[0])" class="split-glass-bg" aria-hidden="true" loading="lazy">
+      <a [routerLink]="['/ads', jobFeedBanners[0].id]"
+         class="split-glass-inner" 
+         [attr.data-ad-id]="jobFeedBanners[0].id"
+         (click)="onAdClick(jobFeedBanners[0])"
+         (mouseenter)="onAdMouseEnter(jobFeedBanners[0])"
+         (mouseleave)="onAdMouseLeave(jobFeedBanners[0])">
+        <img [src]="getAdImage(jobFeedBanners[0])" [alt]="jobFeedBanners[0].title"
+             class="split-glass-img" loading="lazy" (error)="onImgError($event, jobFeedBanners[0])">
+        <div class="split-glass-text">
+          <span class="promo-tag promo-tag-inline">Highlighted Opportunity</span>
+          <h4>{{ jobFeedBanners[0].title }}</h4>
+          <p>{{ jobFeedBanners[0].description | slice:0:150 }}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FEATURED JOB CATEGORIES ========== -->
+<section class="landing-section bg-light" id="categories-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">Explore Job Categories</h2>
+        <p class="section-subtitle text-muted">
+          Find opportunities across the fastest-growing industries.
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-1">
+        <div class="card category-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="category-icon icon-primary">
+              <i class="material-icons">code</i>
+            </div>
+            <div class="category-text">
+              <h5 class="card-title">Web Development</h5>
+              <p class="card-description text-muted">120+ active jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-2">
+        <div class="card category-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="category-icon icon-info">
+              <i class="material-icons">brush</i>
+            </div>
+            <div class="category-text">
+              <h5 class="card-title">UI/UX Design</h5>
+              <p class="card-description text-muted">85+ active jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-3">
+        <div class="card category-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="category-icon icon-success">
+              <i class="material-icons">trending_up</i>
+            </div>
+            <div class="category-text">
+              <h5 class="card-title">Digital Marketing</h5>
+              <p class="card-description text-muted">60+ active jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-1">
+        <div class="card category-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="category-icon icon-warning">
+              <i class="material-icons">phone_iphone</i>
+            </div>
+            <div class="category-text">
+              <h5 class="card-title">Mobile Apps</h5>
+              <p class="card-description text-muted">75+ active jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-2">
+        <div class="card category-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="category-icon icon-danger">
+              <i class="material-icons">ondemand_video</i>
+            </div>
+            <div class="category-text">
+              <h5 class="card-title">Video & Animation</h5>
+              <p class="card-description text-muted">40+ active jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 reveal reveal-delay-3">
+        <div class="card category-card">
+          <div class="card-body d-flex align-items-center">
+            <div class="category-icon icon-rose">
+              <i class="material-icons">translate</i>
+            </div>
+            <div class="category-text">
+              <h5 class="card-title">Writing & Translation</h5>
+              <p class="card-description text-muted">55+ active jobs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AD SLOT 2 — Between Categories & Dual Path ========== -->
+<section class="partner-zone" *ngIf="landingPageBanners.length > 1">
+  <div class="container">
+    <div class="split-glass-banner reveal">
+      <img [src]="getAdImage(landingPageBanners[1])" class="split-glass-bg" aria-hidden="true" loading="lazy">
+      <a [routerLink]="['/ads', landingPageBanners[1].id]"
+         class="split-glass-inner" 
+         [attr.data-ad-id]="landingPageBanners[1].id"
+         (click)="onAdClick(landingPageBanners[1])"
+         (mouseenter)="onAdMouseEnter(landingPageBanners[1])"
+         (mouseleave)="onAdMouseLeave(landingPageBanners[1])">
+        <img [src]="getAdImage(landingPageBanners[1])" [alt]="landingPageBanners[1].title"
+             class="split-glass-img" loading="lazy" (error)="onImgError($event, landingPageBanners[1])">
+        <div class="split-glass-text">
+          <span class="promo-tag promo-tag-inline">Sponsored</span>
+          <h4>{{ landingPageBanners[1].title }}</h4>
+          <p>{{ landingPageBanners[1].description | slice:0:120 }}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== DUAL-USER PATH ========== -->
+<section class="landing-section" id="dual-path-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">How Do You Want to Get Started?</h2>
+        <p class="section-subtitle text-muted">
+          Whether you're offering skills or searching for them, Prolance has you covered.
+        </p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-6 reveal reveal-delay-1">
+        <div class="card path-card">
+          <div class="card-header card-header-icon card-header-primary">
+            <div class="card-icon">
+              <i class="material-icons">person</i>
+            </div>
+          </div>
+          <div class="card-body text-center">
+            <h3 class="card-title">I am a Freelancer</h3>
+            <p class="card-description text-muted">
+              Create your profile, showcase your portfolio, and get matched with high-value projects that fit your expertise.
+            </p>
+            <a class="btn btn-primary btn-round btn-pop" routerLink="/register">
+              <i class="material-icons">arrow_forward</i> Sign Up as Freelancer
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 col-md-6 reveal reveal-delay-2">
+        <div class="card path-card">
+          <div class="card-header card-header-icon card-header-info">
+            <div class="card-icon">
+              <i class="material-icons">work</i>
+            </div>
+          </div>
+          <div class="card-body text-center">
+            <h3 class="card-title">I am a Recruiter</h3>
+            <p class="card-description text-muted">
+              Post a job in minutes, review curated applications, and hire pre-vetted freelancers for your next project.
+            </p>
+            <a class="btn btn-info btn-round btn-pop" routerLink="/register">
+              <i class="material-icons">arrow_forward</i> Post a Job
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== RAG — AI-POWERED AD SEARCH ========== -->
+<section class="landing-section rag-section" id="rag-section">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+
+        <!-- Teaser (before opening) -->
+        <div class="rag-teaser reveal" *ngIf="!ragOpen">
+          <div class="rag-teaser-icon">
+            <i class="material-icons">auto_awesome</i>
+          </div>
+          <h2 class="rag-teaser-title">Tired of scrolling through ads?</h2>
+          <p class="rag-teaser-subtitle">Just ask us about what you're looking for</p>
+          <button class="btn btn-primary btn-round btn-lg btn-pop rag-open-btn" (click)="openRagSearch()">
+            <i class="material-icons">search</i> Ask AI
+          </button>
+        </div>
+
+        <!-- Search Panel (after clicking) -->
+        <div class="rag-panel" *ngIf="ragOpen">
+          <div class="rag-panel-header">
+            <div class="rag-panel-icon">
+              <i class="material-icons">psychology</i>
+            </div>
+            <h3>AI-Powered Ad Search</h3>
+            <p>Describe what you're looking for in plain language</p>
+            <button class="rag-close-btn" (click)="closeRagSearch()" title="Close">
+              <i class="material-icons">close</i>
+            </button>
+          </div>
+
+          <!-- Input -->
+          <div class="rag-input-row">
+            <input type="text"
+                   class="rag-input"
+                   placeholder="e.g. Is anyone advertising web development services?"
+                   [(ngModel)]="ragQuery"
+                   (keydown.enter)="submitRagQuery()"
+                   [disabled]="ragLoading"
+                   autofocus />
+            <button class="rag-submit-btn"
+                    (click)="submitRagQuery()"
+                    [disabled]="ragLoading || !ragQuery.trim()">
+              <i class="material-icons" *ngIf="!ragLoading">send</i>
+              <div class="rag-spinner" *ngIf="ragLoading"></div>
+            </button>
+          </div>
+
+          <!-- Loading -->
+          <div class="rag-loading" *ngIf="ragLoading">
+            <div class="rag-loading-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <p>Searching through ads with AI... this may take a few seconds</p>
+          </div>
+
+          <!-- Error -->
+          <div class="rag-error" *ngIf="ragError && !ragLoading">
+            <i class="material-icons">error_outline</i>
+          </div>
+
+          <!-- Results -->
+          <div class="rag-results" *ngIf="ragResponse && !ragLoading">
+            <!-- AI Answer (Hidden if it's an Ollama crash/error message) -->
+            <div class="rag-answer" *ngIf="ragResponse.answer && !ragResponse.answer.includes('error occurred while generating') && !ragResponse.answer.includes('llama runner process has terminated') && !ragResponse.answer.includes('500 Internal Server')">
+              <div class="rag-answer-header">
+                <i class="material-icons">auto_awesome</i>
+                <span>AI Answer</span>
+              </div>
+              <p class="rag-answer-text">{{ ragResponse.answer }}</p>
+            </div>
+
+            <!-- Relevant Ads -->
+            <div class="rag-ads" *ngIf="ragResponse.relevantAds && ragResponse.relevantAds.length > 0">
+              <h4 class="rag-ads-title">
+                <i class="material-icons">campaign</i>
+                Related Ads ({{ ragResponse.relevantAds.length }})
+              </h4>
+              <div class="rag-ad-card" *ngFor="let ad of ragResponse.relevantAds">
+                <a [routerLink]="['/ads', ad.adId]" class="rag-ad-link">
+                  <div class="rag-ad-top">
+                    <span class="rag-ad-role"
+                          [class.role-freelancer]="ad.roleType === 'FREELANCER'"
+                          [class.role-client]="ad.roleType === 'CLIENT'">
+                      {{ ad.roleType === 'FREELANCER' ? 'Freelancer' : 'Client' }}
+                    </span>
+                    <span class="rag-ad-score">
+                      <i class="material-icons">trending_up</i>
+                      {{ getScorePercent(ad.score) }}% match
+                    </span>
+                  </div>
+                  <h5 class="rag-ad-title">{{ ad.title }}</h5>
+                  <p class="rag-ad-desc">{{ ad.description }}</p>
+                  <div class="rag-ad-meta">
+                    <span><i class="material-icons">label</i> {{ ad.planName }}</span>
+                    <span><i class="material-icons">info</i> {{ ad.status }}</span>
+                  </div>
+                  <div class="rag-score-bar">
+                    <div class="rag-score-fill" [style.width.%]="getScorePercent(ad.score)"></div>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <!-- No ads found -->
+            <div class="rag-empty" *ngIf="ragResponse.relevantAds && ragResponse.relevantAds.length === 0">
+              <i class="material-icons">search_off</i>
+              <p>No matching ads found for your search.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SOCIAL PROOF / STATS ========== -->
+<section class="landing-section stats-section" id="stats-section">
+  <div class="stats-overlay"></div>
+  <div class="container position-relative" style="z-index: 2;">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center mb-5 reveal">
+        <h2 class="section-title text-white">Trusted by Thousands</h2>
+        <p class="section-subtitle text-white-70">
+          Numbers that speak louder than words.
+        </p>
+      </div>
+    </div>
+    <div class="row text-center text-white">
+      <div class="col-md-4 reveal reveal-delay-1">
+        <div class="stat-item">
+          <i class="material-icons stat-icon">people</i>
+          <h2 class="stat-number">10,000+</h2>
+          <p class="stat-label">Freelancers</p>
+        </div>
+      </div>
+      <div class="col-md-4 reveal reveal-delay-2">
+        <div class="stat-item">
+          <i class="material-icons stat-icon">work_outline</i>
+          <h2 class="stat-number">500+</h2>
+          <p class="stat-label">Active Jobs</p>
+        </div>
+      </div>
+      <div class="col-md-4 reveal reveal-delay-3">
+        <div class="stat-item">
+          <i class="material-icons stat-icon">attach_money</i>
+          <h2 class="stat-number">$2M+</h2>
+          <p class="stat-label">Paid to Freelancers</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== TESTIMONIALS (Glassmorphism) ========== -->
+<section class="landing-section testimonial-section" id="testimonial-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">What Our Community Says</h2>
+        <p class="section-subtitle text-muted">
+          Real stories from freelancers and recruiters on Prolance.
+        </p>
+      </div>
+    </div>
+    <div class="row justify-content-center reveal">
+      <div class="col-lg-8">
+        <div class="testimonial-glass-card">
+          <div class="testimonial-body" *ngFor="let t of testimonials; let i = index"
+               [class.active]="i === activeTestimonial">
+            <div class="testimonial-quote">
+              <i class="material-icons quote-icon">format_quote</i>
+              <p>{{ t.quote }}</p>
+            </div>
+            <div class="testimonial-author">
+              <img [src]="t.avatar" [alt]="t.name" class="testimonial-avatar">
+              <div>
+                <strong>{{ t.name }}</strong>
+                <span>{{ t.role }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="testimonial-dots">
+            <span *ngFor="let t of testimonials; let i = index"
+                  class="dot" [class.active]="i === activeTestimonial"
+                  (click)="setTestimonial(i)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FAQ ACCORDION ========== -->
+<section class="landing-section bg-light" id="faq-section">
+  <div class="container">
+    <div class="row justify-content-center mb-5 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-subtitle text-muted">
+          Everything you need to know before getting started.
+        </p>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-lg-8 reveal">
+        <div class="faq-item" [class.open]="activeFaq === 0" (click)="toggleFaq(0)">
+          <div class="faq-question">
+            <span>Is Prolance really commission-free?</span>
+            <i class="material-icons faq-chevron">expand_more</i>
+          </div>
+          <div class="faq-answer">
+            <p>Yes. Freelancers keep 100% of their earnings. We monetize through optional premium features for recruiters, not by taking a cut from your hard work.</p>
+          </div>
+        </div>
+        <div class="faq-item" [class.open]="activeFaq === 1" (click)="toggleFaq(1)">
+          <div class="faq-question">
+            <span>How fast do I get paid after a milestone?</span>
+            <i class="material-icons faq-chevron">expand_more</i>
+          </div>
+          <div class="faq-answer">
+            <p>Payments are released within 24 hours of milestone approval. Funds go directly to your linked bank account or PayPal.</p>
+          </div>
+        </div>
+        <div class="faq-item" [class.open]="activeFaq === 2" (click)="toggleFaq(2)">
+          <div class="faq-question">
+            <span>How does Prolance verify jobs and clients?</span>
+            <i class="material-icons faq-chevron">expand_more</i>
+          </div>
+          <div class="faq-answer">
+            <p>Every job posting and client account goes through a manual review by our Trust &amp; Safety team. We verify identities, company details, and payment methods before anything goes live.</p>
+          </div>
+        </div>
+        <div class="faq-item" [class.open]="activeFaq === 3" (click)="toggleFaq(3)">
+          <div class="faq-question">
+            <span>Can I use Prolance for both freelancing and hiring?</span>
+            <i class="material-icons faq-chevron">expand_more</i>
+          </div>
+          <div class="faq-answer">
+            <p>Absolutely. A single Prolance account lets you switch between freelancer and recruiter modes at any time. Many of our power users do both.</p>
+          </div>
+        </div>
+        <div class="faq-item" [class.open]="activeFaq === 4" (click)="toggleFaq(4)">
+          <div class="faq-question">
+            <span>What happens if there's a dispute?</span>
+            <i class="material-icons faq-chevron">expand_more</i>
+          </div>
+          <div class="faq-answer">
+            <p>Our built-in escrow and mediation system protects both parties. If a disagreement arises, our support team steps in to review the work and resolve the issue fairly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FINAL CTA ========== -->
+<section class="landing-section cta-section" id="cta-section">
+  <div class="container">
+    <div class="row justify-content-center reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">Ready to Start?</h2>
+        <p class="section-subtitle text-muted">
+          Join Prolance today and take the next step in your freelance career — or find the perfect talent for your team.
+        </p>
+        <a class="btn btn-primary btn-round btn-lg btn-pop" routerLink="/register">
+          <i class="material-icons">person_add</i> Create Your Free Account
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== QUICK PARTNERS (SEARCH_SIDEBAR ads) ========== -->
+<section class="landing-section quick-partners-section" *ngIf="sidebarShowcase.length > 0">
+  <div class="container">
+    <div class="row justify-content-center mb-4 reveal">
+      <div class="col-lg-7 text-center">
+        <h2 class="section-title">Quick Partners</h2>
+        <p class="section-subtitle text-muted">Trusted partners and services from the Prolance network.</p>
+      </div>
+    </div>
+    <div class="quick-partners-grid">
+      <a *ngFor="let ad of sidebarShowcase; let i = index"
+         [routerLink]="['/ads', ad.id]"
+         class="quick-partner-card reveal"
+         [class.reveal-delay-1]="i % 3 === 0"
+         [class.reveal-delay-2]="i % 3 === 1"
+         [class.reveal-delay-3]="i % 3 === 2"
+         [attr.data-ad-id]="ad.id"
+         (click)="onAdClick(ad)"
+         (mouseenter)="onAdMouseEnter(ad)"
+         (mouseleave)="onAdMouseLeave(ad)">
+        <img [src]="getAdImage(ad)" [alt]="ad.title" class="quick-partner-img"
+             loading="lazy" (error)="onImgError($event, ad)">
+        <div class="quick-partner-body">
+          <h6 class="quick-partner-title">{{ ad.title }}</h6>
+          <p class="quick-partner-desc">{{ ad.description | slice:0:60 }}{{ ad.description.length > 60 ? '...' : '' }}</p>
+          <span class="member-highlight-label">Ad</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== AD SLOT 3 — Above Footer ========== -->
+<section class="partner-zone" *ngIf="landingPageBanners.length > 2">
+  <div class="container">
+    <div class="split-glass-banner reveal">
+      <img [src]="getAdImage(landingPageBanners[2])" class="split-glass-bg" aria-hidden="true" loading="lazy">
+      <a [routerLink]="['/ads', landingPageBanners[2].id]"
+         class="split-glass-inner"
+         [attr.data-ad-id]="landingPageBanners[2].id"
+         (click)="onAdClick(landingPageBanners[2])"
+         (mouseenter)="onAdMouseEnter(landingPageBanners[2])"
+         (mouseleave)="onAdMouseLeave(landingPageBanners[2])">
+        <img [src]="getAdImage(landingPageBanners[2])" [alt]="landingPageBanners[2].title"
+             class="split-glass-img" loading="lazy" (error)="onImgError($event, landingPageBanners[2])">
+        <div class="split-glass-text">
+          <span class="promo-tag promo-tag-inline">Sponsored</span>
+          <h4>{{ landingPageBanners[2].title }}</h4>
+          <p>{{ landingPageBanners[2].description | slice:0:120 }}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="landing-footer">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-4 text-center text-md-left">
+        <a class="footer-brand" routerLink="/">
+          <strong>Pro</strong>lance
+        </a>
+      </div>
+      <div class="col-md-4 text-center">
+        <ul class="footer-links">
+          <li><a href="javascript:void(0)">Privacy Policy</a></li>
+          <li><a href="javascript:void(0)">Terms of Service</a></li>
+          <li><a href="javascript:void(0)">Contact</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4 text-center text-md-right">
+        <div class="social-buttons">
+          <a href="javascript:void(0)" class="btn btn-just-icon btn-round btn-sm btn-twitter">
+            <i class="fa fa-twitter"></i>
+          </a>
+          <a href="javascript:void(0)" class="btn btn-just-icon btn-round btn-sm btn-linkedin">
+            <i class="fa fa-linkedin"></i>
+          </a>
+          <a href="javascript:void(0)" class="btn btn-just-icon btn-round btn-sm btn-github">
+            <i class="fa fa-github"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12 text-center">
+        <p class="copyright">
+          &copy; {{ currentYear }} <strong>Prolance</strong>. Crafted with
+          <i class="material-icons" style="font-size: 14px; position: relative; top: 2px; color: #e91e63;">favorite</i>
+          for the freelance community.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- SPORTS-BETTING STYLE SIDE RAILS (Fixed Sticky)  -->
+<!-- ════════════════════════════════════════════════ -->
+<!-- Left Side Rail: Type 3 (SEARCH_SIDEBAR) -->
+<aside class="side-rail side-rail-left" *ngIf="leftSideRailAd" [@fadeInOut]>
+  <a [routerLink]="['/ads', leftSideRailAd.id]" 
+     class="side-rail-content"
+     [attr.data-ad-id]="leftSideRailAd.id"
+     (click)="onAdClick(leftSideRailAd)"
+     (mouseenter)="onAdMouseEnter(leftSideRailAd)"
+     (mouseleave)="onAdMouseLeave(leftSideRailAd)"
+     [class.rail-freelancer]="leftSideRailAd.roleType === 'FREELANCER'"
+     [class.rail-client]="leftSideRailAd.roleType === 'CLIENT'">
+    <img [src]="getAdImage(leftSideRailAd)" [alt]="leftSideRailAd.title" 
+         class="side-rail-img" loading="lazy" (error)="onImgError($event, leftSideRailAd)">
+    <div class="side-rail-overlay">
+      <span class="side-rail-badge">Sponsored</span>
+      <h5>{{ leftSideRailAd.title }}</h5>
+      <p>{{ leftSideRailAd.description | slice:0:60 }}...</p>
+    </div>
+  </a>
+</aside>
+
+<!-- Right Side Rail: Type 5 (JOB_FEED BANNER) -->
+<aside class="side-rail side-rail-right" *ngIf="rightSideRailAd" [@fadeInOut]>
+  <a [routerLink]="['/ads', rightSideRailAd.id]" 
+     class="side-rail-content"
+     [attr.data-ad-id]="rightSideRailAd.id"
+     (click)="onAdClick(rightSideRailAd)"
+     (mouseenter)="onAdMouseEnter(rightSideRailAd)"
+     (mouseleave)="onAdMouseLeave(rightSideRailAd)"
+     [class.rail-freelancer]="rightSideRailAd.roleType === 'FREELANCER'"
+     [class.rail-client]="rightSideRailAd.roleType === 'CLIENT'">
+    <img [src]="getAdImage(rightSideRailAd)" [alt]="rightSideRailAd.title" 
+         class="side-rail-img" loading="lazy" (error)="onImgError($event, rightSideRailAd)">
+    <div class="side-rail-overlay">
+      <span class="side-rail-badge">Featured</span>
+      <h5>{{ rightSideRailAd.title }}</h5>
+      <p>{{ rightSideRailAd.description | slice:0:60 }}...</p>
+    </div>
+  </a>
+</aside>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- COMPELLING BOTTOM CORNER POPUPS (Slide-in)      -->
+<!-- ════════════════════════════════════════════════ -->
+<!-- Bottom-Left Popup: Type 1 (Profile Spotlight) -->
+<div class="corner-popup corner-popup-left" *ngIf="bottomLeftPopup && showBottomLeftPopup"
+     [@slideVertical]
+     [class.popup-freelancer]="bottomLeftPopup.roleType === 'FREELANCER'"
+     [class.popup-client]="bottomLeftPopup.roleType === 'CLIENT'">
+  <button class="popup-close" (click)="closeBottomLeftPopup()" aria-label="Close">
+    <i class="material-icons">close</i>
+  </button>
+  <a [routerLink]="['/ads', bottomLeftPopup.id]" 
+     class="popup-content"
+     [attr.data-ad-id]="bottomLeftPopup.id"
+     (click)="onAdClick(bottomLeftPopup)"
+     (mouseenter)="onAdMouseEnter(bottomLeftPopup)"
+     (mouseleave)="onAdMouseLeave(bottomLeftPopup)">
+    <div class="popup-img-wrap">
+      <img [src]="getAdImage(bottomLeftPopup)" [alt]="bottomLeftPopup.title" 
+           class="popup-img" loading="lazy" (error)="onImgError($event, bottomLeftPopup)">
+    </div>
+    <div class="popup-body">
+      <span class="popup-badge">
+        <i class="material-icons">person_pin</i> Profile Spotlight
+      </span>
+      <h5 class="popup-title">{{ bottomLeftPopup.title }}</h5>
+      <p class="popup-desc">{{ bottomLeftPopup.description | slice:0:80 }}</p>
+      <button class="popup-cta">
+        View Profile <i class="material-icons">arrow_forward</i>
+      </button>
+    </div>
+  </a>
+</div>
+
+<!-- Bottom-Right Popup: Type 2 (Landing Page Banner) -->
+<div class="corner-popup corner-popup-right" *ngIf="bottomRightPopup && showBottomRightPopup"
+     [@slideVertical]
+     [class.popup-freelancer]="bottomRightPopup.roleType === 'FREELANCER'"
+     [class.popup-client]="bottomRightPopup.roleType === 'CLIENT'">
+  <button class="popup-close" (click)="closeBottomRightPopup()" aria-label="Close">
+    <i class="material-icons">close</i>
+  </button>
+  <a [routerLink]="['/ads', bottomRightPopup.id]" 
+     class="popup-content"
+     [attr.data-ad-id]="bottomRightPopup.id"
+     (click)="onAdClick(bottomRightPopup)"
+     (mouseenter)="onAdMouseEnter(bottomRightPopup)"
+     (mouseleave)="onAdMouseLeave(bottomRightPopup)">
+    <div class="popup-img-wrap">
+      <img [src]="getAdImage(bottomRightPopup)" [alt]="bottomRightPopup.title" 
+           class="popup-img" loading="lazy" (error)="onImgError($event, bottomRightPopup)">
+    </div>
+    <div class="popup-body">
+      <span class="popup-badge">
+        <i class="material-icons">panorama</i> Premium Offer
+      </span>
+      <h5 class="popup-title">{{ bottomRightPopup.title }}</h5>
+      <p class="popup-desc">{{ bottomRightPopup.description | slice:0:80 }}</p>
+      <button class="popup-cta">
+        Learn More <i class="material-icons">arrow_forward</i>
+      </button>
+    </div>
+  </a>
+</div>

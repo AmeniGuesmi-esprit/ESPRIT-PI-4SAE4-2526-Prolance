@@ -1,0 +1,27 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# ADS SERVICE ROUTES - Add these to API Gateway application.yml
+# ══════════════════════════════════════════════════════════════════════════════
+# Location: api-gateway/src/main/resources/application.yml
+# Add under: spring.cloud.gateway.routes
+# ══════════════════════════════════════════════════════════════════════════════
+
+        # ── ADS SERVICE ───────────────────────────────────────────
+        - id: ads-service-plans
+          uri: lb://ads-service
+          predicates: [Path=/api/plans/**]
+          filters: [StripPrefix=0]
+
+        - id: ads-service-campaigns
+          uri: lb://ads-service
+          predicates: [Path=/api/campaigns/**]
+          filters: [StripPrefix=0]
+
+        - id: ads-service-ads
+          uri: lb://ads-service
+          predicates: [Path=/api/ads/**]
+          filters: [StripPrefix=0]
+
+        - id: ads-service-swagger
+          uri: lb://ads-service
+          predicates: [Path=/ads-service/swagger-ui/**,/ads-service/v3/api-docs/**]
+          filters: [StripPrefix=0]

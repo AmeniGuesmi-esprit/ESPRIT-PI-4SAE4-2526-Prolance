@@ -1,0 +1,100 @@
+pipeline {
+    agent any
+
+    options {
+        skipDefaultCheckout(true)
+    }
+
+    environment {
+        DOCKER_IMAGE = "marahmarah123/inscription-service"
+        DOCKER_TAG   = "${BUILD_NUMBER}"
+        SONAR_URL    = "http://localhost:9000"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                retry(5) {
+                    sh '''
+                        rm -rf .git
+                        git init
+                        git remote add origin https://github.com/farrahamami/ESPRIT-PIDEV-4SAE4-2025-2026-Prolance-BACKEND.git
+                        git config core.sparseCheckout true
+                        git config http.postBuffer 524288000
+                        git config http.lowSpeedLimit 0
+                        git config http.lowSpeedTime 999999
+                        echo "inscription-service/" > .git/info/sparse-checkout
+                        git fetch --depth=1 --filter=blob:none origin devops/on-integrated6sur6/ads_cicd_k8s
+                        git checkout FETCH_HEAD
+                    '''
+                }
+            }
+        }
+
+        stage('Build & Package') {
+            steps {
+                dir('inscription-service') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                dir('inscription-service') {
+                    sh './mvnw test'
+                }
+            }
+            post {
+                always {
+                    junit 'inscription-service/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('inscription-service') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh './mvnw sonar:sonar -Dsonar.projectKey=inscription-service -Dsonar.host.url=${SONAR_URL}'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                dir('inscription-service') {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                        sh 'docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest'
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                        sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
+                        sh 'docker push ${DOCKER_IMAGE}:latest'
+                    }
+                }
+            }
+        }
+
+        stage('Save build info for CD') {
+            steps {
+                sh 'echo ${DOCKER_TAG} > inscription-service-tag.txt'
+                archiveArtifacts artifacts: 'inscription-service-tag.txt'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI inscription-service réussi ✅'
+            build job: 'inscription-service-CD', wait: false
+        }
+        failure { echo 'CI inscription-service échoué ❌' }
+    }
+}

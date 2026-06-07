@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ads-service
+description: Helm chart for the Prolance ads-service (Spring Boot + PostgreSQL)
+type: application
+version: 0.1.0
+appVersion: "0.0.1-SNAPSHOT"

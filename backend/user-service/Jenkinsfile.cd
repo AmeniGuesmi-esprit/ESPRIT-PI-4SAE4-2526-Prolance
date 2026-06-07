@@ -1,0 +1,214 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE   = 'farrahamami/user-service'
+        K8S_NAMESPACE  = 'default'
+        K8S_DEPLOYMENT = 'user-service'
+        K8S_CONTAINER  = 'user-service'
+        KUBECONFIG     = '/home/farra/.jenkins/.kube/config'
+    }
+
+    stages {
+
+        // ── 0. VERIFY KUBECTL ─────────────────────────────────────────────────
+        stage('Verify kubectl') {
+            steps {
+                sh '''
+                    kubectl version --client
+                    kubectl get nodes
+                '''
+            }
+        }
+
+        // ── 1. RECOVER BUILD TAG FROM CI ─────────────────────────────────────
+        stage('Recover Docker Tag from CI') {
+            steps {
+                echo '🔖 Recovering Docker image tag from CI artifact...'
+                copyArtifacts(
+                    projectName: 'user-service-ci',
+                    filter:      'user-service-tag.txt',
+                    selector:    lastSuccessful(),
+                    flatten:     true
+                )
+                script {
+                    env.DOCKER_TAG = readFile('user-service-tag.txt').trim()
+                    if (!env.DOCKER_TAG) {
+                        error('DOCKER_TAG is empty — check that the CI job archived user-service-tag.txt correctly')
+                    }
+                    echo "📦 Image tag to deploy: ${env.DOCKER_TAG}"
+                }
+            }
+        }
+
+        // ── 2. DEPLOY JAEGER (OpenTelemetry backend) ──────────────────────────
+        stage('Deploy Jaeger (OpenTelemetry)') {
+            steps {
+                echo '🔭 Ensuring Jaeger tracing backend is running...'
+                sh """
+                    kubectl apply -f - <<'YAML'
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  namespace: ${K8S_NAMESPACE}
+  labels:
+    app: jaeger
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+    spec:
+      containers:
+      - name: jaeger
+        image: jaegertracing/all-in-one:1.56
+        ports:
+        - containerPort: 16686
+        - containerPort: 4317
+        - containerPort: 4318
+        env:
+        - name: COLLECTOR_OTLP_ENABLED
+          value: "true"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger
+  namespace: ${K8S_NAMESPACE}
+spec:
+  selector:
+    app: jaeger
+  ports:
+  - name: ui
+    port: 16686
+    targetPort: 16686
+  - name: otlp-grpc
+    port: 4317
+    targetPort: 4317
+  - name: otlp-http
+    port: 4318
+    targetPort: 4318
+YAML
+                """
+                echo '✅ Jaeger deployed — UI available on port 16686'
+            }
+        }
+
+        // ── 3. DEPLOY USER-SERVICE ────────────────────────────────────────────
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo "🚀 Deploying ${DOCKER_IMAGE}:${env.DOCKER_TAG} to Minikube..."
+                sh """
+                    kubectl set image deployment/${K8S_DEPLOYMENT} \
+                        ${K8S_CONTAINER}=${DOCKER_IMAGE}:${env.DOCKER_TAG} \
+                        --namespace=${K8S_NAMESPACE}
+                """
+                sh """
+                    kubectl annotate deployment/${K8S_DEPLOYMENT} \
+                        kubernetes.io/change-cause="Jenkins CD #${BUILD_NUMBER} — image ${env.DOCKER_TAG}" \
+                        --namespace=${K8S_NAMESPACE} \
+                        --overwrite
+                """
+            }
+        }
+
+        // ── 4. WAIT FOR ROLLOUT ───────────────────────────────────────────────
+        stage('Wait for Rollout') {
+            steps {
+                echo '⏳ Waiting for rollout to complete...'
+                sh """
+                    kubectl rollout status deployment/${K8S_DEPLOYMENT} \
+                        --namespace=${K8S_NAMESPACE} \
+                        --timeout=120s
+                """
+            }
+        }
+
+        // ── 5. VERIFY DEPLOYMENT ──────────────────────────────────────────────
+        stage('Verify Deployment') {
+            steps {
+                echo '✅ Verifying pod health...'
+                sh """
+                    kubectl get pods \
+                        --namespace=${K8S_NAMESPACE} \
+                        -l app=${K8S_DEPLOYMENT} \
+                        -o wide
+                """
+                sh """
+                    kubectl get deployment/${K8S_DEPLOYMENT} \
+                        --namespace=${K8S_NAMESPACE}
+                """
+            }
+        }
+
+        // ── 6. VERIFY RATE LIMITING (Bucket4j) ───────────────────────────────
+        stage('Verify Rate Limiting (Bucket4j)') {
+            steps {
+                echo '🪣 Verifying Bucket4j rate limiting is active...'
+                script {
+                    def nodePort = sh(
+                        script: "kubectl get svc user-service -n ${K8S_NAMESPACE} -o jsonpath='{.spec.ports[0].nodePort}'",
+                        returnStdout: true
+                    ).trim()
+                    def nodeIp = sh(
+                        script: "kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}'",
+                        returnStdout: true
+                    ).trim()
+                    def url = "http://${nodeIp}:${nodePort}/actuator/health"
+                    echo "🌐 Sending 25 rapid requests to ${url}"
+                    def got429 = sh(
+                        script: """
+                            COUNT=0
+                            for i in \$(seq 1 25); do
+                                STATUS=\$(curl -s -o /dev/null -w "%{http_code}" ${url} || echo "000")
+                                if [ "\$STATUS" = "429" ]; then
+                                    COUNT=\$((COUNT+1))
+                                fi
+                            done
+                            echo \$COUNT
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    if (got429.toInteger() > 0) {
+                        echo "✅ Rate limiting confirmed — ${got429} request(s) returned HTTP 429"
+                    } else {
+                        echo "⚠️ No 429s observed — limit may not have been hit yet (limit is 20/min)"
+                    }
+                }
+            }
+        }
+
+        // ── 7. VERIFY OPENTELEMETRY TRACES ────────────────────────────────────
+        stage('Verify OpenTelemetry (Jaeger)') {
+            steps {
+                echo '🔭 Verifying Jaeger trace collector is running...'
+                sh """
+                    kubectl wait --for=condition=available \
+                        deployment/jaeger \
+                        --namespace=${K8S_NAMESPACE} \
+                        --timeout=60s
+                """
+                sh "kubectl get pods -n ${K8S_NAMESPACE} -l app=jaeger"
+                echo '✅ OpenTelemetry collector (Jaeger) is running and ready to receive traces'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ CD Pipeline — ${DOCKER_IMAGE}:${env.DOCKER_TAG} deployed successfully!"
+        }
+        failure {
+            echo '❌ CD Pipeline failed — rolling back to previous version...'
+            sh "kubectl rollout undo deployment/${K8S_DEPLOYMENT} --namespace=${K8S_NAMESPACE} || true"
+        }
+        always {
+            sh 'docker logout || true'
+        }
+    }
+}

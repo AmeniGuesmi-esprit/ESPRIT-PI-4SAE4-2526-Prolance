@@ -1,0 +1,337 @@
+<div class="forum-container">
+  <div class="forum-content">
+
+    <!-- ══════ BANNIÈRE BLOCAGE (visible seulement si bloqué) ══════ -->
+    <div class="block-banner" *ngIf="isUserBlocked">
+      <span class="block-banner-icon">🔒</span>
+      <div class="block-banner-text">
+        <strong>Your account is blocked.</strong>
+        You have {{ archivedCount }} archived post{{ archivedCount > 1 ? 's' : '' }} due to reports.
+        You cannot create new posts. Contact an administrator to reactivate your account.
+      </div>
+    </div>
+
+    <!-- Galaxy Filter Card -->
+    <div class="galaxy-card">
+
+      <!-- Tabs + Add Post -->
+      <div class="tabs-bar">
+        <button
+          *ngFor="let type of typeOptions"
+          [class.active]="selectedType === type.value"
+          (click)="onTypeChange(type.value)"
+          class="tab-button">
+          {{ type.label }}
+        </button>
+        <button
+          [class.active]="selectedType === 'MYPOSTS'"
+          (click)="onTypeChange('MYPOSTS')"
+          class="tab-button">
+          My Posts
+        </button>
+
+        <!-- ══ BOUTON ADD POST : disabled si bloqué ══ -->
+        <button
+          class="btn-add"
+          [class.btn-add-disabled]="isUserBlocked"
+          [disabled]="isUserBlocked"
+          (click)="openAddModal()"
+          [title]="isUserBlocked ? 'Account blocked — contact admin' : 'Add a new post'">
+          <span class="btn-icon">{{ isUserBlocked ? '🔒' : '+' }}</span>
+          {{ isUserBlocked ? 'Blocked' : 'Add Post' }}
+          <!-- Badge avertissement sur le bouton -->
+          <span class="btn-warn-badge" *ngIf="!isUserBlocked && archivedCount > 0">
+            {{ archivedCount }}/3
+          </span>
+        </button>
+      </div>
+
+      <!-- Search bar -->
+      <div class="search-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+            class="search-input"
+            placeholder="Search by author name..."
+            autocomplete="off" />
+          <button *ngIf="searchQuery" class="btn-clear" (click)="clearSearch()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <span class="search-results" *ngIf="searchQuery.trim()">
+          <strong>{{ filteredPublications.length }}</strong> result{{ filteredPublications.length !== 1 ? 's' : '' }}
+          for <em>« {{ searchQuery.trim() }} »</em>
+        </span>
+      </div>
+
+    </div><!-- end galaxy-card -->
+
+    <!-- Avertissement (1 ou 2 posts archivés, non bloqué) -->
+    <div class="archives-warning" *ngIf="!isUserBlocked && archivedCount > 0">
+      <span class="archives-warning-icon">⚠️</span>
+      <div class="archives-warning-text">
+        <strong>Warning:</strong> {{ archivedCount }}/3 of your posts have been archived due to reports.
+        {{ 3 - archivedCount }} more will block your account.
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading posts...</p>
+    </div>
+
+    <!-- Cards normales -->
+    <div *ngIf="!loading && filteredPublications.length > 0" class="publications-grid">
+      <div
+        *ngFor="let publication of paginatedPublications"
+        class="publication-card"
+        [attr.data-type]="publication.type">
+
+        <div class="card-main">
+
+          <!-- Header -->
+          <div class="card-header">
+            <div class="user-info">
+              <div class="user-avatar" [attr.data-type]="publication.type">
+                {{ publication.user?.name?.charAt(0) }}{{ publication.user?.lastName?.charAt(0) }}
+              </div>
+              <div class="user-details">
+                <h3 class="user-name"
+                    [innerHTML]="highlightName((publication.user?.name ?? '') + ' ' + (publication.user?.lastName ?? ''))">
+                </h3>
+                <p class="publication-time">{{ getTimeAgo(publication.createAt!) }}</p>
+              </div>
+            </div>
+
+            <div class="header-right">
+              <div class="type-badge" [attr.data-type]="publication.type">
+                {{ getTypeLabel(publication.type) }}
+              </div>
+
+              <!-- Bouton Signaler — ouvre le modal de signalement -->
+              <button
+                *ngIf="!canModifyPublication(publication)"
+                class="btn-signaler"
+                [class.already-signaled]="hasUserSignaled(publication)"
+                [disabled]="hasUserSignaled(publication)"
+                (click)="openSignalementModal(publication)"
+                [title]="hasUserSignaled(publication) ? 'Already reported' : 'Report this post'">
+                <span>🚩</span>
+                <span class="signaler-count" *ngIf="(publication.signalements?.length ?? 0) > 0">
+                  {{ publication.signalements!.length }}
+                </span>
+              </button>
+
+              <div class="actions-right" *ngIf="canModifyPublication(publication)">
+                <button class="btn-menu" (click)="toggleActionMenu(publication.id!)">••</button>
+                <div class="actions-dropdown" *ngIf="activeMenuId === publication.id">
+                  <button class="dropdown-item edit" (click)="openEditModal(publication); closeActionMenu()">
+                    <span>✏️</span> Edit
+                  </button>
+                  <button class="dropdown-item delete" (click)="deletePublication(publication); closeActionMenu()">
+                    <span>🗑️</span> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="card-content">
+            <h2 class="publication-titre"
+                [style.color]="publication.titleColor || '#2d1f4e'"
+                [style.font-size]="publication.titleFontSize || '1.1rem'">{{ publication.titre }}</h2>
+            <p class="publication-contenue"
+               [class.clamped]="!isExpanded(publication.id!)"
+               [style.color]="publication.contentColor || '#555'">{{ publication.contenue }}</p>
+            <button
+              *ngIf="publication.contenue && publication.contenue.length > 300"
+              class="btn-see-more"
+              (click)="toggleExpand(publication.id!)">
+              {{ isExpanded(publication.id!) ? 'See less ▲' : 'See more ▼' }}
+            </button>
+
+            <!-- PDFs -->
+            <div *ngIf="publication.pdfs && publication.pdfs.length > 0" class="pub-pdfs-list">
+              <a *ngFor="let pdf of publication.pdfs"
+                [href]="getPdfUrl(pdf)" target="_blank" rel="noopener noreferrer"
+                class="pub-pdf-link">
+                <span class="pub-pdf-icon">📄</span>
+                <span class="pub-pdf-name">{{ pdf.substring(pdf.indexOf('_') + 1) }}</span>
+                <span class="pub-pdf-open">↗</span>
+              </a>
+            </div>
+
+            <!-- Images -->
+            <div *ngIf="publication.images && publication.images.length > 0" class="pub-images-row"
+                 [class.center-single]="publication.images.length === 1">
+              <div *ngIf="publication.images.length === 1" class="pub-img-wrapper" (click)="openLightbox(publication.images, 0)">
+                <img [src]="getImageUrl(publication.images[0])" [alt]="publication.titre" (error)="onImageError($event)" class="pub-img">
+              </div>
+              <ng-container *ngIf="publication.images.length === 2">
+                <div class="pub-img-wrapper" (click)="openLightbox(publication.images, 0)">
+                  <img [src]="getImageUrl(publication.images[0])" [alt]="publication.titre" (error)="onImageError($event)" class="pub-img">
+                </div>
+                <div class="pub-img-wrapper" (click)="openLightbox(publication.images, 1)">
+                  <img [src]="getImageUrl(publication.images[1])" [alt]="publication.titre" (error)="onImageError($event)" class="pub-img">
+                </div>
+              </ng-container>
+              <ng-container *ngIf="publication.images.length > 2">
+                <div class="pub-img-wrapper" (click)="openLightbox(publication.images, 0)">
+                  <img [src]="getImageUrl(publication.images[0])" [alt]="publication.titre" (error)="onImageError($event)" class="pub-img">
+                </div>
+                <div class="pub-img-wrapper pub-img-wrapper--more" (click)="openLightbox(publication.images, 1)">
+                  <img [src]="getImageUrl(publication.images[1])" [alt]="publication.titre" (error)="onImageError($event)" class="pub-img">
+                  <div class="pub-img-overlay">+{{ publication.images.length - 2 }}</div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <!-- ══ REPORT INFO (visible seulement par l'auteur du post) ══ -->
+          <div class="report-info-section"
+               *ngIf="canModifyPublication(publication) && (publication.signalements?.length ?? 0) > 0">
+            <button class="report-toggle-btn" (click)="toggleReportPanel(publication.id!)">
+              <span class="report-flag">🚩</span>
+              <span class="report-count-label">
+                {{ publication.signalements!.length }} report{{ publication.signalements!.length > 1 ? 's' : '' }} on your post
+              </span>
+              <span class="report-toggle-arrow">{{ isReportPanelOpen(publication.id!) ? '▲' : '▼' }}</span>
+            </button>
+
+            <div class="report-panel" *ngIf="isReportPanelOpen(publication.id!)">
+              <div class="report-panel-inner">
+                <div class="report-row" *ngFor="let userId of publication.signalements; let i = index">
+                  <div class="report-row-left">
+                    <span class="report-user-badge">{{ getUserName(userId) }}</span>
+                    <span class="report-reason" *ngIf="publication.signalementRaisons && publication.signalementRaisons[i]">
+                      {{ publication.signalementRaisons[i] }}
+                    </span>
+                    <span class="report-reason report-no-reason" *ngIf="!publication.signalementRaisons || !publication.signalementRaisons[i]">
+                      No reason given
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="card-footer">
+            <div class="footer-actions">
+              <app-reaction-button [publicationId]="publication.id!"></app-reaction-button>
+              <button class="btn-action btn-comments" (click)="openCommentModal(publication)">
+                <span class="icon">💬</span> Comments
+                <span class="count" *ngIf="publication.commentaires?.length">({{ publication.commentaires!.length }})</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading && totalPages > 1" class="pagination-bar">
+      <button class="page-btn page-nav" (click)="prevPage()" [disabled]="currentPage === 1">&#8592;</button>
+      <button *ngFor="let page of pageNumbers" class="page-btn" [class.active]="page === currentPage" (click)="goToPage(page)">{{ page }}</button>
+      <button class="page-btn page-nav" (click)="nextPage()" [disabled]="currentPage === totalPages">&#8594;</button>
+      <span class="page-info">Page {{ currentPage }} / {{ totalPages }}</span>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && filteredPublications.length === 0" class="empty-state">
+      <div class="empty-icon">{{ searchQuery.trim() ? '🔍' : '💬' }}</div>
+      <h3>{{ searchQuery.trim() ? 'No results found' : 'No posts yet' }}</h3>
+      <p *ngIf="searchQuery.trim()">No author matches <strong>« {{ searchQuery.trim() }} »</strong></p>
+      <p *ngIf="!searchQuery.trim()">Be the first to start the conversation!</p>
+      <button *ngIf="searchQuery.trim()" class="btn-primary" (click)="clearSearch()">Clear search</button>
+      <button *ngIf="!searchQuery.trim() && !isUserBlocked" class="btn-primary" (click)="openAddModal()">Create first post</button>
+      <p *ngIf="!searchQuery.trim() && isUserBlocked" class="blocked-empty-msg">🔒 Your account is blocked. Contact the admin.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════ MODALS ══════ -->
+<app-publication-form
+  *ngIf="showAddModal"
+  [mode]="'create'"
+  (close)="closeAddModal()"
+  (saved)="onPublicationCreated()">
+</app-publication-form>
+
+<app-publication-form
+  *ngIf="showEditModal && selectedPublication"
+  [mode]="'edit'"
+  [publication]="selectedPublication"
+  (close)="closeEditModal()"
+  (saved)="onPublicationUpdated()">
+</app-publication-form>
+
+<app-commentaire-modal
+  *ngIf="showCommentModal && selectedPublication"
+  [publication]="selectedPublication"
+  [currentUserId]="currentUserId"
+  (close)="closeCommentModal()"
+  (commentCountChanged)="onCommentCountChanged($event)">
+</app-commentaire-modal>
+
+<!-- ══════ MODAL SIGNALEMENT ══════ -->
+<app-signalement-modal
+  *ngIf="showSignalementModal && pubToSignal"
+  [publicationId]="pubToSignal.id!"
+  [pubTitre]="pubToSignal.titre"
+  [currentUserId]="currentUserId"
+  (cancelled)="onSignalementCancelled()"
+  (reported)="onSignalementReported($event)"
+  (alreadyReported)="onSignalementAlreadyReported()">
+</app-signalement-modal>
+
+<!-- ══════ LIGHTBOX ══════ -->
+<div class="lightbox-overlay" *ngIf="showLightbox" (click)="closeLightbox()">
+  <div class="lightbox-box" (click)="$event.stopPropagation()">
+    <button class="lightbox-close" (click)="closeLightbox()">✕</button>
+    <div class="lightbox-img-wrapper">
+      <img [src]="getImageUrl(lightboxImages[lightboxIndex])" alt="Image" class="lightbox-img">
+    </div>
+    <button class="lightbox-arrow lightbox-prev" (click)="lightboxPrev()" *ngIf="lightboxImages.length > 1 && lightboxIndex > 0">&#8592;</button>
+    <button class="lightbox-arrow lightbox-next" (click)="lightboxNext()" *ngIf="lightboxImages.length > 1 && lightboxIndex < lightboxImages.length - 1">&#8594;</button>
+    <div class="lightbox-counter" *ngIf="lightboxImages.length > 1">{{ lightboxIndex + 1 }} / {{ lightboxImages.length }}</div>
+    <div class="lightbox-thumbs" *ngIf="lightboxImages.length > 1">
+      <img *ngFor="let img of lightboxImages; let i = index"
+           [src]="getImageUrl(img)" [class.active]="i === lightboxIndex" (click)="lightboxIndex = i" class="lightbox-thumb">
+    </div>
+  </div>
+</div>
+
+<!-- ══════ DELETE MODAL ══════ -->
+<div class="delete-modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+  <div class="delete-modal-box" (click)="$event.stopPropagation()">
+    <div class="delete-modal-icon">🗑️</div>
+    <h3 class="delete-modal-title">Delete this post?</h3>
+    <p class="delete-modal-msg">This action is <strong>irreversible</strong>. The post and all its reactions and comments will be permanently deleted.</p>
+    <div class="delete-modal-actions">
+      <button class="btn-cancel-delete" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-confirm-delete" (click)="confirmDelete()">Yes, delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TOAST ══════ -->
+<div class="toast-notif" *ngIf="toastMessage" [class.toast-error]="toastIsError">
+  {{ toastMessage }}
+</div>
+
+<app-chatbot></app-chatbot>

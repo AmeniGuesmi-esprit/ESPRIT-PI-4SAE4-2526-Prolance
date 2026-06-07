@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    options {
+        skipDefaultCheckout(true)
+    }
+
+    environment {
+        DOCKER_IMAGE  = "marahmarah123/inscription-service"
+        K8S_NAMESPACE = "devops"
+        APP_NAME      = "inscription-service"
+        HELM_REPO     = "https://github.com/MarahMhadbhi/prolance-helm-charts.git"
+        GIT_USER      = "MarahMhadbhi"
+        GIT_EMAIL     = "marah@example.com"
+    }
+
+    stages {
+
+        stage('Récupérer le tag CI') {
+            steps {
+                copyArtifacts(
+                    projectName: 'inscription-service-CI',
+                    selector: lastSuccessful(),
+                    filter: 'inscription-service-tag.txt'
+                )
+                script {
+                    env.DOCKER_TAG = readFile('inscription-service-tag.txt').trim()
+                    echo "Déploiement du tag : ${env.DOCKER_TAG}"
+                }
+            }
+        }
+
+        stage('Mettre à jour Helm chart') {
+            steps {
+                withCredentials([string(
+                    credentialsId: 'github-token',
+                    variable: 'GITHUB_TOKEN'
+                )]) {
+                    sh """
+                        rm -rf prolance-helm-charts
+                        git clone https://${GIT_USER}:\${GITHUB_TOKEN}@github.com/MarahMhadbhi/prolance-helm-charts.git
+                        cd prolance-helm-charts
+                        git config user.email "${GIT_EMAIL}"
+                        git config user.name "${GIT_USER}"
+                        sed -i 's|tag: .*|tag: "${env.DOCKER_TAG}"|g' inscription-service/values.yaml
+                        git add inscription-service/values.yaml
+                        git commit -m "update inscription-service image tag to ${env.DOCKER_TAG}"
+                        git push origin main
+                    """
+                }
+            }
+        }
+
+        stage('Vérifier déploiement ArgoCD') {
+            steps {
+                sh """
+                    sleep 30
+                    kubectl rollout status deployment/${APP_NAME} \
+                        -n ${K8S_NAMESPACE} --timeout=300s
+                """
+            }
+        }
+    }
+
+    post {
+        success { echo 'inscription-service déployé via ArgoCD ✅' }
+        failure { echo 'Déploiement échoué ❌' }
+    }
+}

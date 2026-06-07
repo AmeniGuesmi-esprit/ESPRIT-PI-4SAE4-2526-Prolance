@@ -1,0 +1,185 @@
+package tn.esprit.microservice.subscriptionservice;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import tn.esprit.microservice.subscriptionservice.subscription.controller.StatsController;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.entities.Subscription;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.entities.UserSubscription;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.enums.SubscriptionStatus;
+import tn.esprit.microservice.subscriptionservice.subscription.repository.SubscriptionRepository;
+import tn.esprit.microservice.subscriptionservice.subscription.repository.UserSubscriptionRepository;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class StatsControllerTest {
+
+    @Mock
+    private SubscriptionRepository subscriptionRepo;
+
+    @Mock
+    private UserSubscriptionRepository userSubRepo;
+
+    @InjectMocks
+    private StatsController statsController;
+
+    private UserSubscription activeUserSub;
+    private UserSubscription cancelledUserSub;
+    private Subscription plan;
+
+    @BeforeEach
+    void setUp() {
+        plan = new Subscription();
+        plan.setId(1L);
+        plan.setName("PRO");
+        plan.setIsActive(true);
+
+        activeUserSub = new UserSubscription();
+        activeUserSub.setId(1L);
+        activeUserSub.setStatus(SubscriptionStatus.ACTIVE);
+        activeUserSub.setAmountPaid(new BigDecimal("29.99"));
+
+        cancelledUserSub = new UserSubscription();
+        cancelledUserSub.setId(2L);
+        cancelledUserSub.setStatus(SubscriptionStatus.CANCELLED);
+        cancelledUserSub.setAmountPaid(new BigDecimal("15.00"));
+    }
+
+    @Test
+    void getPlatformStats_returnsOkStatus() {
+        when(userSubRepo.findAll()).thenReturn(Collections.emptyList());
+        when(userSubRepo.count()).thenReturn(0L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        ResponseEntity<Map<String, Object>> response = statsController.getPlatformStats();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    void getPlatformStats_countsOnlyActiveSubscriptions() {
+        when(userSubRepo.findAll()).thenReturn(Arrays.asList(activeUserSub, cancelledUserSub));
+        when(userSubRepo.count()).thenReturn(2L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        ResponseEntity<Map<String, Object>> response = statsController.getPlatformStats();
+
+        assertEquals(1L, response.getBody().get("activeSubscriptions"));
+        assertEquals(2L, response.getBody().get("totalUsers"));
+    }
+
+    @Test
+    void getPlatformStats_calculatesTotalRevenue() {
+        when(userSubRepo.findAll()).thenReturn(Arrays.asList(activeUserSub, cancelledUserSub));
+        when(userSubRepo.count()).thenReturn(2L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        ResponseEntity<Map<String, Object>> response = statsController.getPlatformStats();
+
+        double revenue = (Double) response.getBody().get("totalRevenue");
+        assertEquals(44.99, revenue, 0.01);
+    }
+
+    @Test
+    void getPlatformStats_withNullAmountPaid_treatsAsZero() {
+        activeUserSub.setAmountPaid(null);
+        when(userSubRepo.findAll()).thenReturn(Collections.singletonList(activeUserSub));
+        when(userSubRepo.count()).thenReturn(1L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        ResponseEntity<Map<String, Object>> response = statsController.getPlatformStats();
+
+        assertEquals(0.0, response.getBody().get("totalRevenue"));
+    }
+
+    @Test
+    void getPlatformStats_mostPopularPlanIsFirstPlanName() {
+        when(userSubRepo.findAll()).thenReturn(Collections.emptyList());
+        when(userSubRepo.count()).thenReturn(0L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.singletonList(plan));
+        when(subscriptionRepo.count()).thenReturn(1L);
+
+        ResponseEntity<Map<String, Object>> response = statsController.getPlatformStats();
+
+        assertEquals("PRO", response.getBody().get("mostPopularPlan"));
+    }
+
+    @Test
+    void getPlatformStats_whenNoPlans_mostPopularIsNA() {
+        when(userSubRepo.findAll()).thenReturn(Collections.emptyList());
+        when(userSubRepo.count()).thenReturn(0L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        ResponseEntity<Map<String, Object>> response = statsController.getPlatformStats();
+
+        assertEquals("N/A", response.getBody().get("mostPopularPlan"));
+    }
+
+    @Test
+    void getPlatformStats_returnsAllExpectedKeys() {
+        when(userSubRepo.findAll()).thenReturn(Collections.emptyList());
+        when(userSubRepo.count()).thenReturn(0L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        Map<String, Object> body = statsController.getPlatformStats().getBody();
+
+        assertTrue(body.containsKey("totalUsers"));
+        assertTrue(body.containsKey("totalFreelancers"));
+        assertTrue(body.containsKey("totalClients"));
+        assertTrue(body.containsKey("activeSubscriptions"));
+        assertTrue(body.containsKey("mostPopularPlan"));
+        assertTrue(body.containsKey("planDistribution"));
+        assertTrue(body.containsKey("totalPlans"));
+        assertTrue(body.containsKey("satisfactionRate"));
+        assertTrue(body.containsKey("avgResponseTime"));
+        assertTrue(body.containsKey("projectsCompleted"));
+        assertTrue(body.containsKey("totalRevenue"));
+    }
+
+    @Test
+    void getPlatformStats_staticValuesAreCorrect() {
+        when(userSubRepo.findAll()).thenReturn(Collections.emptyList());
+        when(userSubRepo.count()).thenReturn(0L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(0L);
+
+        Map<String, Object> body = statsController.getPlatformStats().getBody();
+
+        assertEquals(95.0, body.get("satisfactionRate"));
+        assertEquals(1.2, body.get("avgResponseTime"));
+        assertEquals(0, body.get("totalFreelancers"));
+        assertEquals(0, body.get("totalClients"));
+        assertEquals(0, body.get("projectsCompleted"));
+    }
+
+    @Test
+    void getPlatformStats_totalPlansFromRepository() {
+        when(userSubRepo.findAll()).thenReturn(Collections.emptyList());
+        when(userSubRepo.count()).thenReturn(0L);
+        when(subscriptionRepo.findAll()).thenReturn(Collections.emptyList());
+        when(subscriptionRepo.count()).thenReturn(5L);
+
+        Map<String, Object> body = statsController.getPlatformStats().getBody();
+
+        assertEquals(5L, body.get("totalPlans"));
+    }
+}

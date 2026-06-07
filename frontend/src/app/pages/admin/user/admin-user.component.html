@@ -1,0 +1,234 @@
+<!-- Toast Notification -->
+<div class="toast-notification" *ngIf="showToast"
+     [class.toast-success]="toastType === 'success'"
+     [class.toast-error]="toastType === 'error'">
+  <i class="material-icons">{{ toastType === 'success' ? 'check_circle' : 'error' }}</i>
+  <span>{{ toastMessage }}</span>
+  <button class="toast-close" (click)="showToast = false">
+    <i class="material-icons">close</i>
+  </button>
+</div>
+
+<div class="admin-users compact">
+
+  <!-- ════════ PAGE HEADER + KPI STRIP ════════ -->
+  <div class="users-header">
+    <div class="users-header-text">
+      <h2 class="page-title">User Management</h2>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-chip total-chip">
+        <i class="material-icons">people</i>
+        <span>{{ users.length }} Users</span>
+      </div>
+      <div class="kpi-chip admin-chip">
+        <i class="material-icons">admin_panel_settings</i>
+        <span>{{ adminCount }} Admins</span>
+      </div>
+      <div class="kpi-chip client-chip">
+        <i class="material-icons">person</i>
+        <span>{{ clientCount }} Clients</span>
+      </div>
+      <div class="kpi-chip freelancer-chip">
+        <i class="material-icons">work</i>
+        <span>{{ freelancerCount }} Freelancers</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ USER TABLE ════════ -->
+  <section class="section-block">
+    <div class="section-head">
+      <div class="section-title-row">
+        <i class="material-icons section-icon">people_alt</i>
+        <h3>All Users</h3>
+        <span class="count-badge">{{ users.length }}</span>
+      </div>
+      <p class="section-desc">View, moderate, and manage user accounts.</p>
+      <button class="btn-export" (click)="exportToExcel()">
+        <i class="material-icons">download</i> Download Excel
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="material-icons spin">autorenew</i>
+      <p>Loading users...</p>
+    </div>
+
+    <!-- Users Table -->
+    <div class="table-wrap" *ngIf="!isLoading && users.length > 0">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Avatar</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Reports</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users" [class.fading-out]="isFadingOut(user.id)">
+            <td>
+              <div class="avatar-circle">{{ getAvatar(user) }}</div>
+            </td>
+            <td>{{ user.name }} {{ user.lastName }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="role-badge" [ngClass]="getRoleClass(user.role)">
+                {{ getRoleLabel(user.role) }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatusClass(user)">
+                {{ getStatusLabel(user) }}
+              </span>
+              <span class="timeout-hint" *ngIf="user.timedOut && user.timeoutUntil">
+                Until {{ user.timeoutUntil }}
+              </span>
+            </td>
+            <td>
+              <span class="report-count" [class.report-high]="user.reportCount >= 3">
+                <i class="material-icons">flag</i> {{ user.reportCount || 0 }}
+              </span>
+            </td>
+            <td class="text-right td-actions">
+              <!-- Report -->
+              <button class="btn-icon btn-report" (click)="openReportModal(user)" title="Report User">
+                <i class="material-icons">report_problem</i>
+              </button>
+              <!-- Timeout / Lift -->
+              <button class="btn-icon"
+                      [ngClass]="user.timedOut ? 'btn-lift' : 'btn-timeout'"
+                      (click)="user.timedOut ? liftTimeout(user) : openTimeoutModal(user)"
+                      [title]="user.timedOut ? 'Lift Timeout' : 'Time Out User'">
+                <i class="material-icons">{{ user.timedOut ? 'lock_open' : 'timer_off' }}</i>
+              </button>
+              <!-- Deactivate / Reactivate -->
+              <button class="btn-icon"
+                      [ngClass]="user.enabled ? 'btn-deactivate' : 'btn-activate'"
+                      (click)="toggleStatus(user)"
+                      [title]="user.enabled ? 'Deactivate User' : 'Reactivate User'">
+                <i class="material-icons">{{ user.enabled ? 'person_off' : 'person_add' }}</i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-queue" *ngIf="!isLoading && users.length === 0">
+      <i class="material-icons">person_off</i>
+      <p>No users found.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ════════ TIMEOUT MODAL ════════ -->
+<div class="modal-overlay" *ngIf="showTimeoutModal" (click)="closeModals()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-head modal-head-warning">
+      <h3><i class="material-icons">timer_off</i> Time Out User</h3>
+      <button class="modal-close" (click)="closeModals()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-target">Applying timeout to <strong>{{ selectedUser?.name }} {{ selectedUser?.lastName }}</strong></p>
+
+      <label>Duration</label>
+      <div class="duration-grid">
+        <button class="duration-btn" *ngFor="let d of timeoutDurations"
+                [class.active]="selectedDuration === d.value"
+                (click)="selectedDuration = d.value">
+          {{ d.label }}
+        </button>
+      </div>
+
+      <label style="margin-top:1.2rem;">Reason <span class="optional">(optional)</span></label>
+      <textarea [(ngModel)]="actionReason" placeholder="Describe the reason…" rows="2"></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" (click)="closeModals()">Cancel</button>
+      <button class="btn-confirm btn-confirm-warning" (click)="confirmTimeout()">
+        <i class="material-icons">timer_off</i> Apply Timeout
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ REPORT MODAL — with AI Analysis (Feature 1) ════════ -->
+<div class="modal-overlay" *ngIf="showReportModal" (click)="closeModals()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <div class="modal-head modal-head-danger">
+      <h3><i class="material-icons">report_problem</i> Report User</h3>
+      <button class="modal-close" (click)="closeModals()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p class="modal-target">
+        Logging report against
+        <strong>{{ selectedUser?.name }} {{ selectedUser?.lastName }}</strong>
+      </p>
+
+      <label>Category</label>
+      <select [(ngModel)]="reportCategory">
+        <option value="spam">Spam / Fake Activity</option>
+        <option value="fraud">Fraud / Scam</option>
+        <option value="abuse">Abusive Behaviour</option>
+        <option value="tos">Terms of Service Violation</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label>Details <span class="optional">(optional)</span></label>
+      <textarea [(ngModel)]="actionReason" placeholder="Describe the issue…" rows="3"></textarea>
+
+      <!-- ── AI Verdict block ── -->
+      <div class="ai-verdict-section">
+
+        <button class="btn-ai-analyse"
+                (click)="analyseWithAi()"
+                [disabled]="isAnalysing">
+          <i class="material-icons" [class.spin]="isAnalysing">
+            {{ isAnalysing ? 'autorenew' : 'psychology' }}
+          </i>
+          <span>{{ isAnalysing ? 'Analysing…' : 'Analyse with AI' }}</span>
+        </button>
+
+        <div class="ai-result-card" *ngIf="aiVerdict && !isAnalysing">
+          <div class="ai-result-header">
+            <i class="material-icons">smart_toy</i>
+            <span>AI Recommendation</span>
+          </div>
+          <div class="ai-result-body">
+            <div class="ai-chips">
+              <span class="ai-chip" [ngClass]="getSeverityClass(aiVerdict.severity)">
+                Severity: {{ aiVerdict.severity | titlecase }}
+              </span>
+              <span class="ai-chip" [ngClass]="getActionClass(aiVerdict.action)">
+                Action: {{ aiVerdict.action | titlecase }}
+              </span>
+            </div>
+            <p class="ai-justification">{{ aiVerdict.justification }}</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-cancel" (click)="closeModals()">Cancel</button>
+      <button class="btn-confirm btn-confirm-delete" (click)="confirmReport()">
+        <i class="material-icons">report_problem</i> Submit Report
+      </button>
+    </div>
+
+  </div>
+</div>

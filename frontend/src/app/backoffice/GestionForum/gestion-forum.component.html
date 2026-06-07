@@ -1,0 +1,510 @@
+<div class="fo-root">
+
+  <!-- ══════ TOAST ══════ -->
+  <div class="toast-wrap" [class.visible]="toast.visible">
+    <div class="toast-box" [class.t-ok]="toast.success" [class.t-err]="!toast.success">
+      <span class="t-icon">{{ toast.success ? '✅' : '❌' }}</span>
+      <span class="t-msg">{{ toast.message }}</span>
+      <button class="t-close" (click)="closeToast()">✕</button>
+    </div>
+  </div>
+
+  <!-- ══════ DELETE MODAL ══════ -->
+  <div class="del-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="del-box" (click)="$event.stopPropagation()">
+      <div class="del-icon">🗑️</div>
+      <h3 class="del-title">Delete this publication?</h3>
+      <p class="del-sub">
+        You are about to permanently delete<br>
+        <strong>« {{ pubToDelete?.titre }} »</strong><br>
+        <span class="del-warn">This action cannot be undone.</span>
+      </p>
+      <div class="del-btns">
+        <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+        <button class="btn-confirm" (click)="confirmDelete()">Yes, delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ PAGE HEADER ══════ -->
+  <div class="fo-header">
+    <h1 class="fo-title"><span class="fo-title-icon">🗂️</span> Forum Management</h1>
+    <button class="btn-ai-report" (click)="generateAiReport()" [disabled]="generatingReport">
+      <span *ngIf="!generatingReport">🤖 Générer rapport AI</span>
+      <span *ngIf="generatingReport" class="report-loading"><span class="spinner-report"></span> Analyse en cours...</span>
+    </button>
+  </div>
+
+  <!-- ══════ TABS ADMIN ══════ -->
+  <div class="admin-tabs">
+    <button class="admin-tab" [class.active]="activeTab === 'all'" (click)="switchTab('all')">
+      📋 All Publications <span class="tab-badge">{{ publications.length }}</span>
+    </button>
+    <!-- TAB : Utilisateurs bloqués -->
+    <button class="admin-tab admin-tab-blocked" [class.active]="activeTab === 'blocked'" (click)="switchTab('blocked')">
+      🚫 Blocked Users
+      <span class="tab-badge tab-badge-blocked" *ngIf="blockedUsersCount > 0">
+        {{ blockedUsersCount }}
+      </span>
+    </button>
+    <!-- TAB : Utilisateurs avertis -->
+    <button class="admin-tab admin-tab-warned" [class.active]="activeTab === 'warned'" (click)="switchTab('warned')">
+      ⚠️ Warned Users
+      <span class="tab-badge tab-badge-warned" *ngIf="warnedUsersCount > 0">
+        {{ warnedUsersCount }}
+      </span>
+    </button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       TAB : ALL PUBLICATIONS
+       ══════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'all'">
+
+    <!-- STATS CARDS -->
+    <div class="stats-row">
+      <div class="stat-card sc-all" [class.active]="typeFilter==='ALL' && statutFilter==='ALL'" (click)="onTypeChange('ALL')">
+        <span class="sc-icon">📝</span>
+        <div class="sc-body">
+          <p class="sc-val">{{ activePublicationsCount }}</p>
+          <p class="sc-lbl">All Publications</p>
+          <p class="sc-pct">100%</p>
+        </div>
+      </div>
+      <div class="stat-card sc-q" [class.active]="typeFilter==='QUESTION'" (click)="onTypeChange('QUESTION')">
+        <span class="sc-icon">❓</span>
+        <div class="sc-body">
+          <p class="sc-val">{{ getCountByType('QUESTION') }}</p>
+          <p class="sc-lbl">Questions</p>
+          <p class="sc-pct">{{ pct('QUESTION') }}%</p>
+        </div>
+      </div>
+      <div class="stat-card sc-a" [class.active]="typeFilter==='ARTICLE'" (click)="onTypeChange('ARTICLE')">
+        <span class="sc-icon">📰</span>
+        <div class="sc-body">
+          <p class="sc-val">{{ getCountByType('ARTICLE') }}</p>
+          <p class="sc-lbl">Articles</p>
+          <p class="sc-pct">{{ pct('ARTICLE') }}%</p>
+        </div>
+      </div>
+      <div class="stat-card sc-r" [class.active]="typeFilter==='REVIEW'" (click)="onTypeChange('REVIEW')">
+        <span class="sc-icon">⭐</span>
+        <div class="sc-body">
+          <p class="sc-val">{{ getCountByType('REVIEW') }}</p>
+          <p class="sc-lbl">Reviews</p>
+          <p class="sc-pct">{{ pct('REVIEW') }}%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div class="search-bar-row">
+      <div class="sbar-input-wrap">
+        <span class="sbar-icon">🔍</span>
+        <input class="sbar-input" type="text" placeholder="Search by author name…"
+          [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange($event)" />
+        <button *ngIf="searchQuery" class="sbar-clear" (click)="onSearchChange('')">✕</button>
+      </div>
+      <div class="sbar-type-group">
+        <button *ngFor="let t of typeOptions" class="sbar-type-btn"
+          [class.sbt-active]="typeFilter === t && statutFilter === 'ALL'" (click)="onTypeChange(t)">
+          {{ t === 'ALL' ? '📋 All' : getTypeIcon(t) + ' ' + t }}
+        </button>
+      </div>
+      <div class="sbar-info" *ngIf="searchQuery || typeFilter !== 'ALL' || statutFilter !== 'ALL'">
+        <span class="sbar-count">{{ filteredPublications.length }} result{{ filteredPublications.length !== 1 ? 's' : '' }}</span>
+        <button class="sbar-reset" (click)="clearFilters()">↺ Reset</button>
+      </div>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="fo-body" [class.panel-open]="selectedPublication !== null">
+
+      <!-- Cards list -->
+      <div class="fo-main">
+
+        <div *ngIf="loading" class="state-box">
+          <div class="spinner"></div><p>Loading publications…</p>
+        </div>
+        <div *ngIf="error && !loading" class="state-box">
+          <p class="err-txt">⚠️ {{ error }}</p>
+          <button class="btn-retry" (click)="loadData()">↻ Retry</button>
+        </div>
+        <div *ngIf="!loading && !error && filteredPublications.length === 0" class="state-box">
+          <span style="font-size:2.5rem">🔍</span>
+          <p>No publications match your filters.</p>
+          <button class="btn-clear-f" (click)="clearFilters()">Clear filters</button>
+        </div>
+
+        <div *ngIf="!loading && !error && filteredPublications.length > 0" class="pub-grid">
+          <div *ngFor="let pub of pagedPublications"
+            class="pub-card"
+            [class.pub-selected]="selectedPublication?.id === pub.id"
+            [class.pub-archived]="pub.statut === 'ARCHIVED'">
+
+            <div class="pub-ribbon" [style.background]="getTypeColor(pub.type)"></div>
+
+            <div class="pub-card-inner">
+
+              <!-- Header -->
+              <div class="pub-card-header">
+                <div class="pub-author-block">
+                  <div class="pub-avatar" [style.background]="getTypeColor(pub.type)">
+                    {{ getInitials(pub.user) }}
+                  </div>
+                  <div class="pub-author-info">
+                    <span class="pub-author-name">{{ getUserLabel(pub.user) }}</span>
+                    <span class="pub-date">{{ formatDate(pub.createAt) }}</span>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <div class="pub-type-chip"
+                    [style.background]="getTypeBg(pub.type)"
+                    [style.color]="getTypeColor(pub.type)">
+                    {{ getTypeIcon(pub.type) }} {{ pub.type }}
+                  </div>
+                  <div class="pub-signals" *ngIf="pub.signalements && pub.signalements.length > 0" title="Number of reports">
+                    🚩 {{ pub.signalements.length }}
+                  </div>
+                </div>
+              </div>
+
+              <h3 class="pub-titre">{{ pub.titre }}</h3>
+
+              <!-- Raisons des signalements -->
+              <div class="pub-raisons" *ngIf="pub.signalementRaisons && pub.signalementRaisons.length > 0">
+                <p class="pub-raisons-title">📋 Report reasons:</p>
+                <ul class="pub-raisons-list">
+                  <li *ngFor="let raison of pub.signalementRaisons; let i = index" class="pub-raison-item">
+                    <span class="raison-index">#{{ i + 1 }}</span>
+                    <span class="raison-text">{{ raison || '(No reason given)' }}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="pub-content-wrap">
+                <p class="pub-contenue" [class.clamped]="!isExpanded(pub.id)">{{ pub.contenue }}</p>
+                <button *ngIf="pub.contenue && pub.contenue.length > 220"
+                  class="btn-see-more" (click)="toggleExpand(pub.id, $event)">
+                  {{ isExpanded(pub.id) ? '▲ See less' : '▼ See more' }}
+                </button>
+              </div>
+
+              <!-- Actions -->
+              <div class="pub-actions">
+                <button class="pub-action-btn btn-pdf"
+                  [class.btn-active]="selectedPublication?.id === pub.id && activePanel === 'pdfs'"
+                  (click)="openPanel(pub, 'pdfs', $event)" [title]="(pub.pdfs?.length || 0) + ' PDF(s)'">
+                  📄 PDFs <span class="pub-action-badge" *ngIf="pub.pdfs?.length">{{ pub.pdfs.length }}</span>
+                </button>
+                <button class="pub-action-btn btn-img"
+                  [class.btn-active]="selectedPublication?.id === pub.id && activePanel === 'images'"
+                  (click)="openPanel(pub, 'images', $event)">
+                  🖼️ Images <span class="pub-action-badge" *ngIf="pub.images?.length">{{ pub.images.length }}</span>
+                </button>
+                <button class="pub-action-btn btn-react"
+                  [class.btn-active]="selectedPublication?.id === pub.id && activePanel === 'reactions'"
+                  (click)="openPanel(pub, 'reactions', $event)">❤️ Reactions</button>
+                <button class="pub-action-btn btn-cmt"
+                  [class.btn-active]="selectedPublication?.id === pub.id && activePanel === 'comments'"
+                  (click)="openPanel(pub, 'comments', $event)">
+                  💬 Comments <span class="pub-action-badge" *ngIf="pub.commentCount">{{ pub.commentCount }}</span>
+                </button>
+                <button class="pub-action-btn btn-del" (click)="askDelete(pub, $event)">🗑️ Delete</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalPages > 1">
+          <button class="pg-btn" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+          <button *ngFor="let p of pageNumbers" class="pg-btn pg-num"
+            [class.pg-active]="p === currentPage" (click)="goToPage(p)">{{ p }}</button>
+          <button class="pg-btn" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+          <span class="pg-info">Page {{ currentPage }}/{{ totalPages }} · {{ filteredPublications.length }} results</span>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL -->
+      <div class="fo-panel" *ngIf="selectedPublication && activePanel">
+        <div class="panel-head">
+          <div class="panel-head-left">
+            <span class="panel-pub-title">{{ selectedPublication.titre | slice:0:40 }}{{ selectedPublication.titre?.length > 40 ? '…' : '' }}</span>
+            <span class="panel-type-chip" [style.background]="getTypeBg(selectedPublication.type)" [style.color]="getTypeColor(selectedPublication.type)">
+              {{ getTypeIcon(selectedPublication.type) }} {{ selectedPublication.type }}
+            </span>
+          </div>
+          <button class="panel-close" (click)="closePanel()">✕</button>
+        </div>
+
+        <!-- PDFs -->
+        <div *ngIf="activePanel === 'pdfs'" class="panel-body">
+          <h4 class="panel-section-title">📄 PDF Files</h4>
+          <div *ngIf="!selectedPublication.pdfs || selectedPublication.pdfs.length === 0" class="panel-empty">No PDFs attached.</div>
+          <div class="pdf-list" *ngIf="selectedPublication.pdfs?.length">
+            <a *ngFor="let pdf of selectedPublication.pdfs" [href]="getPdfUrl(pdf)" target="_blank" rel="noopener" class="pdf-item">
+              <span class="pdf-item-icon">📄</span>
+              <span class="pdf-item-name">{{ getPdfName(pdf) }}</span>
+              <span class="pdf-item-open">↗</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Images -->
+        <div *ngIf="activePanel === 'images'" class="panel-body">
+          <h4 class="panel-section-title">🖼️ Images</h4>
+          <div *ngIf="!selectedPublication.images || selectedPublication.images.length === 0" class="panel-empty">No images attached.</div>
+          <div class="images-grid" *ngIf="selectedPublication.images?.length">
+            <div *ngFor="let img of selectedPublication.images" class="img-thumb-wrap">
+              <img [src]="getImageUrl(img)" [alt]="selectedPublication.titre" class="img-thumb" (error)="$any($event.target).style.display='none'" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Reactions -->
+        <div *ngIf="activePanel === 'reactions'" class="panel-body">
+          <h4 class="panel-section-title">❤️ Reactions</h4>
+          <div *ngIf="loadingReactions" class="sd-loading"><div class="spinner sm"></div> Loading…</div>
+          <div *ngIf="!loadingReactions && reactionSummary" class="rct-dashboard">
+            <div class="rct-total-row">
+              <span class="rct-total-num">{{ totalReactions }}</span>
+              <span class="rct-total-lbl">total reactions</span>
+            </div>
+            <div class="rct-grid">
+              <div class="rct-tile rct-like-tile"><span class="rct-emoji">👍</span><span class="rct-cnt">{{ reactionSummary.LIKE }}</span><span class="rct-lbl">Likes</span></div>
+              <div class="rct-tile rct-heart-tile"><span class="rct-emoji">❤️</span><span class="rct-cnt">{{ reactionSummary.HEART }}</span><span class="rct-lbl">Hearts</span></div>
+              <div class="rct-tile rct-dis-tile"><span class="rct-emoji">👎</span><span class="rct-cnt">{{ reactionSummary.DISLIKE }}</span><span class="rct-lbl">Dislikes</span></div>
+            </div>
+            <div class="rct-bar" *ngIf="totalReactions > 0">
+              <div class="rct-seg rct-like-seg" [style.width.%]="(reactionSummary.LIKE / totalReactions) * 100"></div>
+              <div class="rct-seg rct-heart-seg" [style.width.%]="(reactionSummary.HEART / totalReactions) * 100"></div>
+              <div class="rct-seg rct-dis-seg" [style.width.%]="(reactionSummary.DISLIKE / totalReactions) * 100"></div>
+            </div>
+            <p *ngIf="totalReactions === 0" class="panel-empty">No reactions yet.</p>
+            <div *ngIf="reactionSummary.reactors?.length" class="reactors-section">
+              <p class="reactors-title">Who reacted:</p>
+              <div class="reactors-chips">
+                <span *ngFor="let r of reactionSummary.reactors" class="reactor-chip"
+                  [class.chip-like]="r.type==='LIKE'" [class.chip-heart]="r.type==='HEART'" [class.chip-dis]="r.type==='DISLIKE'">
+                  {{ r.type==='LIKE' ? '👍' : r.type==='HEART' ? '❤️' : '👎' }} {{ r.userName }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div *ngIf="activePanel === 'comments'" class="panel-body">
+          <h4 class="panel-section-title">💬 Comments <span class="panel-count">{{ totalCommentsDisplayed }}</span></h4>
+          <div *ngIf="loadingComments" class="sd-loading"><div class="spinner sm"></div> Loading…</div>
+          <p *ngIf="!loadingComments && selectedCommentaires.length === 0" class="panel-empty">No comments yet.</p>
+          <div *ngIf="!loadingComments && selectedCommentaires.length > 0" class="cmt-list">
+            <div *ngFor="let c of selectedCommentaires" class="cmt-card">
+              <div class="cmt-head">
+                <span class="cmt-avatar">{{ getInitials(c.user) }}</span>
+                <div style="flex:1">
+                  <p class="cmt-author">{{ getUserLabel(c.user) }}</p>
+                  <p class="cmt-date">{{ formatDate(c.createAt) }}</p>
+                </div>
+              </div>
+              <p class="cmt-text">{{ parseCommentContent(c.contenue) }}</p>
+              <img *ngIf="extractGifUrl(c.contenue)"
+                   [src]="extractGifUrl(c.contenue)"
+                   class="cmt-gif" alt="GIF" />
+              <button *ngIf="c.replies && c.replies.length > 0" class="cmt-replies-toggle" (click)="toggleReplies(c.id)">
+                {{ isRepliesExpanded(c.id) ? '▲ Hide' : '▶ Show' }} {{ c.replies.length }} repl{{ c.replies.length > 1 ? 'ies' : 'y' }}
+              </button>
+              <p *ngIf="!c.replies || c.replies.length === 0" class="cmt-no-reply">No replies</p>
+              <div *ngIf="c.replies && c.replies.length > 0 && isRepliesExpanded(c.id)" class="replies-list">
+                <div *ngFor="let r of c.replies" class="reply-card">
+                  <div class="cmt-head">
+                    <span class="reply-avatar">{{ getInitials(r.user) }}</span>
+                    <div style="flex:1">
+                      <p class="cmt-author">↳ {{ getUserLabel(r.user) }}</p>
+                      <p class="cmt-date">{{ formatDate(r.createAt) }}</p>
+                    </div>
+                  </div>
+                  <p class="cmt-text">{{ parseCommentContent(r.contenue) }}</p>
+                  <img *ngIf="extractGifUrl(r.contenue)"
+                       [src]="extractGifUrl(r.contenue)"
+                       class="cmt-gif" alt="GIF" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- ══════════════════════════════════════
+       TAB : BLOCKED USERS
+       ══════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'blocked'">
+    <div class="blocked-section">
+
+      <div *ngIf="loadingBlocked" class="state-box">
+        <div class="spinner"></div><p>Loading blocked users…</p>
+      </div>
+
+      <div *ngIf="!loadingBlocked && blockedUsersCount === 0" class="state-box">
+        <span style="font-size:2.5rem">✅</span>
+        <p>No blocked users at the moment.</p>
+      </div>
+
+      <ng-container *ngIf="!loadingBlocked && blockedUsersCount > 0">
+        <div class="blocked-grid">
+          <ng-container *ngFor="let user of blockedUsers">
+            <div class="blocked-card bcard-blocked" *ngIf="user.blocked">
+              <div class="bcard-header">
+                <div class="bcard-avatar bavatar-blocked">
+                  {{ (user.name?.charAt(0) || '') + (user.lastName?.charAt(0) || '') | uppercase }}
+                </div>
+                <div class="bcard-info">
+                  <span class="bcard-name">{{ user.name }} {{ user.lastName }}</span>
+                  <span class="bcard-id">ID #{{ user.userId }}</span>
+                </div>
+                <div class="bcard-status-badge badge-blocked">🔴 Blocked</div>
+              </div>
+              <div class="bcard-counter-section">
+                <div class="bcard-counter-label">
+                  <span>🚩 Reported posts</span>
+                  <strong class="text-red">{{ user.warningCount }} / 3+</strong>
+                </div>
+                <div class="bcard-progress-bar">
+                  <div class="bcard-progress-fill fill-blocked" style="width:100%"></div>
+                </div>
+                <div class="bcard-dots">
+                  <span class="bcard-dot dot-filled dot-blocked-filled" *ngFor="let i of [1,2,3]"></span>
+                </div>
+              </div>
+              <p class="bcard-desc">
+                🔒 This user cannot create new posts.<br>
+                Reactivating will <strong>delete all their archived posts</strong> and restore access.
+              </p>
+              <div class="bcard-actions">
+                <button class="btn-reactiver-compte" (click)="reactiverCompteUser(user)">
+                  🔓 Reactivate Account <span class="btn-sub">(archived posts deleted)</span>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </ng-container>
+
+    </div>
+  </ng-container>
+
+  <!-- ══════════════════════════════════════
+       TAB : WARNED USERS
+       ══════════════════════════════════════ -->
+  <ng-container *ngIf="activeTab === 'warned'">
+    <div class="blocked-section">
+
+      <div *ngIf="warnedUsersCount === 0" class="state-box">
+        <span style="font-size:2.5rem">✅</span>
+        <p>No warned users (1–2 archived posts).</p>
+      </div>
+
+      <ng-container *ngIf="warnedUsersCount > 0">
+        <div class="blocked-grid">
+          <div class="blocked-card"
+            *ngFor="let user of warnedUsersFromPublications"
+            [class.bcard-warning]="user.warningCount === 2"
+            [class.bcard-ok]="user.warningCount === 1">
+
+            <div class="bcard-header">
+              <div class="bcard-avatar"
+                [class.bavatar-warning]="user.warningCount === 2">
+                {{ (user.name?.charAt(0) || '') + (user.lastName?.charAt(0) || '') | uppercase }}
+              </div>
+              <div class="bcard-info">
+                <span class="bcard-name">{{ user.name }} {{ user.lastName }}</span>
+                <span class="bcard-id">ID #{{ user.userId }}</span>
+              </div>
+              <div class="bcard-status-badge"
+                [class.badge-warning]="user.warningCount === 2"
+                [class.badge-ok]="user.warningCount === 1">
+                {{ user.warningCount === 2 ? '🟠 2/3 reported' : '🟡 1/3 reported' }}
+              </div>
+            </div>
+
+            <div class="bcard-counter-section">
+              <div class="bcard-counter-label">
+                <span>🚩 Reported posts</span>
+                <strong [class.text-orange]="user.warningCount === 2">{{ user.warningCount }} / 3</strong>
+              </div>
+              <div class="bcard-progress-bar">
+                <div class="bcard-progress-fill"
+                  [class.fill-warning]="user.warningCount === 2"
+                  [class.fill-ok]="user.warningCount === 1"
+                  [style.width.%]="(user.warningCount / 3) * 100">
+                </div>
+              </div>
+              <div class="bcard-dots">
+                <span class="bcard-dot"
+                  *ngFor="let i of [1,2,3]"
+                  [class.dot-filled]="user.warningCount >= i"
+                  [class.dot-warn-filled]="user.warningCount >= i">
+                </span>
+              </div>
+            </div>
+
+            <!-- Posts reportés avec raisons de signalement -->
+            <div class="warn-posts-list" *ngIf="user.posts.length > 0">
+              <p class="warn-posts-title">🚩 Reported posts :</p>
+              <div class="warn-post-item" *ngFor="let pub of user.posts">
+                <div class="warn-post-detail">
+                  <span class="warn-post-titre">{{ pub.titre | slice:0:60 }}{{ pub.titre.length > 60 ? '…' : '' }}</span>
+                  <span class="warn-post-signals" *ngIf="pub.signalements && pub.signalements.length > 0">
+                    🚩 {{ pub.signalements.length }} report(s)
+                  </span>
+                  <!-- Raisons chacune sur une ligne -->
+                  <div class="warn-raisons" *ngIf="pub.signalementRaisons && pub.signalementRaisons.length > 0">
+                    <div class="warn-raison-line" *ngFor="let r of pub.signalementRaisons; let i = index">
+                      <span class="raison-num">#{{ i + 1 }}</span>
+                      <span class="raison-txt">{{ r || 'No reason given' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="bcard-desc bcard-desc-warn">
+              ⚠️ {{ 3 - user.warningCount }} more reported post{{ (3 - user.warningCount) > 1 ? 's' : '' }} will block this user.
+            </p>
+
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </ng-container>
+
+</div>
+
+<!-- ══════ AI RAPPORT MODAL ══════ -->
+<div class="report-overlay" *ngIf="showReportModal" (click)="closeReportModal()">
+  <div class="report-modal" (click)="$event.stopPropagation()">
+    <div class="report-modal-header">
+      <div class="report-modal-title">
+        <span class="report-icon">🤖</span>
+        <div>
+          <h2>Rapport AI — Forum</h2>
+          <p class="report-date">Généré le {{ reportText ? (today | date:'dd/MM/yyyy') : '' }}</p>
+        </div>
+      </div>
+      <button class="report-close-btn" (click)="closeReportModal()">✕</button>
+    </div>
+    <div class="report-modal-body">
+      <p class="report-content">{{ reportText }}</p>
+    </div>
+    <div class="report-modal-footer">
+      <button class="btn-download-report" (click)="downloadReport()">⬇️ Télécharger PDF</button>
+      <button class="btn-close-report" (click)="closeReportModal()">Fermer</button>
+    </div>
+  </div>
+</div>

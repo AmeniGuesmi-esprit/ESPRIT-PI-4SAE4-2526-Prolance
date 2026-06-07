@@ -1,0 +1,218 @@
+// subscription-main.component.scss
+
+.subscription-main {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  position: relative;
+  overflow-x: hidden;
+  
+  // Effet de particules en arrière-plan
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+// Hero Section
+.hero-section {
+  position: relative;
+  padding: 32px 32px 0 32px;
+  
+  .hero-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 32px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .hero-icon {
+      font-size: 48px;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+    }
+  }
+}
+
+// Tabs Container
+.tabs-container {
+  position: relative;
+  padding: 24px 32px 0 32px;
+  
+  .tabs-wrapper {
+    display: flex;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 8px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex-wrap: wrap;
+  }
+}
+
+.tab-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  
+  .tab-icon {
+    font-size: 18px;
+    transition: transform 0.3s ease;
+  }
+  
+  .tab-label {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .tab-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6366f1, #a855f7);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+  
+  &:hover {
+    background: rgba(99, 102, 241, 0.2);
+    color: white;
+    transform: translateY(-2px);
+    
+    .tab-icon {
+      transform: scale(1.1);
+    }
+  }
+  
+  &.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+    color: white;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+    
+    .tab-indicator {
+      width: 40%;
+    }
+    
+    .tab-icon {
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Content Container
+.content-container {
+  padding: 24px 32px 32px 32px;
+  
+  .content-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 24px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// Animation d'entrée
+.content-card {
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 20px 20px 0 20px;
+    
+    .hero-content {
+      flex-direction: column;
+      text-align: center;
+      padding: 20px;
+      
+      h1 {
+        font-size: 24px;
+      }
+    }
+  }
+  
+  .tabs-container {
+    padding: 20px 20px 0 20px;
+    
+    .tabs-wrapper {
+      justify-content: center;
+    }
+  }
+  
+  .content-container {
+    padding: 20px;
+  }
+  
+  .tab-btn {
+    padding: 10px 16px;
+    
+    .tab-label {
+      font-size: 12px;
+    }
+  }
+}

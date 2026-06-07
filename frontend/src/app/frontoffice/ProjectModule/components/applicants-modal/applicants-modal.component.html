@@ -1,0 +1,170 @@
+<div class="modal-backdrop" (click)="onClose()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+
+    <!-- ── Header ── -->
+    <div class="panel-header">
+      <div class="header-left">
+        <div class="header-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="panel-title">Applicants</h2>
+          <p class="panel-subtitle">{{ project?.title }}</p>
+        </div>
+      </div>
+      <button class="close-btn" (click)="onClose()">✕</button>
+    </div>
+
+    <!-- ── Stats strip ── -->
+    <div class="stats-strip">
+      <div class="stat-pill stat-all">
+        <span class="stat-num">{{ applications.length }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+      <div class="stat-pill stat-matched">
+        <span class="stat-num">{{ matchedApps.length }}</span>
+        <span class="stat-label">Matched</span>
+      </div>
+      <div class="stat-pill stat-unmatched">
+        <span class="stat-num">{{ notMatchedApps.length }}</span>
+        <span class="stat-label">Not Matched</span>
+      </div>
+      <button class="btn-auto-match" (click)="autoAcceptBest()"
+        [disabled]="isAutoAccepting || matchedApps.length === 0 || bestMatch?.accepted">
+        <svg *ngIf="!isAutoAccepting" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        <span *ngIf="isAutoAccepting" class="spin-icon">⟳</span>
+        {{ isAutoAccepting ? 'Accepting...' : bestMatch?.accepted ? '✓ Best Accepted' : 'Auto-Accept Best' }}
+      </button>
+    </div>
+
+    <!-- ── AI badge ── -->
+    <div class="ai-badge-row">
+      <span class="ai-badge">✦ AI-powered matching — scores based on project description &amp; freelancer skills</span>
+    </div>
+
+    <!-- ── Tabs ── -->
+    <div class="tabs-row">
+      <button class="tab-btn" [class.active]="activeTab === 'all'" (click)="setTab('all')">
+        All <span class="tab-count">{{ applications.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'matched'" (click)="setTab('matched')">
+        <span class="dot dot-green"></span> Matched <span class="tab-count">{{ matchedApps.length }}</span>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'not-matched'" (click)="setTab('not-matched')">
+        <span class="dot dot-gray"></span> Not Matched <span class="tab-count">{{ notMatchedApps.length }}</span>
+      </button>
+    </div>
+
+    <!-- ── Loading ── -->
+    <div *ngIf="loading" class="loading-area">
+      <div class="loader-ring"></div>
+      <p>Analyzing applicants…</p>
+    </div>
+
+    <!-- ── Empty ── -->
+    <div *ngIf="!loading && displayedApps.length === 0" class="empty-area">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.3">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <line x1="23" y1="11" x2="17" y2="11"/>
+      </svg>
+      <p class="empty-title">No applicants here</p>
+      <p class="empty-sub">
+        {{ activeTab === 'matched' ? 'No matched freelancers yet'
+         : activeTab === 'not-matched' ? 'All applicants are matched!'
+         : 'No one has applied yet' }}
+      </p>
+    </div>
+
+    <!-- ── Cards ── -->
+    <div *ngIf="!loading" class="cards-list">
+      <div *ngFor="let app of displayedApps; trackBy: trackById"
+           class="applicant-card"
+           [class.card-best]="isBestMatch(app)"
+           [class.card-accepted]="app.accepted">
+
+        <!-- Top row: avatar + info + score + action -->
+        <div class="card-top">
+
+          <!-- Avatar -->
+          <div class="avatar" [class.avatar-best]="isBestMatch(app)">
+            {{ getInitial(app) }}
+          </div>
+
+          <!-- Name / email / score -->
+          <div class="applicant-info">
+            <div class="name-row">
+              <span class="applicant-name">{{ getFullName(app) }}</span>
+              <span *ngIf="isBestMatch(app)" class="badge-best">⭐ Best Match</span>
+              <span *ngIf="app.accepted" class="badge-accepted">✓ Accepted</span>
+            </div>
+            <span class="applicant-email">{{ getEmail(app) || '—' }}</span>
+
+            <!-- Score bar -->
+            <div class="score-row">
+              <div class="score-track">
+                <div class="score-fill"
+                     [style.width.%]="app.matchScore ?? 0"
+                     [class.fill-high]="(app.matchScore ?? 0) >= 70"
+                     [class.fill-mid]="(app.matchScore ?? 0) >= 40 && (app.matchScore ?? 0) < 70"
+                     [class.fill-low]="(app.matchScore ?? 0) < 40">
+                </div>
+              </div>
+              <span class="score-pct"
+                    [class.pct-high]="(app.matchScore ?? 0) >= 70"
+                    [class.pct-mid]="(app.matchScore ?? 0) >= 40 && (app.matchScore ?? 0) < 70">
+                {{ app.matchScore ?? 0 }}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Accept button -->
+          <div class="card-action">
+            <button *ngIf="!app.accepted"
+                    class="btn-accept"
+                    (click)="acceptApplication(app)"
+                    [disabled]="isAccepting === app.id">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              {{ isAccepting === app.id ? '…' : 'Accept' }}
+            </button>
+            <div *ngIf="app.accepted" class="btn-accepted-state">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Accepted
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills row -->
+        <div class="card-skills">
+          <span class="skills-label">SKILLS</span>
+          <div class="skills-chips">
+            <ng-container *ngIf="(app.skills || []).length > 0; else noSkills">
+              <span *ngFor="let skill of app.skills"
+                    class="chip"
+                    [class.chip-matched]="isSkillMatched(skill, app)"
+                    [class.chip-neutral]="!isSkillMatched(skill, app)">
+                {{ skill.skillName }}
+                <span class="chip-level" *ngIf="skill.level">{{ skill.level | slice:0:3 }}</span>
+              </span>
+            </ng-container>
+            <ng-template #noSkills>
+              <span class="chip chip-empty">No skills listed</span>
+            </ng-template>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,94 @@
+<section class="reco-section" *ngIf="!errorMsg">
+
+  <!-- ── Header ── -->
+  <div class="reco-header">
+    <div class="reco-header-left">
+      <span class="reco-badge">
+        <i class="material-icons">auto_awesome</i>
+      </span>
+      <div>
+        <h2 class="reco-title">Recommandés pour vous</h2>
+        <p class="reco-subtitle">Sélection personnalisée basée sur vos intérêts</p>
+      </div>
+    </div>
+    <div class="reco-nav-arrows" *ngIf="recommendations.length > visibleCount">
+      <button class="reco-arrow" (click)="prev()" [disabled]="currentIndex === 0">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <button class="reco-arrow" (click)="next()" [disabled]="currentIndex === maxIndex">
+        <i class="material-icons">chevron_right</i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Loading ── -->
+  <div class="reco-loading" *ngIf="loading">
+    <div class="reco-skeleton" *ngFor="let i of [1,2,3]">
+      <div class="skeleton-top"></div>
+      <div class="skeleton-line short"></div>
+      <div class="skeleton-line"></div>
+    </div>
+  </div>
+
+  <!-- ── Empty ── -->
+  <div class="reco-empty" *ngIf="!loading && recommendations.length === 0">
+    <i class="material-icons">sentiment_neutral</i>
+    <p>Pas encore de recommandations. Inscrivez-vous à des événements pour en recevoir !</p>
+  </div>
+
+  <!-- ── Carousel Track ── -->
+  <div class="reco-viewport" *ngIf="!loading && recommendations.length > 0"
+       (mouseenter)="stopAutoPlay()" (mouseleave)="startAutoPlay()">
+    <div class="reco-track"
+         [style.transform]="'translateX(-' + translateX + '%)'">
+
+      <div class="reco-card" *ngFor="let rec of recommendations">
+
+        <!-- Glow accent top -->
+        <div class="reco-card-glow"></div>
+
+        <!-- Icon + Score ring -->
+        <div class="reco-card-top">
+          <div class="reco-icon-wrap">
+            <i class="material-icons">{{ getCategoryIcon(rec.category) }}</i>
+          </div>
+          <div class="reco-score-ring">
+            <svg viewBox="0 0 36 36">
+              <circle class="ring-bg"  cx="18" cy="18" r="15.9"/>
+              <circle class="ring-fill" cx="18" cy="18" r="15.9"
+                [style.stroke-dasharray]="scorePercent(rec.hybridScore) + ' 100'"/>
+            </svg>
+            <span class="ring-label">{{ scorePercent(rec.hybridScore) }}%</span>
+          </div>
+        </div>
+
+        <!-- Name -->
+        <h3 class="reco-card-name">{{ rec.eventName }}</h3>
+
+        <!-- Category + Level chips -->
+        <div class="reco-chips">
+          <span class="chip chip-category">
+            <i class="material-icons">folder</i>{{ rec.category }}
+          </span>
+          <span class="chip chip-level"
+                [style.border-color]="getLevelColor(rec.level)"
+                [style.color]="getLevelColor(rec.level)">
+            {{ rec.level }}
+          </span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Dots ── -->
+  <div class="reco-dots" *ngIf="!loading && dotCount > 1">
+    <button
+      class="reco-dot"
+      *ngFor="let i of [].constructor(dotCount); let idx = index"
+      [class.active]="idx === currentIndex"
+      (click)="goTo(idx)">
+    </button>
+  </div>
+
+</section>

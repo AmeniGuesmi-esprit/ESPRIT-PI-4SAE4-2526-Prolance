@@ -1,0 +1,100 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "marahmarah123/event-service"
+        DOCKER_TAG   = "${BUILD_NUMBER}"
+        SONAR_URL    = "http://localhost:9000"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'devops/on-integrated6sur6/ads_cicd_k8s']],
+                    extensions: [
+                        [$class: 'CloneOption',
+                         depth: 1,
+                         shallow: true,
+                         timeout: 120,
+                         noTags: true],
+                        [$class: 'SparseCheckoutPaths',
+                         sparseCheckoutPaths: [
+                             [$class: 'SparseCheckoutPath', path: 'event-service/']
+                         ]]
+                    ],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/farrahamami/ESPRIT-PIDEV-4SAE4-2025-2026-Prolance-BACKEND.git'
+                    ]]
+                ])
+            }
+        }
+
+        stage('Build & Package') {
+            steps {
+                dir('event-service') {
+                    sh 'chmod +x mvnw'
+                    sh './mvnw clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Tests') {
+            steps {
+                dir('event-service') {
+                    sh './mvnw test'
+                }
+            }
+            post {
+                always {
+                    junit 'event-service/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('event-service') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh './mvnw sonar:sonar -Dsonar.projectKey=event-service -Dsonar.host.url=${SONAR_URL}'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                dir('event-service') {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )]) {
+                        sh 'docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .'
+                        sh 'docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest'
+                        sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                        sh 'docker push ${DOCKER_IMAGE}:${DOCKER_TAG}'
+                        sh 'docker push ${DOCKER_IMAGE}:latest'
+                    }
+                }
+            }
+        }
+
+        stage('Save build info for CD') {
+            steps {
+                sh 'echo ${DOCKER_TAG} > event-service-tag.txt'
+                archiveArtifacts artifacts: 'event-service-tag.txt'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'CI event-service réussi ✅'
+            build job: 'event-service-CD', wait: false
+        }
+        failure { echo 'CI event-service échoué ❌' }
+    }
+}

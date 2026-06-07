@@ -1,0 +1,77 @@
+# Default values for ads-service
+
+namespace: prolance
+
+image:
+  repository: 172.22.191.1:5000/ads-service
+  tag: latest
+  pullPolicy: Always
+  # Uncomment when ECR is configured
+  # pullSecrets:
+  #   - name: ecr-registry-secret
+
+replicaCount: 1
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "1Gi"
+    cpu: "500m"
+
+service:
+  type: NodePort
+  port: 8090
+  nodePort: 30090
+
+probes:
+  readiness:
+    initialDelaySeconds: 45
+    periodSeconds: 10
+    failureThreshold: 6
+  liveness:
+    initialDelaySeconds: 90
+    periodSeconds: 20
+    failureThreshold: 3
+
+configMap:
+  SPRING_APPLICATION_NAME: "ads-service"
+  SERVER_PORT: "8090"
+  SERVER_SERVLET_CONTEXT_PATH: "/ads-service"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-ads:5432/ads_db"
+  SPRING_DATASOURCE_USERNAME: "postgres"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+  SPRING_JPA_SHOW_SQL: "false"
+  SPRING_JPA_OPEN_IN_VIEW: "false"
+  EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: "http://eureka-server:8761/eureka/"
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "true"
+  SPRING_AI_POSTGRESML_EMBEDDING_ENABLED: "false"
+  SPRING_AI_VECTORSTORE_PGVECTOR_ENABLED: "false"
+  SPRING_AI_OLLAMA_BASE_URL: "http://ollama:11434"
+  SPRING_AI_OLLAMA_CHAT_OPTIONS_MODEL: "llama-guard3:1b"
+  SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED: "false"
+  GROQ_API_MODEL: "llama-3.3-70b-versatile"
+  SPRING_KAFKA_BOOTSTRAP_SERVERS: "kafka:9092"
+  QDRANT_URL: "http://qdrant:6333"
+  RAG_EMBEDDING_MODEL: "nomic-embed-text"
+  RAG_LLM_MODEL: "phi3:mini"
+  RAG_SEARCH_TOP_K: "5"
+
+secret:
+  SPRING_DATASOURCE_PASSWORD: "postgres"
+  JWT_SECRET: "super-secret-key-that-is-at-least-32-chars!"
+  GROQ_API_KEY: ""
+
+postgres:
+  enabled: true
+  image: postgres:15-alpine
+  database: ads_db
+  username: postgres
+  password: postgres
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClass: manual
+    hostPath: /var/lib/prolance/postgres-ads

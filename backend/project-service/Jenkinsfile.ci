@@ -1,0 +1,102 @@
+pipeline {
+    agent any
+    tools {
+        jdk 'JDK17'
+        maven 'Maven3'
+    }
+    environment {
+        JAVA_HOME        = '/usr/lib/jvm/java-21-openjdk-amd64'
+        PATH             = "/usr/lib/jvm/java-21-openjdk-amd64/bin:${env.PATH}"
+        SERVICE_NAME     = 'project-service'
+        DOCKER_NAMESPACE = 'yesmine111'
+        IMAGE_NAME       = "${DOCKER_NAMESPACE}/${SERVICE_NAME}"
+        IMAGE_TAG        = "${env.BUILD_NUMBER}"
+        SONAR_PROJECT    = 'project-service'
+    }
+    options {
+        timeout(time: 40, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    stages {
+        stage('📥 Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/devops/on-integrated6sur6/ads_cicd_k8s']],
+                    extensions: [
+                        [$class: 'CloneOption', depth: 1, shallow: true, noTags: true, timeout: 60],
+                        [$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [
+                            [$class: 'SparseCheckoutPath', path: 'project-service/']
+                        ]]
+                    ],
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-credentials',
+                        url: 'https://github.com/farrahamami/ESPRIT-PIDEV-4SAE4-2025-2026-Prolance-BACKEND'
+                    ]]
+                ])
+            }
+        }
+        stage('🔨 Build & Package') {
+            steps {
+                dir('project-service') {
+                    sh 'java -version'
+                    sh 'mvn clean package -DskipTests -B'
+                }
+            }
+        }
+        stage('🧪 Tests') {
+            steps {
+                dir('project-service') {
+                    sh 'mvn test -B'
+                }
+            }
+        }
+        stage('🔍 SonarQube Analysis') {
+            steps {
+                dir('project-service') {
+                    withSonarQubeEnv('SonarQube') {
+                        sh '''
+                            mvn sonar:sonar \
+                              -Dsonar.projectKey=${SONAR_PROJECT} \
+                              -Dsonar.projectName=${SONAR_PROJECT} \
+                              -Dsonar.host.url=http://localhost:9000 \
+                              -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                        '''
+                    }
+                }
+            }
+        }
+        stage('🐳 Docker Build & Push') {
+            steps {
+                dir('project-service') {
+                    sh 'docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -t ${IMAGE_NAME}:latest .'
+                }
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        docker push ${IMAGE_NAME}:latest
+                        docker logout
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        success {
+            writeFile file: 'last-build.txt', text: "${IMAGE_TAG}"
+            archiveArtifacts artifacts: 'last-build.txt'
+            echo "✅ CI OK : image ${IMAGE_NAME}:${IMAGE_TAG} poussée sur DockerHub."
+        }
+        failure {
+            echo "❌ CI échoué."
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

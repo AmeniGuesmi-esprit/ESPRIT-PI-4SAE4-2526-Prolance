@@ -1,0 +1,237 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">{{ mode === 'create' ? '✍️ New Post' : '✏️ Edit Post' }}</h2>
+      <button class="btn-close" (click)="onClose()" [disabled]="loading">✕</button>
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+
+    <!-- Body -->
+    <div class="modal-body">
+
+      <!-- Type pills -->
+      <div class="type-pills">
+        <button
+          *ngFor="let typeOption of typeOptions"
+          type="button"
+          class="type-pill"
+          [class.active]="formData.type === typeOption.value"
+          [attr.data-type]="typeOption.value"
+          (click)="formData.type = typeOption.value; onTypeChange()">
+          <span>{{ typeOption.icon }}</span> {{ typeOption.label }}
+        </button>
+      </div>
+      <span *ngIf="errors.type" class="error-text">{{ errors.type }}</span>
+
+      <!-- ══ TITLE INPUT with inline color + size pickers ══ -->
+      <div class="fb-input-wrap">
+        <div class="input-row">
+
+          <!-- Color picker button for title -->
+          <div class="picker-wrap">
+            <button type="button" class="picker-btn color-btn"
+              [style.background]="titleColor"
+              (click)="showTitleColorPicker = !showTitleColorPicker; showTitleSizePicker = false; showContentColorPicker = false"
+              title="Title color">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+              </svg>
+            </button>
+            <!-- Title color popover -->
+            <div class="picker-popover" *ngIf="showTitleColorPicker">
+              <div class="popover-label">Title color</div>
+              <div class="color-swatches">
+                <button *ngFor="let c of colorOptions" type="button"
+                  class="swatch" [style.background]="c"
+                  [class.swatch-active]="titleColor === c"
+                  (click)="titleColor = c; showTitleColorPicker = false"></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Size picker button for title -->
+          <div class="picker-wrap">
+            <button type="button" class="picker-btn size-picker-btn"
+              (click)="showTitleSizePicker = !showTitleSizePicker; showTitleColorPicker = false; showContentColorPicker = false"
+              title="Title size">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/>
+              </svg>
+            </button>
+            <!-- Title size popover -->
+            <div class="picker-popover" *ngIf="showTitleSizePicker">
+              <div class="popover-label">Title size</div>
+              <div class="size-btns">
+                <button *ngFor="let s of fontSizes" type="button"
+                  class="size-btn" [class.size-active]="titleFontSize === s.value"
+                  (click)="titleFontSize = s.value; showTitleSizePicker = false">{{ s.label }}</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Title input -->
+          <input
+            type="text"
+            name="titre"
+            [(ngModel)]="formData.titre"
+            class="fb-title-input"
+            [style.color]="titleColor"
+            [style.font-size]="titleFontSize"
+            placeholder="Write a title..."
+            maxlength="200"
+            [class.has-error]="errors.titre" />
+        </div>
+        <span class="char-hint">{{ formData.titre.length }}/200</span>
+        <span *ngIf="errors.titre" class="error-text">{{ errors.titre }}</span>
+      </div>
+
+      <!-- ✨ AI Generate Button -->
+      <div class="ai-generate-wrap">
+        <button
+          type="button"
+          class="btn-ai-generate"
+          (click)="generateContent()"
+          [disabled]="generatingContent || loading"
+          title="Generate content from title with AI">
+          <span *ngIf="!generatingContent">
+            ✨ {{ showRegenerateBtn ? 'Regenerate content' : 'Generate content with AI' }}
+          </span>
+          <span *ngIf="generatingContent" class="ai-loading">
+            <span class="spinner-dot"></span>
+            <span class="spinner-dot"></span>
+            <span class="spinner-dot"></span>
+            Generating...
+          </span>
+        </button>
+        <span *ngIf="aiError" class="error-text ai-error">{{ aiError }}</span>
+        <span *ngIf="showRegenerateBtn && !generatingContent" class="ai-hint">
+          💡 Content generated! You can edit it or regenerate.
+        </span>
+      </div>
+
+      <!-- ══ CONTENT TEXTAREA with inline color picker ══ -->
+      <div class="fb-input-wrap">
+        <div class="input-row">
+
+          <!-- Color picker button for content -->
+          <div class="picker-wrap">
+            <button type="button" class="picker-btn color-btn"
+              [style.background]="contentColor"
+              (click)="showContentColorPicker = !showContentColorPicker; showTitleColorPicker = false; showTitleSizePicker = false"
+              title="Content color">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+              </svg>
+            </button>
+            <!-- Content color popover -->
+            <div class="picker-popover" *ngIf="showContentColorPicker">
+              <div class="popover-label">Content color</div>
+              <div class="color-swatches">
+                <button *ngFor="let c of colorOptions" type="button"
+                  class="swatch" [style.background]="c"
+                  [class.swatch-active]="contentColor === c"
+                  (click)="contentColor = c; showContentColorPicker = false"></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Content textarea -->
+          <textarea
+            name="contenue"
+            [(ngModel)]="formData.contenue"
+            class="fb-content-input"
+            [style.color]="contentColor"
+            placeholder="What's on your mind?"
+            rows="5"
+            [class.has-error]="errors.contenue"></textarea>
+        </div>
+        <span *ngIf="errors.contenue" class="error-text">{{ errors.contenue }}</span>
+      </div>
+
+      <!-- Image previews -->
+      <div *ngIf="imagePreviews.length > 0" class="preview-grid">
+        <div *ngFor="let preview of imagePreviews; let i = index" class="preview-item">
+          <img [src]="preview.previewUrl" [alt]="'Image ' + (i + 1)">
+          <button type="button" class="btn-remove" (click)="removeImage(i)">✕</button>
+        </div>
+      </div>
+      <div *ngIf="errors.images" class="error-text small-err">{{ errors.images }}</div>
+
+      <!-- PDF previews -->
+      <div *ngIf="pdfPreviews.length > 0" class="pdf-previews">
+        <div *ngFor="let pdf of pdfPreviews; let i = index" class="pdf-chip">
+          <span>📄</span>
+          <span class="pdf-chip-name">{{ pdf.fileName }}</span>
+          <button type="button" (click)="removePdf(i)">✕</button>
+        </div>
+      </div>
+      <div *ngIf="errors.pdfs" class="error-text small-err">{{ errors.pdfs }}</div>
+
+      <!-- QUESTION notice -->
+      <div *ngIf="formData.type === 'QUESTION'" class="question-notice">
+        📌 Images and PDFs are not available for Question posts.
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <div class="footer-left">
+        <span class="add-label">Add to post</span>
+
+        <!-- Image upload -->
+        <label class="icon-btn green" [class.icon-disabled]="formData.type === 'QUESTION'" title="Add images">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/>
+          </svg>
+          <input type="file" accept="image/*" multiple
+            (change)="onFilesSelected($event)"
+            [disabled]="formData.type === 'QUESTION'"
+            class="file-input-hidden">
+        </label>
+
+        <!-- PDF upload -->
+        <label class="icon-btn orange" [class.icon-disabled]="formData.type === 'QUESTION'" title="Add PDF">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/>
+          </svg>
+          <input type="file" accept="application/pdf" multiple
+            (change)="onPdfsSelected($event)"
+            [disabled]="formData.type === 'QUESTION'"
+            class="file-input-hidden">
+        </label>
+      </div>
+
+    <div *ngIf="errorMessage && moderationErrors.length === 0" class="alert-error">{{ errorMessage }}</div>
+    <div *ngIf="moderationErrors.length > 0" class="moderation-error-box">
+      <div class="mod-error-header">
+        <span class="mod-error-icon">🚫</span>
+        <strong>Your post was blocked by our content policy</strong>
+      </div>
+      <ul class="mod-error-list">
+        <li *ngFor="let reason of moderationErrors">{{ reason }}</li>
+      </ul>
+      <p class="mod-error-hint">Please edit your title or description and try again.</p>
+    </div>
+
+    <!-- ══ MODERATION LOADING ══ -->
+    <div *ngIf="moderating" class="moderation-checking">
+      <span class="mod-spinner"></span>
+      <span>Checking content for policy compliance…</span>
+    </div>
+
+      <button class="btn-publish" (click)="onSubmit()" [disabled]="loading || moderating">
+        <span *ngIf="!loading && !moderating">{{ mode === 'create' ? 'Publish' : 'Update' }}</span>
+        <span *ngIf="moderating" class="spinner-small"></span>
+        <span *ngIf="loading && !moderating" class="spinner-small"></span>
+      </button>
+    </div>
+
+  </div>
+</div>

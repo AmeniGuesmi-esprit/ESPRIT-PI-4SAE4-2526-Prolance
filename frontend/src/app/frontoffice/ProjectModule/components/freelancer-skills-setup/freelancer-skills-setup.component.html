@@ -1,0 +1,194 @@
+<div class="modal-overlay" (click)="close.emit()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-left">
+        <div class="header-icon">🛠️</div>
+        <div>
+          <h2 class="modal-title">Complete Your Profile</h2>
+          <p class="modal-subtitle">Add your skills — this is a one-time setup before applying</p>
+        </div>
+      </div>
+      <button class="modal-close" (click)="close.emit()">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- ── SECTION: Add Skill ── -->
+      <div class="section-block">
+        <div class="section-label">
+          <span class="section-dot"></span>
+          ADD A SKILL
+        </div>
+
+        <div *ngIf="errorMessage" class="error-banner">⚠️ {{ errorMessage }}</div>
+
+        <form [formGroup]="skillForm" class="skill-form" (ngSubmit)="addSkillAndSave()">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="field-label">SKILL NAME <span class="req">*</span></label>
+              <input
+                formControlName="skillName"
+                class="form-input"
+                placeholder="e.g. Angular, Python, Figma..."
+                autocomplete="off"
+              />
+              <small class="err-msg" *ngIf="skillForm.get('skillName')?.invalid && skillForm.get('skillName')?.touched">
+                Skill name is required
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="field-label">LEVEL <span class="req">*</span></label>
+              <select formControlName="level" class="form-input">
+                <option *ngFor="let l of skillLevels" [value]="l">{{ l }}</option>
+              </select>
+            </div>
+
+            <div class="form-group narrow">
+              <label class="field-label">YEARS EXP. <span class="req">*</span></label>
+              <input
+                formControlName="yearsExperience"
+                type="number"
+                class="form-input"
+                min="0"
+                max="50"
+              />
+            </div>
+          </div>
+
+          <button type="button" class="btn-add" (click)="addSkillAndSave()">
+            <span>+</span> Add Skill
+          </button>
+        </form>
+
+        <!-- Skills chips with icons -->
+        <div class="skills-chips" *ngIf="addedSkills.length > 0">
+          <div class="chips-label">Skills to save ({{ addedSkills.length }})</div>
+          <div class="chips-grid">
+            <div class="skill-chip" *ngFor="let skill of addedSkills; let i = index">
+              <div class="chip-icon">
+                <img
+                  *ngIf="getSkillIcon(skill.skillName)"
+                  [src]="getSkillIcon(skill.skillName)!"
+                  [alt]="skill.skillName"
+                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+                />
+                <span
+                  class="chip-initial"
+                  [style.display]="getSkillIcon(skill.skillName) ? 'none' : 'flex'"
+                >
+                  {{ getInitial(skill.skillName) }}
+                </span>
+              </div>
+              <div class="chip-info">
+                <span class="chip-name">{{ skill.skillName }}</span>
+                <span class="chip-meta">{{ skill.level }} · {{ skill.yearsExperience }} yr{{ skill.yearsExperience !== 1 ? 's' : '' }}</span>
+              </div>
+              <button class="chip-remove" (click)="removeSkill(i)" title="Remove">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION: CV / Resume ── -->
+      <div class="section-block">
+        <div class="section-label">
+          <span class="section-dot orange"></span>
+          YOUR RESUME / CV
+        </div>
+
+        <div class="cv-area">
+
+          <!-- Upload -->
+          <div class="cv-card">
+            <div class="cv-card-icon">📤</div>
+            <div class="cv-card-body">
+              <p class="cv-card-title">Upload your CV</p>
+              <p class="cv-card-sub">PDF format recommended</p>
+
+              <label class="drop-zone" [class.drop-zone--selected]="resumeFile">
+                <input type="file" accept=".pdf" (change)="onResumeFileChange($event)" hidden />
+                <div class="drop-empty" *ngIf="!resumeFile">
+                  <div class="drop-icon">📁</div>
+                  <span class="drop-text">Click to choose a PDF</span>
+                  <span class="drop-hint">or drag & drop here</span>
+                </div>
+                <div class="drop-preview" *ngIf="resumeFile">
+                  <div class="pdf-thumb"><span class="pdf-ext">PDF</span></div>
+                  <div class="drop-preview-info">
+                    <span class="drop-preview-name">{{ resumeFileName }}</span>
+                    <span class="drop-preview-size">{{ (resumeFile.size / 1024).toFixed(0) }} KB</span>
+                  </div>
+                  <span class="drop-change">Change</span>
+                </div>
+              </label>
+
+              <button
+                class="btn-upload"
+                (click)="uploadResume()"
+                [disabled]="!resumeFile || isUploadingResume || !!resumeUrl">
+                <span *ngIf="!isUploadingResume && !resumeUrl">⬆️ Upload</span>
+                <span *ngIf="isUploadingResume">⏳ Uploading...</span>
+                <span *ngIf="resumeUrl && !isUploadingResume">✅ Uploaded</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Generate -->
+          <div class="cv-card">
+            <div class="cv-card-icon">⚡</div>
+            <div class="cv-card-body">
+              <p class="cv-card-title">Generate from skills</p>
+              <p class="cv-card-sub">Auto-creates a PDF resume from your profile</p>
+
+              <button
+                class="btn-generate"
+                (click)="generateResume()"
+               [disabled]="isGeneratingResume">
+                <span *ngIf="!isGeneratingResume && !generatedResumeUrl">📄 Generate PDF</span>
+                <span *ngIf="isGeneratingResume">⏳ Generating...</span>
+                <span *ngIf="generatedResumeUrl && !isGeneratingResume">🔄 Regenerate PDF</span>
+              </button>
+
+              <!-- PDF Preview -->
+              <div *ngIf="generatedResumeUrl" style="margin-top: 14px;">
+                <iframe
+                  [src]="generatedResumeUrl"
+                  width="100%"
+                  height="280px"
+                  style="border: 1px solid #e5e7eb; border-radius: 8px; display: block;"
+                ></iframe>
+                <button
+  (click)="downloadResume()"
+  style="display:block; width:100%; margin-top:8px; padding:8px; text-align:center; 
+         color:#7c3aed; background:none; border:1px solid #7c3aed; 
+         border-radius:6px; cursor:pointer; font-size:13px;">
+  ⬇ Download Resume
+</button>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="close.emit()">Cancel</button>
+      <button
+        class="btn-save"
+        (click)="save()"
+        [disabled]="isSubmitting"
+      >
+        <span *ngIf="!isSubmitting">Save & Continue →</span>
+        <span *ngIf="isSubmitting">Saving...</span>
+      </button>
+    </div>
+
+  </div>
+</div>

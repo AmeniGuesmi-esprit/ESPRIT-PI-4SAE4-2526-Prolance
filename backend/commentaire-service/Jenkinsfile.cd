@@ -1,0 +1,92 @@
+pipeline {
+    agent any
+
+    // ✅ CORRECTION 1 : IMAGE_TAG reçu comme paramètre du CI
+    // Avant : lecture de lastSuccessfulBuild → échoue si CI est UNSTABLE
+    // Après : tag injecté directement par le CI via build(..., parameters:[...])
+    parameters {
+        string(
+            name: 'IMAGE_TAG',
+            defaultValue: 'latest',
+            description: 'Tag de l\'image Docker transmis automatiquement par le CI'
+        )
+    }
+
+    environment {
+        JAVA_HOME        = '/usr/lib/jvm/java-21-openjdk-amd64'
+        PATH             = "/usr/lib/jvm/java-21-openjdk-amd64/bin:${env.PATH}"
+        SERVICE_NAME     = 'commentaire-service'
+        DOCKER_NAMESPACE = 'yesmine111'
+        IMAGE_NAME       = "${DOCKER_NAMESPACE}/${SERVICE_NAME}"
+        APP_PORT         = '8083'
+        K8S_NAMESPACE    = 'devops'
+    }
+
+    options {
+        // ✅ CORRECTION 2 : timeout augmenté 20→30 min
+        // car initContainer + Spring Boot + MySQL prend plus de 20 min parfois
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('📥 Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/devops/on-integrated6sur6/ads_cicd_k8s']],
+                    extensions: [[$class: 'CloneOption', depth: 1, shallow: true]],
+                    userRemoteConfigs: [[
+                        credentialsId: 'github-credentials',
+                        url: 'https://github.com/farrahamami/ESPRIT-PIDEV-4SAE4-2025-2026-Prolance-BACKEND'
+                    ]]
+                ])
+            }
+        }
+
+        // ✅ CORRECTION 1 : tag vient du paramètre, plus de lecture fichier fragile
+        stage('🔖 Vérifier le tag image') {
+            steps {
+                script {
+                    env.IMAGE_TAG = params.IMAGE_TAG?.trim() ?: 'latest'
+                    echo "🔖 Tag utilisé    : ${env.IMAGE_TAG}"
+                    echo "🐳 Image complète : ${IMAGE_NAME}:${env.IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('🚀 Deploy to Kubernetes') {
+            steps {
+                dir('commentaire-service/k8s') {
+                    sh '''
+                        sed -i "s|IMAGE_PLACEHOLDER|${IMAGE_NAME}:${IMAGE_TAG}|g" deployment.yaml
+                        kubectl apply -f mysql-deployment.yaml --validate=false
+                        kubectl apply -f deployment.yaml --validate=false
+                        kubectl apply -f service.yaml --validate=false
+                    '''
+                }
+            }
+        }
+
+        stage('✅ Vérifier le déploiement') {
+            steps {
+                sh """
+                    kubectl rollout status deployment/${SERVICE_NAME} -n ${K8S_NAMESPACE} --timeout=300s
+                    kubectl get pods -l app=${SERVICE_NAME} -n ${K8S_NAMESPACE}
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ CD OK : ${SERVICE_NAME} déployé avec l'image ${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "❌ CD échoué pour ${SERVICE_NAME}."
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

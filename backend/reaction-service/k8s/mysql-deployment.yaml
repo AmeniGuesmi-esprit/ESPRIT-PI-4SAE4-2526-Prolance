@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysql-secret-reaction
+  namespace: devops
+type: Opaque
+data:
+  mysql-root-password: cm9vdA==              # "root" encodé en base64
+  mysql-database: cGlkZXZfcmVhY3Rpb24=      # "pidev_reaction" encodé en base64
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-reaction
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-reaction
+  template:
+    metadata:
+      labels:
+        app: mysql-reaction
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: mysql
+          image: mysql:8.0.36
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-reaction
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-reaction
+                  key: mysql-database
+          ports:
+            - containerPort: 3306
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service-reaction
+  namespace: devops
+spec:
+  selector:
+    app: mysql-reaction
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP

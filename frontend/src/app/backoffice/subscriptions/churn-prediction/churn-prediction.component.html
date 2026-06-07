@@ -1,0 +1,263 @@
+<div class="churn-container">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="churn-header">
+    <div class="header-left">
+      <div class="header-icon-wrap">
+        <span>🤖</span>
+      </div>
+      <div>
+        <h1>AI Churn Prediction</h1>
+        <p class="header-subtitle">Real-time risk analysis based on subscriber behavior</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="ai-badge">
+        <span class="ai-pulse-dot"></span>
+        AI Engine Active
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LOADING ═══ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <span>Analyzing subscriber data...</span>
+    </div>
+  </div>
+
+  <!-- ═══ ERROR ═══ -->
+  <div class="error-state" *ngIf="errorMessage && !loading">
+    <span class="error-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-retry" (click)="loadPredictions()">Retry</button>
+  </div>
+
+  <div *ngIf="!loading && !errorMessage">
+
+    <!-- ═══ KPI CARDS ═══ -->
+    <div class="kpi-grid">
+      <div class="kpi-card kpi-critical">
+        <span class="kpi-icon">🚨</span>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ criticalCount }}</span>
+          <span class="kpi-label">Critical Risk</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-high">
+        <span class="kpi-icon">⚠️</span>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ highCount }}</span>
+          <span class="kpi-label">High Risk</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-revenue">
+        <span class="kpi-icon">💰</span>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ revenueAtRisk }} <small>DT</small></span>
+          <span class="kpi-label">Revenue at Risk</span>
+        </div>
+      </div>
+      <div class="kpi-card kpi-avg">
+        <span class="kpi-icon">📊</span>
+        <div class="kpi-content">
+          <span class="kpi-value">{{ avgChurnScore }}%</span>
+          <span class="kpi-label">Avg. Churn Score</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ FILTERS ═══ -->
+    <div class="filters-row">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" class="search-input"
+               placeholder="Search by name, email or plan..."
+               [(ngModel)]="searchTerm"
+               (input)="onSearch()" />
+      </div>
+      <div class="filter-group">
+        <button class="filter-btn" [class.active]="filterRisk === 'ALL'" (click)="onFilterRisk('ALL')">All</button>
+        <button class="filter-btn critical" [class.active]="filterRisk === 'CRITICAL'" (click)="onFilterRisk('CRITICAL')">Critical</button>
+        <button class="filter-btn high" [class.active]="filterRisk === 'HIGH'" (click)="onFilterRisk('HIGH')">High</button>
+        <button class="filter-btn medium" [class.active]="filterRisk === 'MEDIUM'" (click)="onFilterRisk('MEDIUM')">Medium</button>
+        <button class="filter-btn low" [class.active]="filterRisk === 'LOW'" (click)="onFilterRisk('LOW')">Low</button>
+      </div>
+      <select class="sort-select" [(ngModel)]="sortBy" (change)="onSort(sortBy)">
+        <option value="score_desc">Risk Score ↓</option>
+        <option value="score_asc">Risk Score ↑</option>
+        <option value="days_asc">Expiring Soon</option>
+        <option value="revenue_desc">Revenue ↓</option>
+      </select>
+    </div>
+
+    <!-- ═══ PREDICTIONS TABLE ═══ -->
+    <div class="table-wrapper">
+      <table class="churn-table">
+        <thead>
+          <tr>
+            <th>Subscriber</th>
+            <th>Plan</th>
+            <th>Churn Score</th>
+            <th>Risk Level</th>
+            <th>Days Left</th>
+            <th>Auto-Renew</th>
+            <th>Usage</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of filteredPredictions" class="table-row" [class]="getRiskClass(p.riskLevel)">
+
+            <!-- Subscriber -->
+            <td class="user-cell">
+              <div class="user-avatar" [class]="getRiskClass(p.riskLevel)">
+                {{ getInitials(p.userName) }}
+              </div>
+              <div class="user-info">
+                <span class="user-name">{{ p.userName }}</span>
+                <span class="user-email">{{ p.userEmail }}</span>
+              </div>
+            </td>
+
+            <!-- Plan -->
+            <td>
+              <span class="plan-badge" [class.freelancer]="p.planType === 'FREELANCER'" [class.client]="p.planType === 'CLIENT'">
+                {{ p.planName }}
+              </span>
+              <span class="plan-price">{{ p.amountPaid }} DT</span>
+            </td>
+
+            <!-- Churn Score -->
+            <td class="score-cell">
+              <div class="score-bar-wrap">
+                <div class="score-bar" [style.width.%]="getScoreBarWidth(p.churnScore)" [class]="getRiskClass(p.riskLevel)"></div>
+              </div>
+              <span class="score-number" [class]="getRiskClass(p.riskLevel)">{{ p.churnScore }}%</span>
+            </td>
+
+            <!-- Risk Level -->
+            <td>
+              <span class="risk-badge" [class]="getRiskClass(p.riskLevel)">
+                {{ p.riskLevel }}
+              </span>
+            </td>
+
+            <!-- Days Left -->
+            <td>
+              <span class="days-left" [class.urgent]="p.daysRemaining <= 7" [class.warning]="p.daysRemaining <= 30 && p.daysRemaining > 7">
+                {{ p.daysRemaining }}d
+              </span>
+            </td>
+
+            <!-- Auto-Renew -->
+            <td>
+              <span class="renew-status" [class.active]="p.autoRenew" [class.inactive]="!p.autoRenew">
+                {{ p.autoRenew ? '✅ On' : '❌ Off' }}
+              </span>
+            </td>
+
+            <!-- Usage -->
+            <td class="usage-cell">
+              <div class="usage-mini">
+                <div class="usage-row">
+                  <span class="usage-label">P</span>
+                  <div class="usage-track"><div class="usage-fill" [style.width.%]="p.projectsUsagePercent"></div></div>
+                  <span class="usage-val">{{ p.projectsUsagePercent }}%</span>
+                </div>
+                <div class="usage-row">
+                  <span class="usage-label">R</span>
+                  <div class="usage-track"><div class="usage-fill proposals" [style.width.%]="p.proposalsUsagePercent"></div></div>
+                  <span class="usage-val">{{ p.proposalsUsagePercent }}%</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Action -->
+            <td class="action-cell">
+              <button class="btn-view" (click)="openDetail(p)">Details</button>
+              <button class="btn-retain" *ngIf="p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL'"
+                      (click)="sendRetentionOffer(p)">
+                📩 Retain
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="filteredPredictions.length === 0">
+        <span class="empty-icon">🎉</span>
+        <p>No subscribers match this filter</p>
+      </div>
+    </div>
+
+    <!-- ═══ COUNT ═══ -->
+    <div class="results-count" *ngIf="filteredPredictions.length > 0">
+      <span>{{ filteredPredictions.length }} subscribers analyzed</span>
+    </div>
+
+  </div>
+
+  <!-- ═══ DETAIL PANEL (SLIDE-IN) ═══ -->
+  <div class="detail-overlay" *ngIf="selectedPrediction" (click)="closeDetail()"></div>
+  <div class="detail-panel" *ngIf="selectedPrediction" [class]="getRiskClass(selectedPrediction.riskLevel)">
+
+    <div class="detail-header">
+      <div>
+        <h2>{{ selectedPrediction.userName }}</h2>
+        <span class="detail-email">{{ selectedPrediction.userEmail }}</span>
+      </div>
+      <button class="btn-close" (click)="closeDetail()">✕</button>
+    </div>
+
+    <!-- Score Circle -->
+    <div class="detail-score-section">
+      <div class="detail-circle" [class]="getRiskClass(selectedPrediction.riskLevel)">
+        <span class="circle-number">{{ selectedPrediction.churnScore }}</span>
+        <span class="circle-label">/ 100</span>
+      </div>
+      <div class="detail-risk-info">
+        <span class="risk-badge large" [class]="getRiskClass(selectedPrediction.riskLevel)">
+          {{ selectedPrediction.riskLevel }} RISK
+        </span>
+        <p class="detail-plan">{{ selectedPrediction.planName }} · {{ selectedPrediction.amountPaid }} DT</p>
+        <p class="detail-dates">
+          {{ selectedPrediction.daysRemaining }} days remaining ·
+          Auto-renew: {{ selectedPrediction.autoRenew ? 'Enabled' : 'Disabled' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- AI Summary -->
+    <div class="detail-section">
+      <h3>🤖 AI Analysis</h3>
+      <p class="ai-summary-text">{{ selectedPrediction.aiSummary }}</p>
+    </div>
+
+    <!-- Risk Factors -->
+    <div class="detail-section">
+      <h3>⚡ Risk Factors</h3>
+      <div class="factor-list">
+        <div class="factor-item" *ngFor="let f of selectedPrediction.factors" [class]="'severity-' + f.severity.toLowerCase()">
+          <div class="factor-header">
+            <strong>{{ f.name }}</strong>
+            <span class="factor-impact">+{{ f.impact }} pts</span>
+          </div>
+          <p>{{ f.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Suggested Action -->
+    <div class="detail-section action-section">
+      <h3>💡 Recommended Action</h3>
+      <p class="suggested-action">{{ selectedPrediction.suggestedAction }}</p>
+      <button class="btn-send-offer" (click)="sendRetentionOffer(selectedPrediction)">
+        📩 Send Retention Offer
+      </button>
+    </div>
+
+  </div>
+</div>

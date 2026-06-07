@@ -1,0 +1,172 @@
+package tn.esprit.microservice.subscriptionservice;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import tn.esprit.microservice.subscriptionservice.subscription.controller.UserSubscriptionController;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.entities.UserSubscription;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.enums.BillingCycle;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.enums.SubscriptionStatus;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.enums.SubscriptionType;
+import tn.esprit.microservice.subscriptionservice.subscription.dto.response.UserSubscriptionResponse;
+import tn.esprit.microservice.subscriptionservice.subscription.service.UserSubscriptionService;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class UserSubscriptionControllerExtraTest {
+
+    @Mock
+    private UserSubscriptionService userSubscriptionService;
+
+    @InjectMocks
+    private UserSubscriptionController controller;
+
+    private UserSubscriptionResponse sample;
+
+    @BeforeEach
+    void setUp() {
+        sample = new UserSubscriptionResponse();
+        sample.setId(1L);
+        sample.setUserId(100L);
+    }
+
+    // ========== decrementProjects ==========
+
+    @Test
+    void decrementProjects_returnsNoContent() {
+        doNothing().when(userSubscriptionService).decrementProjectCount(100L);
+
+        ResponseEntity<Void> response = controller.decrementProjects(100L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(userSubscriptionService).decrementProjectCount(100L);
+    }
+
+    // ========== decrementProposals ==========
+
+    @Test
+    void decrementProposals_returnsNoContent() {
+        doNothing().when(userSubscriptionService).decrementProposalCount(100L);
+
+        ResponseEntity<Void> response = controller.decrementProposals(100L);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(userSubscriptionService).decrementProposalCount(100L);
+    }
+
+    // ========== toggleAutoRenew to true ==========
+
+    @Test
+    void toggleAutoRenew_toTrue_returnsNoContent() {
+        doNothing().when(userSubscriptionService).toggleAutoRenew(100L, true);
+
+        ResponseEntity<Void> response = controller.toggleAutoRenew(100L, true);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(userSubscriptionService).toggleAutoRenew(100L, true);
+    }
+}
+
+// ====== Separate test class for entities/enums/DTOs ======
+
+class DomainEntityTest {
+
+    @Test
+    void userSubscription_gettersAndSetters_workCorrectly() {
+        UserSubscription us = new UserSubscription();
+        LocalDateTime now = LocalDateTime.now();
+
+        us.setId(1L);
+        us.setUserId(42L);
+        us.setStatus(SubscriptionStatus.ACTIVE);
+        us.setCurrentProjects(3);
+        us.setCurrentProposals(5);
+        us.setStartDate(now);
+        us.setEndDate(now.plusYears(1));
+        us.setAutoRenew(true);
+        us.setAmountPaid(new BigDecimal("29.99"));
+        us.setPaymentMethod("CARD");
+        us.setTransactionId("TX999");
+        us.setCancelledAt(now);
+
+        assertEquals(1L, us.getId());
+        assertEquals(42L, us.getUserId());
+        assertEquals(SubscriptionStatus.ACTIVE, us.getStatus());
+        assertEquals(3, us.getCurrentProjects());
+        assertEquals(5, us.getCurrentProposals());
+        assertEquals(now, us.getStartDate());
+        assertEquals(now.plusYears(1), us.getEndDate());
+        assertTrue(us.getAutoRenew());
+        assertEquals(new BigDecimal("29.99"), us.getAmountPaid());
+        assertEquals("CARD", us.getPaymentMethod());
+        assertEquals("TX999", us.getTransactionId());
+        assertEquals(now, us.getCancelledAt());
+    }
+
+    @Test
+    void subscriptionStatus_valuesAreAccessible() {
+        SubscriptionStatus active = SubscriptionStatus.ACTIVE;
+        SubscriptionStatus cancelled = SubscriptionStatus.CANCELLED;
+        SubscriptionStatus expired = SubscriptionStatus.EXPIRED;
+        SubscriptionStatus pending = SubscriptionStatus.PENDING;
+
+        assertNotNull(active);
+        assertNotNull(cancelled);
+        assertNotNull(expired);
+        assertNotNull(pending);
+        assertNotEquals(active, cancelled);
+    }
+
+    @Test
+    void billingCycle_allValuesExist() {
+        BillingCycle monthly = BillingCycle.MENSUELLE;
+        BillingCycle biannual = BillingCycle.SEMESTRIELLE;
+        BillingCycle annual = BillingCycle.ANNUELLE;
+
+        assertNotNull(monthly);
+        assertNotNull(biannual);
+        assertNotNull(annual);
+    }
+
+    @Test
+    void subscriptionType_allValuesExist() {
+        SubscriptionType freelancer = SubscriptionType.FREELANCER;
+        SubscriptionType client = SubscriptionType.CLIENT;
+
+        assertNotNull(freelancer);
+        assertNotNull(client);
+        assertNotEquals(freelancer, client);
+    }
+
+    @Test
+    void userSubscriptionResponse_gettersAndSetters_work() {
+        UserSubscriptionResponse r = new UserSubscriptionResponse();
+        LocalDateTime now = LocalDateTime.now();
+
+        r.setId(1L);
+        r.setUserId(50L);
+        r.setStatus(SubscriptionStatus.ACTIVE);
+        r.setStartDate(now);
+        r.setEndDate(now.plusMonths(6));
+        r.setAutoRenew(false);
+        r.setCurrentProjects(2);
+        r.setCurrentProposals(3);
+
+        assertEquals(1L, r.getId());
+        assertEquals(50L, r.getUserId());
+        assertEquals(SubscriptionStatus.ACTIVE, r.getStatus());
+        assertFalse(r.getAutoRenew());
+        assertEquals(2, r.getCurrentProjects());
+        assertEquals(3, r.getCurrentProposals());
+    }
+}

@@ -1,0 +1,15 @@
+<header class="header-admin">
+  <div class="header-container">
+    <div class="search-container">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        placeholder="Search..."
+        class="search-input">
+      <button class="search-button">
+        <i class="search-icon">🔍</i>
+      </button>
+    </div>
+  </div>
+</header>

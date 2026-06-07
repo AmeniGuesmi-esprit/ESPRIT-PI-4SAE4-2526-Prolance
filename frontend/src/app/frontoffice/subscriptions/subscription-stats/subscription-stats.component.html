@@ -1,0 +1,228 @@
+<div class="stats-page">
+
+  <!-- HERO -->
+  <section class="hero-section" @fadeIn>
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="grid-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <span class="hero-badge">
+        {{ selectedType === 'FREELANCER' ? '💼 Freelancer Community' : '🏢 Client Network' }}
+      </span>
+      <h1>
+        Join <span class="counter-highlight">{{ displayUsers | number }}</span>
+        <br>professionals on Prolance
+      </h1>
+      <p class="hero-subtitle">
+        {{ selectedType === 'FREELANCER'
+          ? 'The #1 platform in Tunisia for ambitious freelancers'
+          : 'Recruit the best freelancers for your projects' }}
+      </p>
+      <button class="btn-hero" (click)="goToPlans()">
+        View available plans →
+      </button>
+    </div>
+  </section>
+
+  <!-- STATS CARDS -->
+  <section class="stats-section" @staggerItems>
+    <div class="section-header">
+      <h2>Prolance in Numbers</h2>
+      <p>Real results that speak for themselves</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card glow-cyan">
+        <div class="stat-icon">👥</div>
+        <div class="stat-number">{{ displayUsers | number }}</div>
+        <div class="stat-label">Registered Users</div>
+        <div class="stat-detail">
+          <span class="detail-up">↑ 23%</span> this month
+        </div>
+      </div>
+
+      <div class="stat-card glow-indigo">
+        <div class="stat-icon">{{ selectedType === 'FREELANCER' ? '💼' : '🏢' }}</div>
+        <div class="stat-number">
+          {{ selectedType === 'FREELANCER' ? (displayFreelancers | number) : (displayClients | number) }}
+        </div>
+        <div class="stat-label">
+          {{ selectedType === 'FREELANCER' ? 'Active Freelancers' : 'Partner Companies' }}
+        </div>
+        <div class="stat-detail">
+          <span class="detail-up">↑ 18%</span> this month
+        </div>
+      </div>
+
+      <div class="stat-card glow-green">
+        <div class="stat-icon">🚀</div>
+        <div class="stat-number">{{ displayProjects | number }}</div>
+        <div class="stat-label">Completed Projects</div>
+        <div class="stat-detail">
+          <span class="detail-up">↑ 31%</span> this quarter
+        </div>
+      </div>
+
+      <div class="stat-card glow-amber">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-number">{{ displaySatisfaction }}%</div>
+        <div class="stat-label">Satisfaction Rate</div>
+        <div class="stat-bar">
+          <div class="bar-fill" [style.width.%]="displaySatisfaction"></div>
+        </div>
+      </div>
+
+      <div class="stat-card glow-violet">
+        <div class="stat-icon">📋</div>
+        <div class="stat-number">{{ displayActiveSubscriptions | number }}</div>
+        <div class="stat-label">Active Subscribers</div>
+        <div class="stat-detail">
+          <span class="detail-up">↑ 42%</span> this month
+        </div>
+      </div>
+
+      <div class="stat-card glow-rose">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-number">{{ stats?.avgResponseTime || 2.4 }}h</div>
+        <div class="stat-label">Average Response Time</div>
+        <div class="stat-detail">
+          <span class="detail-neutral">Industry average: 12h</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLAN POPULARITY -->
+  <section class="popularity-section" @fadeIn *ngIf="planBars.length > 0">
+    <div class="section-header">
+      <h2>Most Popular Plan</h2>
+      <p>Discover what professionals prefer</p>
+    </div>
+
+    <div class="popularity-content">
+      <div class="popular-highlight">
+        <div class="popular-badge">🏆 #1</div>
+        <h3>{{ stats?.mostPopularPlan }} Plan</h3>
+        <p>The top choice of our community</p>
+      </div>
+
+      <div class="plan-bars">
+        <div class="bar-row" *ngFor="let bar of planBars">
+          <span class="bar-name">{{ bar.name }}</span>
+          <div class="bar-track">
+            <div class="bar-progress"
+                 [style.width.%]="bar.percent"
+                 [style.background]="bar.color">
+            </div>
+          </div>
+          <span class="bar-count">{{ bar.count }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY PROLANCE -->
+  <section class="features-section" @staggerItems>
+    <div class="section-header">
+      <h2>Why Choose Prolance?</h2>
+      <p>
+        {{ selectedType === 'FREELANCER'
+          ? 'Everything you need to succeed as a freelancer'
+          : 'The tools to recruit effectively' }}
+      </p>
+    </div>
+
+    <div class="features-grid" *ngIf="selectedType === 'FREELANCER'">
+      <div class="feature-item">
+        <div class="feature-icon-wrap cyan"><span>🎯</span></div>
+        <h4>Maximum Visibility</h4>
+        <p>Your profile seen by hundreds of clients every day</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap indigo"><span>📊</span></div>
+        <h4>Advanced Analytics</h4>
+        <p>Track your performance and optimize your strategy</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap green"><span>💰</span></div>
+        <h4>Multiplied Earnings</h4>
+        <p>Pro subscribers earn 3x more on average</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap amber"><span>🤝</span></div>
+        <h4>Dedicated Support</h4>
+        <p>A team ready to help and guide you</p>
+      </div>
+    </div>
+
+    <div class="features-grid" *ngIf="selectedType === 'CLIENT'">
+      <div class="feature-item">
+        <div class="feature-icon-wrap cyan"><span>🤖</span></div>
+        <h4>AI Matching</h4>
+        <p>Find the ideal freelancer with our smart algorithm</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap indigo"><span>⚡</span></div>
+        <h4>Fast Recruitment</h4>
+        <p>Receive qualified proposals in less than 48 hours</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap green"><span>🔒</span></div>
+        <h4>Secure Payments</h4>
+        <p>Your transactions are protected and traceable</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap amber"><span>📈</span></div>
+        <h4>HR Dashboard</h4>
+        <p>Manage your recruitments with powerful tools</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials-section" @staggerItems>
+    <div class="section-header">
+      <h2>What They Say</h2>
+      <p>Our {{ selectedType === 'FREELANCER' ? 'freelancers' : 'clients' }} share their experience</p>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card" *ngFor="let t of filteredTestimonials">
+        <div class="testimonial-stars">
+          <span *ngFor="let s of getStarArray(t.rating)">⭐</span>
+        </div>
+        <p class="testimonial-text">"{{ t.text }}"</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" [attr.data-color]="t.avatar">{{ t.avatar }}</div>
+          <div>
+            <strong>{{ t.name }}</strong>
+            <span>{{ t.role }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" @fadeIn>
+    <div class="cta-card">
+      <div class="cta-bg-shapes">
+        <div class="cta-shape cta-shape-1"></div>
+        <div class="cta-shape cta-shape-2"></div>
+      </div>
+      <h2>Ready to join the community?</h2>
+      <p>
+        {{ selectedType === 'FREELANCER'
+          ? 'Start today and land your next project'
+          : 'Find the best talent to move your projects forward' }}
+      </p>
+      <button class="btn-cta" (click)="goToPlans()">
+        Discover our plans 🚀
+      </button>
+    </div>
+  </section>
+
+</div>

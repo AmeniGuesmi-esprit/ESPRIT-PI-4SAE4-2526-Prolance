@@ -1,0 +1,11 @@
+Prolance ads-service deployed!
+
+Get the service URL:
+  export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+  echo "http://$NODE_IP:{{ .Values.service.nodePort }}{{ .Values.configMap.SERVER_SERVLET_CONTEXT_PATH }}/"
+
+Check pod status:
+  kubectl -n {{ .Values.namespace }} get pods -l app=ads-service
+
+View logs:
+  kubectl -n {{ .Values.namespace }} logs -l app=ads-service --tail=50

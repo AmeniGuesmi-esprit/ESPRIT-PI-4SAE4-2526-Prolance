@@ -1,0 +1,334 @@
+<div class="event-list-page">
+  <div class="container">
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!--  CAROUSEL RECOMMANDATIONS                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <app-recommendation-carousel
+      *ngIf="currentUserId"
+      [userId]="currentUserId.toString()">
+    </app-recommendation-carousel>
+
+    <!-- ─── Alerts ─── -->
+    <div class="alert alert-success" *ngIf="successMsg">
+      <i class="material-icons">check_circle</i> {{ successMsg }}
+    </div>
+    <div class="alert alert-danger" *ngIf="errorMsg">
+      <i class="material-icons">error</i> {{ errorMsg }}
+    </div>
+
+    <!-- ─── BARRE DE FILTRAGE ─── -->
+    <div class="filter-bar">
+      <div class="filter-search">
+        <i class="material-icons">search</i>
+        <input
+          type="text"
+          placeholder="Rechercher un événement..."
+          [(ngModel)]="searchText"
+          (ngModelChange)="applyFilters()"
+        />
+        <button class="filter-clear-btn" *ngIf="searchText" (click)="searchText=''; applyFilters()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+
+      <div class="filter-select-wrap">
+        <i class="material-icons">category</i>
+        <select [(ngModel)]="filterCategory" (ngModelChange)="applyFilters()">
+          <option value="">Toutes les catégories</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="filter-select-wrap">
+        <i class="material-icons">flag</i>
+        <select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()">
+          <option value="">Tous les statuts</option>
+          <option *ngFor="let s of eventStatuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+
+      <button
+        class="filter-reset-btn"
+        (click)="resetFilters()"
+        *ngIf="searchText || filterCategory || filterStatus"
+      >
+        <i class="material-icons">refresh</i> Réinitialiser
+      </button>
+
+      <span class="filter-results-count" *ngIf="!loading">
+        {{ filteredEvents.length }} résultat{{ filteredEvents.length !== 1 ? 's' : '' }}
+      </span>
+    </div>
+
+    <!-- ─── Loading ─── -->
+    <div class="loading-state" *ngIf="loading">
+      <i class="material-icons spin">autorenew</i>
+      <p>Chargement des événements...</p>
+    </div>
+
+    <!-- ─── Empty state ─── -->
+    <div class="empty-state" *ngIf="!loading && filteredEvents.length === 0">
+      <i class="material-icons">event_busy</i>
+      <h3>Aucun événement trouvé</h3>
+      <p>Aucun événement ne correspond à votre recherche.</p>
+    </div>
+
+
+    <!-- ─── Recommandés pour vous ─── -->
+<div class="recommendations-strip" *ngIf="currentUserId && filteredEvents.length > 0">
+  <div class="recommendations-strip__header">
+    <i class="material-icons">auto_awesome</i>
+    <span>Recommandés pour vous</span>
+  </div>
+  <div class="recommendations-strip__chips">
+    <div
+      class="recommendation-chip"
+      *ngFor="let event of filteredEvents | slice:0:4"
+      (click)="openModal(event)"
+    >
+      <div
+        class="recommendation-chip__thumb"
+        [style.background-image]="event.imageUrl ? 'url(' + event.imageUrl + ')' : 'none'"
+      ></div>
+      <div class="recommendation-chip__info">
+        <span class="chip-title">{{ event.title }}</span>
+        <span class="chip-meta">
+          <i class="material-icons">place</i> {{ event.location }}
+        </span>
+      </div>
+      <span class="chip-category">{{ event.category }}</span>
+    </div>
+  </div>
+</div>
+
+    <!-- ─── Events Grid ─── -->
+    <div class="events-grid" *ngIf="!loading && filteredEvents.length > 0">
+      <div class="event-card" *ngFor="let event of filteredEvents">
+
+        <div
+          class="event-card-banner"
+          [style.background-image]="event.imageUrl ? 'url(' + event.imageUrl + ')' : 'none'"
+          (click)="openModal(event)"
+          style="cursor:pointer"
+        >
+          <div class="event-card-banner-overlay">
+            <span class="event-category">{{ event.category }}</span>
+            <span class="event-status" [class]="getStatusClass(event.eventStatus)">
+              {{ event.eventStatus }}
+            </span>
+          </div>
+        </div>
+
+        <div class="event-card-body" (click)="openModal(event)" style="cursor:pointer">
+          <h3 class="event-title">{{ event.title }}</h3>
+          <p class="event-description">{{ event.description }}</p>
+
+          <div class="event-meta">
+            <div class="meta-item">
+              <i class="material-icons">place</i>
+              <span>{{ event.location }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="material-icons">event</i>
+              <span>Du {{ formatDateOnly(event.startDate) }} au {{ formatDateOnly(event.endDate) }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="material-icons">group</i>
+              <span>{{ event.currentParticipants || 0 }} / {{ event.capacity }} participants</span>
+            </div>
+            <div class="meta-item" *ngIf="event.activities && event.activities.length > 0">
+              <i class="material-icons">local_activity</i>
+              <span>
+                <ng-container *ngFor="let act of event.activities; let last = last">
+                  {{ act.name }}<ng-container *ngIf="!last"> · </ng-container>
+                </ng-container>
+              </span>
+            </div>
+          </div>
+
+          <div class="capacity-bar">
+            <div
+              class="capacity-fill"
+              [style.width.%]="(event.currentParticipants || 0) / event.capacity * 100"
+            ></div>
+          </div>
+        </div>
+
+        <div class="event-card-actions">
+          <button class="btn-participate"
+            [disabled]="isParticipateDisabled(event.idEvent!)"
+            [class.btn-participate--pending]="getUserInscriptionStatus(event.idEvent!) === 'PENDING'"
+            [class.btn-participate--accepted]="getUserInscriptionStatus(event.idEvent!) === 'ACCEPTED'"
+            [class.btn-participate--rejected]="getUserInscriptionStatus(event.idEvent!) === 'REJECTED'"
+            (click)="participerEvent(event)">
+            <i class="material-icons">how_to_reg</i> {{ getParticipateLabel(event.idEvent!) }}
+          </button>
+
+          <button class="btn-cancel"
+            *ngIf="getUserInscriptionStatus(event.idEvent!) === 'ACCEPTED'
+                || getUserInscriptionStatus(event.idEvent!) === 'PENDING'"
+            [disabled]="!canCancelInscription(event.idEvent!)"
+            [title]="!canCancelInscription(event.idEvent!)
+                     ? 'Annulation impossible à J-1'
+                     : 'Annuler mon inscription'"
+            (click)="cancelInscription(event.idEvent!, $event)">
+            <i class="material-icons">cancel</i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  MODAL DÉTAILS DE L'ÉVÉNEMENT                          -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" *ngIf="selectedEvent" (click)="onBackdropClick($event)">
+  <div class="modal-box">
+
+    <button class="modal-close" (click)="closeModal()">
+      <i class="material-icons">close</i>
+    </button>
+
+    <div
+      class="modal-banner"
+      [style.background-image]="selectedEvent.imageUrl ? 'url(' + selectedEvent.imageUrl + ')' : 'none'"
+    >
+      <div class="modal-banner-overlay">
+        <span class="event-category">{{ selectedEvent.category }}</span>
+        <span class="event-status" [class]="getStatusClass(selectedEvent.eventStatus)">
+          {{ selectedEvent.eventStatus }}
+        </span>
+      </div>
+    </div>
+
+    <div class="modal-content">
+      <h2 class="modal-title">{{ selectedEvent.title }}</h2>
+      <p class="modal-description">{{ selectedEvent.description }}</p>
+
+      <div class="modal-info-grid">
+        <div class="modal-info-item">
+          <i class="material-icons">place</i>
+          <div>
+            <span class="info-label">Lieu</span>
+            <span class="info-value">{{ selectedEvent.location }}</span>
+          </div>
+        </div>
+        <div class="modal-info-item">
+          <i class="material-icons">event</i>
+          <div>
+            <span class="info-label">Date de début</span>
+            <span class="info-value">{{ formatDate(selectedEvent.startDate) }}</span>
+          </div>
+        </div>
+        <div class="modal-info-item">
+          <i class="material-icons">event_available</i>
+          <div>
+            <span class="info-label">Date de fin</span>
+            <span class="info-value">{{ formatDate(selectedEvent.endDate) }}</span>
+          </div>
+        </div>
+        <div class="modal-info-item">
+          <i class="material-icons">group</i>
+          <div>
+            <span class="info-label">Participants</span>
+            <span class="info-value">
+              {{ selectedEvent.currentParticipants || 0 }} / {{ selectedEvent.capacity }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-capacity-label">
+        <span>Taux de remplissage</span>
+        <span>
+          {{ ((selectedEvent.currentParticipants || 0) / selectedEvent.capacity * 100).toFixed(0) }}%
+        </span>
+      </div>
+      <div class="capacity-bar" style="margin-bottom:24px">
+        <div
+          class="capacity-fill"
+          [style.width.%]="(selectedEvent.currentParticipants || 0) / selectedEvent.capacity * 100"
+        ></div>
+      </div>
+
+      <!-- ─── CARTE ─── -->
+      <div class="modal-section-title">
+        <i class="material-icons">map</i>
+        Localisation
+      </div>
+      <app-event-map
+        [lat]="selectedEvent.latitude"
+        [lng]="selectedEvent.longitude"
+        [locationName]="selectedEvent.location"
+        [eventTitle]="selectedEvent.title"
+      ></app-event-map>
+
+      <!-- ─── ACTIVITÉS ─── -->
+      <div class="modal-section-title">
+        <i class="material-icons">list_alt</i>
+        Activités ({{ selectedEvent.activities?.length || 0 }})
+      </div>
+
+      <div *ngIf="activityLoading" style="text-align:center; padding:16px; color:#888;">
+        <i class="material-icons spin">autorenew</i> Chargement des activités...
+      </div>
+
+      <div
+        *ngIf="!activityLoading && (!selectedEvent.activities || selectedEvent.activities.length === 0)"
+        class="no-activities-modal"
+      >
+        <i class="material-icons">event_note</i>
+        Aucune activité pour cet événement.
+      </div>
+
+      <div
+        class="modal-activities-list"
+        *ngIf="!activityLoading && selectedEvent.activities && selectedEvent.activities.length > 0"
+      >
+        <div class="modal-activity-card" *ngFor="let act of selectedEvent.activities">
+          <div class="modal-activity-header">
+            <i class="material-icons">bolt</i>
+            <strong>{{ act.name }}</strong>
+          </div>
+          <p class="act-description">{{ act.description }}</p>
+          <div class="act-requirements" *ngIf="act.requirements">
+            <i class="material-icons">info_outline</i>
+            <span>{{ act.requirements }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ACTIONS ─── -->
+      <div class="modal-actions">
+        <button class="btn-modal-participate"
+          [disabled]="isParticipateDisabled(selectedEvent.idEvent!)"
+          [class.btn-participate--pending]="getUserInscriptionStatus(selectedEvent.idEvent!) === 'PENDING'"
+          [class.btn-participate--accepted]="getUserInscriptionStatus(selectedEvent.idEvent!) === 'ACCEPTED'"
+          [class.btn-participate--rejected]="getUserInscriptionStatus(selectedEvent.idEvent!) === 'REJECTED'"
+          (click)="participerEvent(selectedEvent)">
+          <i class="material-icons">how_to_reg</i> {{ getParticipateLabel(selectedEvent.idEvent!) }}
+        </button>
+        <button class="btn-modal-close" (click)="closeModal()">Fermer</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!--  MODAL FORMULAIRE D'INSCRIPTION                        -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<app-inscription-form
+  *ngIf="inscriptionEvent"
+  [eventId]="inscriptionEvent.idEvent!"
+  [eventTitle]="inscriptionEvent.title"
+  [userId]="currentUserId"
+  (closeModal)="closeInscriptionModal()"
+  (formSubmitted)="onInscriptionSuccess($event)"
+></app-inscription-form>

@@ -1,0 +1,326 @@
+/* ═══════════════════════════════════════════════════════
+   PARTICIPANT BADGE – SCSS
+   Palette : deep navy · sky blue · amber · white
+═══════════════════════════════════════════════════════ */
+
+$navy-900 : #060a1e;
+$navy-800 : #0d1433;
+$sky      : #60b3f0;
+$sky-dim  : rgba(96, 179, 240, 0.18);
+$amber    : #f5b731;
+$amber-dim: rgba(245, 183, 49, 0.15);
+$white    : #ffffff;
+$w60      : rgba(255,255,255,.6);
+$w30      : rgba(255,255,255,.3);
+$w12      : rgba(255,255,255,.12);
+$w06      : rgba(255,255,255,.06);
+$green    : #4ade80;
+$font     : 'Sora', 'DM Sans', sans-serif;
+
+// ── Google Font import ────────────────────────────────────
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap');
+
+// ── OVERLAY ──────────────────────────────────────────────
+.badge-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+
+  &.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+}
+
+// ── MODAL ────────────────────────────────────────────────
+.badge-modal {
+  background: #0f1528;
+  border: 1px solid $w12;
+  border-radius: 20px;
+  padding: 28px;
+  width: min(800px, 95vw);
+  position: relative;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6);
+  animation: slideUp .35s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px) scale(.97); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);   opacity: 1; }
+}
+
+.close-btn {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: $w06;
+  border: 1px solid $w12;
+  color: $w60;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all .2s;
+  &:hover { background: $w12; color: $white; transform: scale(1.08); }
+}
+
+// ── MODAL HEADER ─────────────────────────────────────────
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.modal-title-group {
+  display: flex; align-items: center; gap: 14px;
+  .modal-icon { font-size: 28px; }
+}
+.modal-title {
+  font-family: $font;
+  font-size: 20px; font-weight: 700; color: $white; margin: 0;
+}
+.modal-subtitle {
+  font-family: $font;
+  font-size: 12px; color: $w60; margin: 2px 0 0;
+}
+.modal-actions { display: flex; gap: 10px; }
+
+// Buttons
+%btn {
+  font-family: $font;
+  font-size: 13px; font-weight: 600;
+  border-radius: 10px;
+  padding: 10px 18px;
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer;
+  transition: all .2s;
+  border: none;
+}
+.btn-download {
+  @extend %btn;
+  background: linear-gradient(135deg, $amber, #e8a020);
+  color: #1a0f00;
+  box-shadow: 0 4px 16px rgba(245,183,49,.35);
+  &:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,183,49,.5); }
+  &:disabled { opacity: .6; cursor: not-allowed; }
+}
+.btn-print {
+  @extend %btn;
+  background: $w06;
+  color: $w60;
+  border: 1px solid $w12;
+  &:hover { background: $w12; color: $white; }
+}
+
+.spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(0,0,0,.2);
+  border-top-color: #1a0f00;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+// ── BADGE STAGE ──────────────────────────────────────────
+.badge-stage {
+  display: flex;
+  justify-content: center;
+}
+
+// ── BADGE CARD ───────────────────────────────────────────
+.badge-card {
+  position: relative;
+  width: 680px;
+  background: linear-gradient(135deg, $navy-900 0%, #0d1a4a 50%, $navy-800 100%);
+  border-radius: 20px;
+  border: 1px solid $w12;
+  overflow: hidden;
+  font-family: $font;
+  box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 1px 0 $w12;
+
+  .badge-bg-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(96,179,240,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(96,179,240,.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+
+  .badge-bg-glow {
+    position: absolute;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    pointer-events: none;
+    &.top-left {
+      top: -80px; left: -60px;
+      background: radial-gradient(circle, rgba(96,179,240,.12) 0%, transparent 70%);
+    }
+    &.bottom-right {
+      bottom: -80px; right: -60px;
+      background: radial-gradient(circle, rgba(245,183,49,.08) 0%, transparent 70%);
+    }
+  }
+}
+
+// Corner accents
+.corner {
+  position: absolute;
+  width: 24px; height: 24px;
+  border-color: rgba(96,179,240,.5);
+  border-style: solid;
+  &.tl { top:14px; left:14px;  border-width: 2px 0 0 2px; border-radius: 4px 0 0 0; }
+  &.tr { top:14px; right:14px; border-width: 2px 2px 0 0; border-radius: 0 4px 0 0; }
+  &.bl { bottom:14px; left:14px;  border-width: 0 0 2px 2px; border-radius: 0 0 0 4px; }
+  &.br { bottom:14px; right:14px; border-width: 0 2px 2px 0; border-radius: 0 0 4px 0; }
+}
+
+// ── TOP BAR ──────────────────────────────────────────────
+.badge-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 26px 0;
+}
+.app-identity { display: flex; align-items: center; gap: 12px; }
+.app-logo-ring {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 2px solid rgba(96,179,240,.4);
+  display: flex; align-items: center; justify-content: center;
+  background: $sky-dim;
+  overflow: hidden;
+}
+.app-logo-img { width: 100%; height: 100%; object-fit: cover; }
+.app-logo-fallback { font-size: 16px; font-weight: 800; color: $sky; }
+.app-text { display: flex; flex-direction: column; gap: 2px; }
+.app-name { font-size: 13px; font-weight: 700; color: $white; letter-spacing: 2px; }
+.app-tagline { font-size: 10px; color: $sky; letter-spacing: 1px; text-transform: uppercase; }
+
+.badge-label-chip {
+  display: flex; align-items: center; gap: 7px;
+  background: $amber-dim;
+  border: 1px solid rgba(245,183,49,.3);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 10px; font-weight: 700; color: $amber; letter-spacing: 1.5px;
+}
+.badge-label-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: $amber;
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(.85); }
+}
+
+// ── DIVIDER ──────────────────────────────────────────────
+.hline {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 5%, $w12 30%, $w12 70%, transparent 95%);
+  margin: 18px 26px;
+}
+
+// ── BODY ─────────────────────────────────────────────────
+.badge-body {
+  display: flex;
+  align-items: flex-start;
+  padding: 0 26px;
+  gap: 24px;
+}
+
+.badge-info { flex: 1; }
+
+.role-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: $sky-dim;
+  border: 1px solid rgba(96,179,240,.25);
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 11px; font-weight: 700; color: $sky; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 14px;
+  .role-icon { font-size: 14px; }
+}
+
+.participant-name {
+  font-size: 30px; font-weight: 800; color: $white;
+  line-height: 1.1; margin: 0 0 14px; letter-spacing: -.5px;
+  .name-last { color: $sky; }
+}
+
+.domain-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: $w06; border: 1px solid $w12;
+  border-radius: 8px; padding: 5px 12px;
+  font-size: 12px; color: $w60; margin-bottom: 20px;
+  text-transform: uppercase; letter-spacing: 1px;
+  svg { opacity: .5; }
+}
+
+.event-pills { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.event-pill {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 8px 14px;
+  background: $w06; border: 1px solid $w06; border-radius: 10px;
+}
+.pill-label {
+  font-size: 9px; font-weight: 700; color: $amber;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  min-width: 68px; flex-shrink: 0;
+}
+.pill-value { font-size: 13px; font-weight: 600; color: $white; }
+
+// ── AVATAR ───────────────────────────────────────────────
+.badge-avatar-col {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding-top: 4px;
+}
+.avatar-frame { position: relative; width: 120px; height: 120px; }
+.avatar-ring {
+  position: absolute; border-radius: 50%;
+  &.outer { inset: -6px; border: 2px solid rgba(96,179,240,.35); }
+  &.inner { inset: -2px; border: 2px solid rgba(96,179,240,.6); }
+}
+.avatar-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; display: block; }
+.avatar-initials {
+  width: 120px; height: 120px; border-radius: 50%;
+  background: linear-gradient(135deg, $sky, #3b82f6);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; font-weight: 800; color: $white; letter-spacing: -2px;
+}
+.verified-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: rgba(74,222,128,.12);
+  border: 1px solid rgba(74,222,128,.3);
+  border-radius: 20px; padding: 5px 12px;
+  font-size: 11px; font-weight: 700; color: $green;
+  svg { stroke: $green; }
+}
+
+// ── FOOTER ───────────────────────────────────────────────
+.badge-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 22px 26px 20px;
+  padding-top: 14px;
+  border-top: 1px solid $w06;
+}
+.footer-id   { font-size: 10px; color: rgba(255,255,255,.25); font-weight: 600; letter-spacing: 1px; }
+.footer-dots { display: flex; gap: 5px; span { width:4px; height:4px; border-radius:50%; background:$w30; } }
+.footer-date { font-size: 10px; color: rgba(255,255,255,.25); }
+
+// ── PRINT ────────────────────────────────────────────────
+@media print {
+  .badge-overlay { position: static; background: transparent; opacity: 1; pointer-events: all; display: block; }
+  .badge-modal   { background: transparent; border: none; box-shadow: none; padding: 0; }
+  .modal-header, .close-btn { display: none !important; }
+  .badge-stage   { padding: 0; }
+  .badge-card    { box-shadow: none; }
+}

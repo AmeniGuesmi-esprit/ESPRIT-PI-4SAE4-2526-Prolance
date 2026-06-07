@@ -1,0 +1,73 @@
+<div class="dashboard-content">
+  <div class="dashboard-header">
+    <div class="section-info">
+    </div>
+    <div class="tabs">
+      <button 
+        [class.active]="activeTab === 'accounts'"
+        (click)="setActiveTab('accounts')"
+        class="tab-button">
+        Accounts
+      </button>
+      <button 
+        [class.active]="activeTab === 'purchases'"
+        (click)="setActiveTab('purchases')"
+        class="tab-button">
+        Purchases
+      </button>
+      <button 
+        [class.active]="activeTab === 'sessions'"
+        (click)="setActiveTab('sessions')"
+        class="tab-button">
+        Sessions
+      </button>
+    </div>
+  </div>
+
+  <div class="performance-section">
+    <div class="chart-placeholder">
+      <p style="color: #666; font-size: 0.9rem;">Graphique de performance (intégrez Chart.js)</p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon shipments">🔔</div>
+        <div class="stat-info">
+          <p class="stat-label">Total Shipments</p>
+          <h3 class="stat-value">{{ stats.totalShipments.toLocaleString() }}</h3>
+        </div>
+      </div>
+      <div class="stat-chart">
+        <p style="color: #666; font-size: 0.75rem;">Mini chart</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon sales">💰</div>
+        <div class="stat-info">
+          <p class="stat-label">Daily Sales</p>
+          <h3 class="stat-value">{{ stats.dailySales.toLocaleString() }}€</h3>
+        </div>
+      </div>
+      <div class="stat-chart">
+        <p style="color: #666; font-size: 0.75rem;">Mini chart</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-header">
+        <div class="stat-icon tasks">✈️</div>
+        <div class="stat-info">
+          <p class="stat-label">Completed Tasks</p>
+          <h3 class="stat-value">{{ stats.completedTasks.toLocaleString() }}K</h3>
+        </div>
+      </div>
+      <div class="stat-chart">
+        <p style="color: #666; font-size: 0.75rem;">Mini chart</p>
+      </div>
+    </div>
+  </div>
+</div>

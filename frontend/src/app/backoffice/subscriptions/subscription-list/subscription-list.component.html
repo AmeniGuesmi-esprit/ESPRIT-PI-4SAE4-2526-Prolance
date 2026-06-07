@@ -1,0 +1,408 @@
+<div class="list-container">
+
+  <!-- Header -->
+  <div class="list-header">
+    <div class="header-left">
+      <span class="header-icon">⚡</span>
+      <div>
+        <h1>Subscription Management</h1>
+        <p class="header-subtitle">{{ getTotalFiltered() }} plans available</p>
+      </div>
+    </div>
+    
+    <!-- ✅ BOUTON AI -->
+    <div class="header-actions">
+      <button class="btn-ai-generate" (click)="openAIModal()">
+        <span class="btn-ai-icon">🤖</span>
+        <span class="btn-ai-text">Générer avec IA</span>
+        <span class="btn-ai-sparkle">✨</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-wrapper">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search a plan..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()" />
+    </div>
+
+    <div class="filter-group">
+      <button
+        class="filter-btn"
+        [class.active]="filterType === 'ALL'"
+        (click)="onFilterType('ALL')">All</button>
+      <button
+        class="filter-btn freelancer"
+        [class.active]="filterType === 'FREELANCER'"
+        (click)="onFilterType('FREELANCER')">Freelancer</button>
+      <button
+        class="filter-btn client"
+        [class.active]="filterType === 'CLIENT'"
+        (click)="onFilterType('CLIENT')">Client</button>
+    </div>
+
+    <select class="sort-select" [(ngModel)]="sortBy" (change)="onSort(sortBy)">
+      <option value="price_asc">Price ↑</option>
+      <option value="price_desc">Price ↓</option>
+      <option value="name_asc">Name A-Z</option>
+      <option value="name_desc">Name Z-A</option>
+    </select>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading plans...</p>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper" *ngIf="!loading && !errorMessage">
+    <table class="sub-table">
+      <thead>
+        <tr>
+          <th>Plan Name</th>
+          <th>Type</th>
+          <th>Price</th>
+          <th>Cycle</th>
+          <th>Status</th>
+          <th>Subscribers</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sub of filteredSubscriptions" class="table-row">
+          <td class="name-cell">
+            <span class="plan-name">{{ sub.name }}</span>
+          </td>
+          <td>
+            <span class="type-badge" [ngClass]="{
+              'type-freelancer': sub.type === 'FREELANCER',
+              'type-client': sub.type === 'CLIENT'
+            }">
+              {{ sub.type === 'FREELANCER' ? '🧑‍💻 Freelancer' : '🏢 Client' }}
+            </span>
+          </td>
+          <td class="price-cell">
+            <span class="price-amount">{{ sub.price }}</span>
+            <span class="price-currency">DT</span>
+          </td>
+          <td>
+            <span class="cycle-badge" [ngClass]="{
+              'cycle-sem': sub.billingCycle === 'SEMESTRIELLE',
+              'cycle-ann': sub.billingCycle === 'ANNUELLE'
+            }">
+              {{ getCycleLabel(sub.billingCycle) }}
+            </span>
+          </td>
+          <td>
+            <label class="toggle-switch">
+              <input type="checkbox" [checked]="sub.isActive" (change)="onToggleActive(sub)" />
+              <span class="toggle-track">
+                <span class="toggle-thumb"></span>
+              </span>
+              <span class="toggle-label">{{ sub.isActive ? 'Active' : 'Inactive' }}</span>
+            </label>
+          </td>
+          <td class="subscribers-cell">
+            <span class="sub-count">{{ sub.activeSubscribersCount || 0 }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="filteredSubscriptions.length === 0">
+      <span class="empty-icon">📭</span>
+      <p>No plans found</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-row" *ngIf="!loading && totalPages > 1">
+    <span class="pagination-info">
+      {{ (currentPage - 1) * itemsPerPage + 1 }}–{{ currentPage * itemsPerPage > getTotalFiltered() ? getTotalFiltered() : currentPage * itemsPerPage }}
+      <span class="pagination-total">of {{ getTotalFiltered() }} plans</span>
+    </span>
+    <div class="pagination-buttons">
+      <button
+        *ngFor="let page of getPages()"
+        class="page-btn"
+        [class.active]="page === currentPage"
+        (click)="goToPage(page)">
+        {{ page }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-message" *ngIf="errorMessage">
+    <span class="error-icon">⚠️</span>
+    <p>{{ errorMessage }}</p>
+    <button class="btn-retry" (click)="loadSubscriptions()">Retry</button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--  AI GENERATION MODAL                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+
+<div class="ai-modal-overlay" *ngIf="showAIModal" (click)="closeAIModal()">
+  <div class="ai-modal" (click)="$event.stopPropagation()">
+    
+    <!-- Modal Header -->
+    <div class="ai-modal-header">
+      <div class="ai-modal-title">
+        <span class="ai-robot">🤖</span>
+        <div>
+          <h2>Générateur d'Abonnements IA</h2>
+          <p>Créez des plans optimisés automatiquement</p>
+        </div>
+      </div>
+      <button class="ai-close-btn" (click)="closeAIModal()" *ngIf="!aiGenerating && !aiSaving">✕</button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- Configuration Form (avant génération) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="ai-modal-body" *ngIf="!aiGenerating && !showAIResults && !aiSaving">
+      
+      <div class="ai-config-section">
+        <h3>🎯 Configuration</h3>
+        
+        <div class="ai-form-group">
+          <label>Type de plans à générer</label>
+          <div class="ai-radio-group">
+            <label class="ai-radio" [class.selected]="aiConfig.targetType === 'FREELANCER'">
+              <input type="radio" name="targetType" value="FREELANCER" [(ngModel)]="aiConfig.targetType">
+              <span class="ai-radio-icon">🧑‍💻</span>
+              <span>Freelancer</span>
+            </label>
+            <label class="ai-radio" [class.selected]="aiConfig.targetType === 'CLIENT'">
+              <input type="radio" name="targetType" value="CLIENT" [(ngModel)]="aiConfig.targetType">
+              <span class="ai-radio-icon">🏢</span>
+              <span>Client</span>
+            </label>
+            <label class="ai-radio" [class.selected]="aiConfig.targetType === 'BOTH'">
+              <input type="radio" name="targetType" value="BOTH" [(ngModel)]="aiConfig.targetType">
+              <span class="ai-radio-icon">🎯</span>
+              <span>Les deux</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="ai-form-row">
+          <div class="ai-form-group">
+            <label>Nombre de tiers</label>
+            <select [(ngModel)]="aiConfig.numberOfPlans">
+              <option [value]="1">1 (Starter uniquement)</option>
+              <option [value]="2">2 (Starter + Pro)</option>
+              <option [value]="3">3 (Starter + Pro + Elite)</option>
+            </select>
+          </div>
+          
+          <div class="ai-form-group">
+            <label>Gamme de prix</label>
+            <select [(ngModel)]="aiConfig.priceRange">
+              <option value="low">Budget (x0.5)</option>
+              <option value="medium">Standard (x1)</option>
+              <option value="high">Premium (x1.5)</option>
+              <option value="premium">Luxe (x2.5)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="ai-form-row">
+          <div class="ai-form-group">
+            <label>Cycle de facturation</label>
+            <select [(ngModel)]="aiConfig.billingCycle">
+              <option value="SEMESTRIELLE">Semestriel uniquement</option>
+              <option value="ANNUELLE">Annuel uniquement</option>
+              <option value="BOTH">Les deux</option>
+            </select>
+          </div>
+          
+          <div class="ai-form-group checkbox-group">
+            <label class="ai-checkbox">
+              <input type="checkbox" [(ngModel)]="aiConfig.includeFree">
+              <span class="checkmark"></span>
+              <span>Inclure un plan gratuit</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ✅ Option Auto-Save -->
+        <div class="ai-auto-save-option">
+          <label class="ai-checkbox auto-save">
+            <input type="checkbox" [(ngModel)]="aiConfig.autoSave">
+            <span class="checkmark"></span>
+            <span>⚡ Sauvegarde automatique</span>
+          </label>
+          <p class="auto-save-hint">Les plans seront créés directement dans le frontoffice</p>
+        </div>
+      </div>
+
+      <div class="ai-info-box">
+        <span class="ai-info-icon">💡</span>
+        <p>L'IA va analyser le marché et générer des plans optimisés avec les meilleures pratiques de pricing et de features.</p>
+      </div>
+
+      <div class="ai-modal-footer">
+        <button class="ai-btn-cancel" (click)="closeAIModal()">Annuler</button>
+        <button class="ai-btn-generate" (click)="startAIGeneration()">
+          <span class="ai-btn-icon">🚀</span>
+          Lancer la génération
+        </button>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- Generation Progress -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="ai-modal-body ai-generating" *ngIf="aiGenerating">
+      <div class="ai-progress-container">
+        <div class="ai-brain-animation">
+          <div class="ai-brain-ring"></div>
+          <div class="ai-brain-ring"></div>
+          <div class="ai-brain-ring"></div>
+          <span class="ai-brain-emoji">🧠</span>
+        </div>
+        
+        <h3>Génération en cours...</h3>
+        <p class="ai-current-step">{{ aiCurrentStep }}</p>
+        
+        <div class="ai-progress-bar">
+          <div class="ai-progress-fill" [style.width.%]="aiProgress"></div>
+        </div>
+        
+        <div class="ai-steps-list">
+          <div 
+            class="ai-step" 
+            *ngFor="let step of aiSteps; let i = index"
+            [class.done]="step.done"
+            [class.active]="!step.done && (i === 0 || aiSteps[i-1].done)">
+            <span class="ai-step-icon">{{ step.done ? '✓' : step.icon }}</span>
+            <span class="ai-step-label">{{ step.label }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- Auto-Save Progress -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="ai-modal-body ai-saving" *ngIf="aiSaving">
+      <div class="ai-save-container">
+        <div class="ai-save-animation">
+          <div class="ai-save-ring"></div>
+          <span class="ai-save-emoji">💾</span>
+        </div>
+        
+        <h3>Sauvegarde automatique...</h3>
+        <p class="ai-current-step">{{ aiCurrentStep }}</p>
+        
+        <div class="ai-progress-bar save-bar">
+          <div class="ai-progress-fill save-fill" [style.width.%]="aiSaveProgress"></div>
+        </div>
+        
+        <p class="ai-save-hint">Les plans sont ajoutés au frontoffice...</p>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- Success Screen (Auto-save terminé) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="ai-modal-body ai-success" *ngIf="aiSaveSuccess && !aiSaving && !showAIResults">
+      <div class="ai-success-container">
+        <div class="ai-success-animation">
+          <span class="ai-success-check">✓</span>
+        </div>
+        
+        <h3>{{ aiCurrentStep }}</h3>
+        <p class="ai-success-hint">Les plans sont maintenant disponibles dans le frontoffice !</p>
+        
+        <div class="ai-success-summary">
+          <div class="ai-summary-item">
+            <span class="ai-summary-icon">📋</span>
+            <span class="ai-summary-value">{{ aiSavedCount }}</span>
+            <span class="ai-summary-label">Plans créés</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- Manual Results (si autoSave=false ou erreurs) -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="ai-modal-body ai-results" *ngIf="showAIResults && !aiGenerating && !aiSaving">
+      <div class="ai-results-header">
+        <div class="ai-success-badge">
+          <span>✅</span>
+          {{ aiGeneratedPlans.length }} plans générés !
+        </div>
+      </div>
+
+      <div class="ai-plans-grid">
+        <div 
+          class="ai-plan-card" 
+          *ngFor="let plan of aiGeneratedPlans"
+          [class.freelancer]="plan.type === 'FREELANCER'"
+          [class.client]="plan.type === 'CLIENT'">
+          
+          <div class="ai-plan-header">
+            <span class="ai-plan-icon">{{ getPlanIcon(plan.name) }}</span>
+            <div class="ai-plan-info">
+              <h4>{{ plan.name }}</h4>
+              <span class="ai-plan-type">{{ plan.type }}</span>
+            </div>
+            <button class="ai-plan-remove" (click)="removeGeneratedPlan(plan)">✕</button>
+          </div>
+          
+          <div class="ai-plan-price">
+            <span class="ai-price-amount">{{ plan.price }}</span>
+            <span class="ai-price-currency">DT</span>
+            <span class="ai-price-cycle">/{{ plan.billingCycle === 'SEMESTRIELLE' ? '6 mois' : 'an' }}</span>
+          </div>
+          
+          <p class="ai-plan-desc">{{ plan.description }}</p>
+          
+          <div class="ai-plan-features">
+            <div class="ai-feature" *ngIf="plan.maxProposals">
+              <span>📨</span> {{ plan.maxProposals >= 999 ? 'Illimité' : plan.maxProposals }}
+            </div>
+            <div class="ai-feature" *ngIf="plan.analyticsAccess">
+              <span>📊</span> Analytics
+            </div>
+            <div class="ai-feature" *ngIf="plan.prioritySupport">
+              <span>⭐</span> Support VIP
+            </div>
+          </div>
+          
+          <button class="ai-plan-save" (click)="saveGeneratedPlan(plan)">
+            <span>💾</span> Enregistrer
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-modal-footer" *ngIf="aiGeneratedPlans.length > 0">
+        <button class="ai-btn-cancel" (click)="closeAIModal()">Fermer</button>
+        <button class="ai-btn-save-all" (click)="saveAllGeneratedPlans()">
+          <span>💾</span>
+          Tout enregistrer ({{ aiGeneratedPlans.length }})
+        </button>
+      </div>
+
+      <div class="ai-empty-results" *ngIf="aiGeneratedPlans.length === 0">
+        <span class="ai-empty-icon">✅</span>
+        <p>Tous les plans ont été enregistrés !</p>
+        <button class="ai-btn-generate" (click)="closeAIModal()">Fermer</button>
+      </div>
+    </div>
+
+  </div>
+</div>

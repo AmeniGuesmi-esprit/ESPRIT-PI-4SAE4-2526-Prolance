@@ -1,0 +1,102 @@
+<div class="promo-suggestion-container" @fadeIn>
+  
+  <!-- Header collapsible -->
+  <div class="promo-header" (click)="toggleExpand()">
+    <div class="header-left">
+      <span class="ai-icon">🤖</span>
+      <div class="header-text">
+        <h4>Codes Promo Recommandés par IA</h4>
+        <p *ngIf="!loading && recommendations.length > 0">
+          {{ recommendations.length }} offres personnalisées pour vous
+        </p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="best-offer" *ngIf="recommendations.length > 0 && !loading">
+        Jusqu'à -{{ recommendations[0]?.discountPercent }}%
+      </span>
+      <span class="expand-icon" [class.rotated]="isExpanded">▼</span>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div class="promo-loading" *ngIf="loading">
+    <div class="loading-pulse"></div>
+    <span>Analyse IA en cours...</span>
+  </div>
+
+  <!-- Promo cards -->
+  <div class="promo-content" *ngIf="!loading && isExpanded" @staggerPromos>
+    
+    <div 
+      class="promo-card" 
+      *ngFor="let promo of recommendations; let i = index"
+      [class.selected]="selectedPromo?.id === promo.id"
+      [class.personalized]="promo.isPersonalized"
+      (click)="selectPromo(promo)">
+      
+      <!-- Badge discount -->
+      <div class="discount-badge" [style.background]="getScoreColor(promo.relevanceScore)">
+        {{ formatDiscount(promo.discountPercent) }}
+      </div>
+
+      <!-- Urgency label -->
+      <span class="urgency-label" *ngIf="getUrgencyLabel(promo)">
+        {{ getUrgencyLabel(promo) }}
+      </span>
+
+      <!-- Personalized badge -->
+      <span class="personalized-badge" *ngIf="promo.isPersonalized">
+        ✨ Pour vous
+      </span>
+
+      <div class="promo-info">
+        <div class="promo-code-row">
+          <code class="promo-code">{{ promo.code }}</code>
+          <button 
+            class="copy-btn" 
+            (click)="copyCode(promo.code, $event)"
+            [class.copied]="copiedCode === promo.code">
+            {{ copiedCode === promo.code ? '✓' : '📋' }}
+          </button>
+        </div>
+        
+        <p class="promo-desc">{{ promo.description }}</p>
+        
+        <div class="ai-reason">
+          <span class="ai-tag">IA</span>
+          {{ promo.aiReason }}
+        </div>
+
+        <div class="promo-meta">
+          <span class="relevance" [style.color]="getScoreColor(promo.relevanceScore)">
+            Score: {{ promo.relevanceScore | number:'1.0-0' }}%
+          </span>
+          <span class="remaining">{{ promo.remainingUses }} utilisations restantes</span>
+        </div>
+      </div>
+
+      <button class="use-btn" (click)="selectPromo(promo); $event.stopPropagation()">
+        Utiliser ce code →
+      </button>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="recommendations.length === 0">
+      <span class="empty-icon">🎫</span>
+      <p>Aucun code promo disponible actuellement</p>
+    </div>
+  </div>
+
+  <!-- Collapsed preview -->
+  <div class="promo-preview" *ngIf="!loading && !isExpanded && recommendations.length > 0" (click)="toggleExpand()">
+    <div class="preview-cards">
+      <div class="mini-card" *ngFor="let promo of recommendations.slice(0, 3)">
+        <span class="mini-discount">-{{ promo.discountPercent }}%</span>
+        <code>{{ promo.code }}</code>
+      </div>
+    </div>
+    <span class="view-all">Voir tout →</span>
+  </div>
+
+</div>

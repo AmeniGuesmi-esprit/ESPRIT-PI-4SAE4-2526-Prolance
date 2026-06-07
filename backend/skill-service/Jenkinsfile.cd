@@ -1,0 +1,96 @@
+pipeline {
+    agent any
+
+    environment {
+        JAVA_HOME        = '/usr/lib/jvm/java-21-openjdk-amd64'
+        PATH             = "/usr/lib/jvm/java-21-openjdk-amd64/bin:${env.PATH}"
+        SERVICE_NAME     = 'skill-service'
+        DOCKER_NAMESPACE = 'yesmine111'
+        IMAGE_NAME       = "${DOCKER_NAMESPACE}/${SERVICE_NAME}"
+        APP_PORT         = '8096'
+        K8S_NAMESPACE    = 'devops'
+    }
+
+    options {
+        timeout(time: 20, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+       stage('📥 Checkout') {
+        steps {
+            checkout([$class: 'GitSCM',
+                branches: [[name: '*/devops/on-integrated6sur6/ads_cicd_k8s']],
+                extensions: [[$class: 'CloneOption', depth: 1, shallow: true]],
+                userRemoteConfigs: [[
+                    credentialsId: 'github-credentials',
+                    url: 'https://github.com/farrahamami/ESPRIT-PIDEV-4SAE4-2025-2026-Prolance-BACKEND'
+                ]]
+            ])
+        }
+}
+
+      stage('🔖 Récupérer le tag CI') {
+          steps {
+              script {
+                  def tagFile = '/var/lib/jenkins/jobs/skill-service-ci/builds/lastSuccessfulBuild/archive/last-build.txt'
+                  try {
+                      env.IMAGE_TAG = sh(script: "cat ${tagFile}", returnStdout: true).trim()
+                  } catch (e) {
+                      env.IMAGE_TAG = 'latest'
+                  }
+                  echo "🔖 Tag récupéré : ${env.IMAGE_TAG}"
+              }
+          }
+      }
+
+       stage('🚀 Deploy to Kubernetes') {
+           steps {
+               dir('skill-service/k8s') {
+                   sh '''
+                       sed -i "s|IMAGE_PLACEHOLDER|${IMAGE_NAME}:${IMAGE_TAG}|g" deployment.yaml
+                       kubectl apply -f deployment.yaml --validate=false
+                       kubectl apply -f service.yaml --validate=false
+                   '''
+               }
+           }
+       }
+
+        stage('✅ Vérifier le déploiement') {
+            steps {
+                sh '''
+                    kubectl rollout status deployment/${SERVICE_NAME} -n ${K8S_NAMESPACE} --timeout=120s
+                    kubectl get pods -l app=${SERVICE_NAME} -n ${K8S_NAMESPACE}
+                '''
+            }
+        }
+
+        stage('Load Test K6') {
+            steps {
+                sh '''
+                    docker run --rm \
+                    -v /var/lib/jenkins/k6:/k6 \
+                    grafana/k6 run /k6/loadtest.js
+                '''
+            }
+            post {
+                always {
+                    echo 'K6 Load Test terminé'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ CD OK : ${SERVICE_NAME} déployé sur Kubernetes avec l'image ${IMAGE_NAME}:${IMAGE_TAG}"
+        }
+        failure {
+            echo "❌ CD échoué pour ${SERVICE_NAME}."
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

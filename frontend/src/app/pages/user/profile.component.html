@@ -1,0 +1,642 @@
+<!-- profile.component.html -->
+<div class="profile-container">
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading && !userProfile">
+    <div class="spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="!isLoading && loadError && !userProfile">
+    <i class="material-icons error-icon">error_outline</i>
+    <h3>Error Loading Profile</h3>
+    <p>{{ loadError }}</p>
+    <button class="btn-retry" (click)="loadUserProfile()">
+      <i class="material-icons">refresh</i> Try Again
+    </button>
+  </div>
+
+  <!-- Profile Content -->
+  <div class="profile-card" *ngIf="userProfile">
+
+    <!-- Cover: gradient + floating avatar -->
+    <div class="profile-cover">
+      <div class="cover-gradient"></div>
+      <div class="profile-avatar-wrapper">
+
+        <!-- Avatar circle -->
+        <div class="profile-avatar" [class.has-image]="avatarPreview">
+          <img *ngIf="avatarPreview" [src]="avatarPreview" alt="Profile picture" class="avatar-img" />
+          <span class="avatar-initials" *ngIf="!avatarPreview">{{ getInitials() }}</span>
+
+          <!-- Camera overlay -->
+          <label class="avatar-upload-overlay" for="avatarInput"
+                 [class.uploading]="isUploadingAvatar" title="Change profile picture">
+            <span *ngIf="!isUploadingAvatar">
+              <i class="material-icons">photo_camera</i>
+              <span class="overlay-text">Change</span>
+            </span>
+            <span *ngIf="isUploadingAvatar" class="spinner-small white"></span>
+          </label>
+
+          <input id="avatarInput" type="file" accept="image/*"
+                 style="display:none" (change)="onAvatarSelected($event)">
+        </div>
+
+        <!-- AI Generate button -->
+        <button class="btn-ai-avatar" (click)="openAiAvatarModal()" title="Generate AI avatar">
+          <span class="ai-btn-glow"></span>
+          <i class="material-icons">auto_awesome</i>
+          <span>AI</span>
+        </button>
+
+        <!-- Admin badge -->
+        <div class="avatar-badge" *ngIf="userProfile.role === 'ADMIN'">
+          <i class="material-icons">verified</i>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Header bar -->
+    <div class="profile-header">
+      <div class="header-left">
+        <h1 class="profile-title">My Profile</h1>
+        <span class="role-badge"
+              [class.role-admin]="userProfile.role === 'ADMIN'"
+              [class.role-client]="userProfile.role === 'CLIENT'"
+              [class.role-freelancer]="userProfile.role === 'FREELANCER'">
+          <i class="material-icons role-icon">
+            {{ userProfile.role === 'ADMIN' ? 'security' :
+               userProfile.role === 'CLIENT' ? 'business' : 'work' }}
+          </i>
+          {{ userProfile.role }}
+        </span>
+      </div>
+      <div class="header-actions">
+        <ng-container *ngIf="!isEditMode; else editActions">
+          <button class="btn-edit" (click)="toggleEditMode()" [disabled]="isLoading">
+            <i class="material-icons">edit</i> Edit Profile
+          </button>
+        </ng-container>
+        <ng-template #editActions>
+          <button class="btn-save" (click)="saveProfile()" [disabled]="isLoading">
+            <i class="material-icons" *ngIf="!isLoading">save</i>
+            <span class="spinner-small" *ngIf="isLoading"></span>
+            {{ isLoading ? 'Saving...' : 'Save Changes' }}
+          </button>
+          <button class="btn-cancel" (click)="cancelEdit()" [disabled]="isLoading">
+            <i class="material-icons">close</i> Cancel
+          </button>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Details -->
+    <div class="profile-details">
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- VIEW MODE                                   -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="details-grid" *ngIf="!isEditMode && !showPasswordChange">
+        <div class="detail-card">
+          <div class="detail-icon"><i class="material-icons">person</i></div>
+          <div class="detail-content">
+            <span class="detail-label">First Name</span>
+            <span class="detail-value">{{ userProfile.name }}</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-icon"><i class="material-icons">person</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Last Name</span>
+            <span class="detail-value">{{ userProfile.lastName }}</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-icon"><i class="material-icons">email</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Email Address</span>
+            <span class="detail-value">{{ userProfile.email }}</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-icon"><i class="material-icons">cake</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Birth Date</span>
+            <span class="detail-value">{{ formatDate(userProfile.birthDate) || 'Not set' }}</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-icon"><i class="material-icons">badge</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Role</span>
+            <span class="detail-value role-value"
+                  [class.role-admin]="userProfile.role === 'ADMIN'"
+                  [class.role-client]="userProfile.role === 'CLIENT'"
+                  [class.role-freelancer]="userProfile.role === 'FREELANCER'">
+              {{ userProfile.role }}
+            </span>
+          </div>
+        </div>
+        <div class="detail-card password-card">
+          <div class="detail-icon"><i class="material-icons">lock</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Password</span>
+            <div class="password-field">
+              <span class="detail-value password-dots">••••••••</span>
+              <button class="btn-icon" (click)="showPasswordChange = true; isEditMode = false;">
+                <i class="material-icons">lock_reset</i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-card bio-view-card" *ngIf="userProfile.bio">
+          <div class="detail-icon"><i class="material-icons">description</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Bio</span>
+            <span class="detail-value">{{ userProfile.bio }}</span>
+          </div>
+        </div>
+
+        <!-- Face ID status card (view mode) -->
+        <div class="detail-card face-id-card">
+          <div class="detail-icon face-id-icon" [class.enrolled]="hasFaceEnrolled">
+            <i class="material-icons">{{ hasFaceEnrolled ? 'face_retouching_natural' : 'face' }}</i>
+          </div>
+          <div class="detail-content">
+            <span class="detail-label">Face ID</span>
+            <div class="face-id-row">
+              <span class="detail-value face-id-status" [class.enrolled]="hasFaceEnrolled">
+                {{ hasFaceEnrolled ? 'Enabled on this device' : 'Not set up' }}
+              </span>
+              <span class="face-id-badge" *ngIf="hasFaceEnrolled">
+                <i class="material-icons">check_circle</i> Active
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- EDIT MODE                                   -->
+      <!-- ═══════════════════════════════════════════ -->
+      <form class="details-grid edit-grid" *ngIf="isEditMode"
+            [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <div class="detail-card"
+             [class.card-invalid]="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">
+          <div class="detail-icon"><i class="material-icons">person</i></div>
+          <div class="detail-content">
+            <label class="detail-label" for="name">First Name</label>
+            <input class="detail-input" id="name" type="text" formControlName="name" placeholder="First name">
+            <span class="field-error" *ngIf="profileForm.get('name')?.invalid && profileForm.get('name')?.touched">Required</span>
+          </div>
+        </div>
+        <div class="detail-card"
+             [class.card-invalid]="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">
+          <div class="detail-icon"><i class="material-icons">person</i></div>
+          <div class="detail-content">
+            <label class="detail-label" for="lastName">Last Name</label>
+            <input class="detail-input" id="lastName" type="text" formControlName="lastName" placeholder="Last name">
+            <span class="field-error" *ngIf="profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched">Required</span>
+          </div>
+        </div>
+        <div class="detail-card"
+             [class.card-invalid]="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">
+          <div class="detail-icon"><i class="material-icons">email</i></div>
+          <div class="detail-content">
+            <label class="detail-label" for="email">Email Address</label>
+            <input class="detail-input" id="email" type="email" formControlName="email" placeholder="Email address">
+            <span class="field-error" *ngIf="profileForm.get('email')?.invalid && profileForm.get('email')?.touched">Valid email required</span>
+          </div>
+        </div>
+        <div class="detail-card">
+          <div class="detail-icon"><i class="material-icons">cake</i></div>
+          <div class="detail-content">
+            <label class="detail-label" for="birthDate">Birth Date</label>
+            <input class="detail-input" id="birthDate" type="date" formControlName="birthDate">
+          </div>
+        </div>
+        <div class="detail-card card-disabled">
+          <div class="detail-icon"><i class="material-icons">badge</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Role</span>
+            <span class="detail-value role-value"
+                  [class.role-admin]="userProfile.role === 'ADMIN'"
+                  [class.role-client]="userProfile.role === 'CLIENT'"
+                  [class.role-freelancer]="userProfile.role === 'FREELANCER'">{{ userProfile.role }}</span>
+            <span class="field-hint">Cannot be changed</span>
+          </div>
+        </div>
+        <div class="detail-card card-disabled">
+          <div class="detail-icon"><i class="material-icons">lock</i></div>
+          <div class="detail-content">
+            <span class="detail-label">Password</span>
+            <span class="detail-value password-dots">••••••••</span>
+          </div>
+        </div>
+        <button type="submit" style="display:none"></button>
+      </form>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- AI BIO GENERATOR                            -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="bio-toggle-row" *ngIf="isEditMode">
+        <button class="btn-bio-toggle" (click)="toggleBioPanel()" type="button">
+          <i class="material-icons">auto_awesome</i>
+          {{ showBioPanel ? 'Close Bio Generator' : 'Generate Bio with AI' }}
+        </button>
+      </div>
+
+      <div class="bio-panel" *ngIf="isEditMode && showBioPanel">
+        <div class="bio-panel-header">
+          <div class="bio-panel-icon">
+            <i class="material-icons">psychology</i>
+          </div>
+          <div>
+            <h4>AI Bio Generator</h4>
+            <p>Generate a professional bio based on your profile</p>
+          </div>
+        </div>
+
+        <div class="bio-panel-body">
+          <div>
+            <div class="bio-field-label">Tone</div>
+            <div class="bio-tone-row">
+              <button *ngFor="let t of bioTones"
+                      class="bio-tone-btn"
+                      [class.active]="bioTone === t.value"
+                      (click)="bioTone = t.value"
+                      type="button">
+                {{ t.label }}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="bio-field-label">
+              Additional context
+              <span class="bio-field-label-hint">(optional)</span>
+            </div>
+            <textarea class="bio-extra-input"
+                      [(ngModel)]="bioExtra"
+                      placeholder="Add skills, years of experience, specialties…"
+                      rows="2">
+            </textarea>
+          </div>
+
+          <button class="btn-generate-bio"
+                  (click)="generateBio()"
+                  [disabled]="isGeneratingBio"
+                  type="button">
+            <i class="material-icons">{{ isGeneratingBio ? 'autorenew' : 'auto_awesome' }}</i>
+            {{ isGeneratingBio ? 'Generating…' : 'Generate' }}
+          </button>
+
+          <div class="bio-result" *ngIf="generatedBio">
+            <p class="bio-result-text">{{ generatedBio }}</p>
+            <div class="bio-result-actions">
+              <span class="bio-result-hint" *ngIf="!bioSaved">Review and save to your profile</span>
+              <span class="bio-saved-badge" *ngIf="bioSaved">
+                <i class="material-icons">check_circle</i> Saved to profile
+              </span>
+              <div class="bio-result-btn-group">
+                <button class="btn-copy-bio" (click)="copyBio()" type="button">
+                  <i class="material-icons">content_copy</i> Copy
+                </button>
+                <button class="btn-use-bio" (click)="useBio()" type="button" *ngIf="!bioSaved">
+                  <i class="material-icons">save</i> Use This Bio
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- FACE ID SETUP PANEL                         -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="face-setup-section" *ngIf="!isEditMode && !showPasswordChange">
+
+        <div class="face-setup-toggle-row">
+          <!-- Set up Face ID (not enrolled) -->
+          <button class="btn-face-setup"
+                  *ngIf="!hasFaceEnrolled && !showFaceSetupPanel"
+                  (click)="toggleFaceSetupPanel()"
+                  type="button">
+            <i class="material-icons">face_retouching_natural</i>
+            Set up Face ID
+          </button>
+
+          <!-- Face ID enrolled: show remove + re-enroll options -->
+          <ng-container *ngIf="hasFaceEnrolled && !showFaceSetupPanel">
+            <button class="btn-face-reenroll"
+                    (click)="toggleFaceSetupPanel()"
+                    type="button">
+              <i class="material-icons">face_retouching_natural</i>
+              Re-enroll Face ID
+            </button>
+            <button class="btn-face-remove"
+                    (click)="clearFaceEnrollment()"
+                    type="button">
+              <i class="material-icons">no_accounts</i>
+              Remove Face ID
+            </button>
+          </ng-container>
+
+          <!-- Cancel while panel is open -->
+          <button class="btn-face-cancel"
+                  *ngIf="showFaceSetupPanel"
+                  (click)="toggleFaceSetupPanel()"
+                  type="button">
+            <i class="material-icons">close</i>
+            Cancel Face Setup
+          </button>
+        </div>
+
+        <!-- ── Face Setup Panel ── -->
+        <div class="face-setup-panel" *ngIf="showFaceSetupPanel">
+          <div class="face-setup-panel-header">
+            <div class="face-panel-icon">
+              <i class="material-icons">face_retouching_natural</i>
+            </div>
+            <div>
+              <h4>Set Up Face ID</h4>
+              <p>Your face data is saved <strong>only on this device</strong> — nothing is sent to any server.</p>
+            </div>
+          </div>
+
+          <div class="face-setup-panel-body">
+            <!-- Camera feed -->
+            <div class="face-cam-frame">
+              <div class="face-cam-oval"
+                   [class.scanning]="faceRingState === 'scanning'"
+                   [class.success]="faceRingState === 'success'"
+                   [class.error]="faceRingState === 'error'">
+                <video #faceVideo autoplay muted playsinline></video>
+              </div>
+              <div class="face-cam-ring" [class]="faceRingState"></div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="face-enroll-progress" *ngIf="isFaceWorking && enrollProgress > 0">
+              <div class="face-progress-track">
+                <div class="face-progress-fill" [style.width.%]="enrollProgress"></div>
+              </div>
+              <span class="face-progress-label">{{ enrollProgress }}%</span>
+            </div>
+
+            <!-- Status pill -->
+            <div class="face-status-pill" [class]="faceStatusType">
+              <span class="face-dot" [class.blink]="faceStatusType === 'working'"></span>
+              <span>{{ faceStatus || 'Starting camera…' }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- PASSWORD CHANGE                             -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="password-change-section" *ngIf="showPasswordChange && !isEditMode">
+        <h3 class="section-title">
+          <i class="material-icons">password</i> Change Password
+        </h3>
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+          <div class="details-grid">
+            <div class="detail-card" style="grid-column: 1 / -1">
+              <div class="detail-icon"><i class="material-icons">lock</i></div>
+              <div class="detail-content">
+                <label class="detail-label" for="currentPassword">Current Password</label>
+                <input class="detail-input" id="currentPassword" type="password"
+                       formControlName="currentPassword" placeholder="Enter current password">
+              </div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-icon"><i class="material-icons">lock_open</i></div>
+              <div class="detail-content">
+                <label class="detail-label" for="newPassword">New Password</label>
+                <input class="detail-input" id="newPassword" type="password"
+                       formControlName="newPassword" placeholder="New password">
+              </div>
+            </div>
+            <div class="detail-card">
+              <div class="detail-icon"><i class="material-icons">lock_clock</i></div>
+              <div class="detail-content">
+                <label class="detail-label" for="confirmPassword">Confirm Password</label>
+                <input class="detail-input" id="confirmPassword" type="password"
+                       formControlName="confirmPassword" placeholder="Confirm password">
+              </div>
+            </div>
+          </div>
+          <div class="field-error mismatch-error"
+               *ngIf="passwordForm.hasError('mismatch') && passwordForm.get('confirmPassword')?.touched">
+            <i class="material-icons">error</i> Passwords do not match
+          </div>
+          <div class="pw-actions">
+            <button type="button" class="btn-cancel" (click)="showPasswordChange = false">
+              <i class="material-icons">close</i> Cancel
+            </button>
+            <button type="submit" class="btn-save" [disabled]="passwordForm.invalid || isLoading">
+              <i class="material-icons" *ngIf="!isLoading">check</i>
+              <span class="spinner-small" *ngIf="isLoading"></span>
+              {{ isLoading ? 'Saving...' : 'Change Password' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ═══════════════════════════════════════════ -->
+      <!-- DANGER ZONE                                 -->
+      <!-- ═══════════════════════════════════════════ -->
+      <div class="danger-zone" *ngIf="!isEditMode && !showPasswordChange">
+        <button class="btn-delete" (click)="openDeleteModal()" [disabled]="isLoading">
+          <i class="material-icons">delete_forever</i> Delete Account
+        </button>
+        <p class="danger-hint">
+          <i class="material-icons">warning</i>
+          This action cannot be undone. All your data will be permanently removed.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- DELETE CONFIRMATION MODAL                     -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="delete-backdrop" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="delete-modal" (click)="$event.stopPropagation()">
+
+    <div class="delete-modal-header">
+      <div class="delete-icon-box">
+        <i class="material-icons">delete_forever</i>
+      </div>
+      <button class="delete-modal-close" (click)="closeDeleteModal()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="delete-modal-content">
+      <h2 class="delete-title">Delete Account?</h2>
+      <p class="delete-subtitle">
+        This action is <strong>permanent</strong> and cannot be undone.
+        All your data will be permanently removed.
+      </p>
+      <div class="delete-warning-card">
+        <i class="material-icons">warning</i>
+        <span>This will delete your profile, projects, and all associated data.</span>
+      </div>
+    </div>
+
+    <div class="delete-modal-actions">
+      <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isLoading">
+        <i class="material-icons">close</i> Cancel
+      </button>
+      <button class="btn-delete-confirm" (click)="confirmDeleteAccount()" [disabled]="isLoading">
+        <i class="material-icons" *ngIf="!isLoading">delete_forever</i>
+        <span class="spinner-small" *ngIf="isLoading"></span>
+        {{ isLoading ? 'Deleting…' : 'Delete Account' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- AI AVATAR GENERATOR MODAL                     -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="ai-modal-backdrop" *ngIf="showAiAvatarModal" (click)="closeAiAvatarModal()">
+  <div class="ai-modal" (click)="$event.stopPropagation()">
+
+    <div class="ai-modal-header">
+      <div class="ai-modal-title">
+        <div class="ai-title-icon">
+          <i class="material-icons">auto_awesome</i>
+        </div>
+        <div>
+          <h2>AI Avatar Generator</h2>
+          <p>Describe yourself and let AI create your profile picture</p>
+        </div>
+      </div>
+      <button class="ai-modal-close" (click)="closeAiAvatarModal()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="ai-modal-body">
+
+      <div class="ai-style-section">
+        <label class="ai-label">Style</label>
+        <div class="ai-style-chips">
+          <button *ngFor="let style of avatarStyles"
+                  class="ai-style-chip"
+                  [class.active]="selectedStyle === style.value"
+                  (click)="selectedStyle = style.value">
+            <span class="chip-emoji">{{ style.emoji }}</span>
+            {{ style.label }}
+          </button>
+        </div>
+      </div>
+
+      <div class="ai-prompt-section">
+        <label class="ai-label">Description <span class="ai-label-hint">(optional)</span></label>
+        <div class="ai-prompt-wrap">
+          <textarea class="ai-prompt-input"
+                    [(ngModel)]="aiPromptText"
+                    placeholder="e.g. confident young professional, short hair, warm smile..."
+                    rows="3"
+                    maxlength="200">
+          </textarea>
+          <span class="ai-char-count">{{ aiPromptText.length }}/200</span>
+        </div>
+      </div>
+
+      <div class="ai-previews" *ngIf="generatedImages.length > 0 || isGenerating">
+        <label class="ai-label">Generated Avatars</label>
+        <div class="ai-preview-grid">
+
+          <ng-container *ngIf="isGenerating">
+            <div class="ai-preview-item skeleton" *ngFor="let i of [1,2,3,4]">
+              <div class="skeleton-shimmer"></div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="!isGenerating">
+            <div class="ai-preview-item"
+                 *ngFor="let img of generatedImages"
+                 [class.selected]="selectedGeneratedImage === img"
+                 [class.skeleton]="isImageLoading(img)"
+                 [class.ai-preview-error]="isImageError(img)"
+                 (click)="selectGeneratedImage(img)">
+
+              <div class="skeleton-shimmer"></div>
+
+              <img *ngIf="isImageLoaded(img)"
+                   [src]="img"
+                   class="ai-gen-img ai-gen-img--loaded"
+                   alt="Generated avatar" />
+
+              <div class="ai-preview-error-icon" *ngIf="isImageError(img)">
+                <i class="material-icons">error_outline</i>
+                <span>Failed</span>
+              </div>
+
+              <div class="ai-preview-check" *ngIf="selectedGeneratedImage === img">
+                <i class="material-icons">check_circle</i>
+              </div>
+            </div>
+          </ng-container>
+
+        </div>
+
+        <p class="ai-loading-hint"
+           *ngIf="!isGenerating && loadedImages.size < generatedImages.length && loadedImages.size + getErrorCount() < generatedImages.length">
+          <span class="ai-dot-pulse"></span>
+          Generating… this takes about 15–30 seconds
+        </p>
+      </div>
+
+      <div class="ai-empty-state" *ngIf="generatedImages.length === 0 && !isGenerating">
+        <div class="ai-empty-icon">
+          <i class="material-icons">brush</i>
+        </div>
+        <p>Choose a style and click <strong>Generate</strong> to create your AI avatar</p>
+      </div>
+
+    </div>
+
+    <div class="ai-modal-footer">
+      <button class="ai-btn-generate" (click)="generateAiAvatars()" [disabled]="isGenerating">
+        <span *ngIf="!isGenerating">
+          <i class="material-icons">auto_awesome</i>
+          Generate Avatars
+        </span>
+        <span *ngIf="isGenerating" class="ai-generating-text">
+          <span class="ai-dot-pulse"></span>
+          Generating...
+        </span>
+      </button>
+
+      <button class="ai-btn-apply"
+              [disabled]="!selectedGeneratedImage || isUploadingAvatar"
+              (click)="applyGeneratedAvatar()">
+        <span *ngIf="!isUploadingAvatar">
+          <i class="material-icons">check</i>
+          Apply as Profile Picture
+        </span>
+        <span *ngIf="isUploadingAvatar">Saving...</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- AI SUPPORT CHAT                               -->
+<!-- ══════════════════════════════════════════════ -->
+<app-support-chat></app-support-chat>

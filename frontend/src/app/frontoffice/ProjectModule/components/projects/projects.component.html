@@ -1,0 +1,235 @@
+<div class="forum-container">
+  <div class="forum-content">
+
+    <!-- Top bar: pills + Add button -->
+    <div class="top-bar">
+      <div class="pills">
+        <button *ngFor="let cat of categoryOptions" class="pill"
+          [class.active]="selectedCategory === cat.value"
+          (click)="onCategoryChange(cat.value)">
+          {{ cat.label }}
+        </button>
+        <button *ngIf="isClient" class="pill"
+          [class.active]="selectedView === 'MY_PROJECTS'"
+          (click)="onViewChange(selectedView === 'MY_PROJECTS' ? 'ALL' : 'MY_PROJECTS')">
+          My Projects
+        </button>
+      </div>
+      <button *ngIf="isClient" class="btn-add-inline" (click)="openAddModal()">
+        + Add Project
+      </button>
+    </div>
+
+    <!-- Search bar -->
+    <div class="search-wrapper">
+      <span class="search-icon-left">🔍</span>
+      <input class="search-input" type="text"
+        placeholder="Search by title, description or client..."
+        [value]="searchQuery"
+        (input)="onSearchChange($any($event.target).value)" />
+      <button *ngIf="searchQuery" class="search-clear" (click)="onSearchChange('')">✕</button>
+    </div>
+
+    <!-- Applications counter (freelancer only) -->
+    <div *ngIf="isFreelancer" class="applications-counter">
+      <span class="counter-icon">📋</span>
+      <span class="counter-text">
+        <strong>{{ applicationCount }}</strong> / {{ MAX_APPLICATIONS }} applications
+      </span>
+      <div class="counter-bar">
+        <div class="counter-fill"
+          [style.width.%]="(applicationCount / MAX_APPLICATIONS) * 100"
+          [class.counter-fill--warn]="applicationCount >= 8"
+          [class.counter-fill--full]="applicationCount >= MAX_APPLICATIONS">
+        </div>
+      </div>
+      <button class="btn-ai-recommendations" (click)="openAiRecommendations()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        AI Picks
+      </button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner"></div>
+      <p>Loading projects...</p>
+    </div>
+
+    <!-- Cards -->
+    <div *ngIf="!loading && filteredProjects.length > 0" class="publications-grid">
+      <div *ngFor="let project of filteredProjects" class="publication-card">
+
+        <div class="card-header">
+          <div class="user-info">
+            <div class="user-avatar">{{ project.client?.name?.charAt(0)?.toUpperCase() || 'U' }}</div>
+            <div class="user-details">
+              <h3 class="user-name">{{ project.client?.name }} {{ project.client?.lastName }}</h3>
+              <p class="publication-time">{{ project.createdAt | date:'mediumDate' }}</p>
+            </div>
+          </div>
+          <div [class]="'type-badge ' + getCategoryBadgeClass(project.category)">
+            <span class="type-icon">{{ getCategoryIcon(project.category) }}</span>
+            <span>{{ project.category }}</span>
+          </div>
+          <div class="card-header-actions">
+            <button *ngIf="isMyProject(project)" class="btn-action-small delete"
+              (click)="openDeleteModal(project)" title="Delete">🗑️</button>
+            <button class="btn-action-small" (click)="openProjectDetails(project)" title="Details">⋮</button>
+          </div>
+        </div>
+
+        <div class="card-content">
+          <h2 class="publication-titre">{{ project.title }}</h2>
+          <p class="publication-contenue">{{ project.description | slice:0:120 }}...</p>
+          <div class="project-details">
+            <div class="detail-item">
+              <span class="detail-label">Budget</span>
+              <span class="detail-value">{{ formatBudget(project.budget) }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Status</span>
+              <span class="detail-value" [class]="'status-' + (project.status | lowercase)">
+                {{ formatStatus(project.status) }}
+              </span>
+            </div>
+          </div>
+          <div class="skills-section" *ngIf="project.requiredSkills?.length">
+            <p class="skills-label">Required Skills</p>
+            <div class="skills-list">
+              <span *ngFor="let skill of project.requiredSkills" class="skill-tag">{{ skill.skillName }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer" [class.card-footer--client]="isClient && isMyProject(project)">
+          <!-- Freelancer actions -->
+          <ng-container *ngIf="isFreelancer">
+            <button *ngIf="hasApplied(project)" class="btn-applied" disabled>✅ Applied</button>
+            <button *ngIf="!hasApplied(project)" class="btn-apply-centered"
+              (click)="openApplyModal(project)"
+              [disabled]="applicationCount >= MAX_APPLICATIONS">
+              🚀 Apply
+            </button>
+          </ng-container>
+
+          <!-- Client: See All Applied button -->
+          <button
+            *ngIf="isClient && isMyProject(project)"
+            class="btn-see-applied"
+            (click)="openApplicantsModal(project)"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            See All Applied
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!loading && filteredProjects.length === 0" class="empty-state">
+      <div class="empty-icon">📝</div>
+      <h3>No projects found</h3>
+      <button *ngIf="isClient" class="btn-primary" (click)="openAddModal()">Create first project</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Delete confirmation modal ─────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal-box modal-box--purple" (click)="$event.stopPropagation()">
+    <div class="modal-glow-header"></div>
+    <div class="modal-inner">
+      <div class="modal-icon-circle modal-icon-circle--purple">
+        <span>🗑️</span>
+      </div>
+      <h2 class="modal-title">Delete This Project?</h2>
+      <p class="modal-message">
+        This action is <strong>irreversible</strong>. The project and all its data
+        will be permanently deleted.
+      </p>
+      <div class="modal-reason-box modal-reason-box--purple">
+        <div class="reason-item">
+          <span class="reason-dot reason-dot--purple">●</span>
+          All tasks linked to this project will also be deleted.
+        </div>
+        <div class="reason-item">
+          <span class="reason-dot reason-dot--purple">●</span>
+          This project will no longer be visible to any freelancer.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal--cancel" (click)="closeDeleteModal()">Cancel</button>
+        <button class="btn-modal btn-modal--danger" (click)="confirmDelete()">Yes, Delete It</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Blocked alert ─────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showBlockedAlert" (click)="closeBlockedAlert()">
+  <div class="modal-box modal-box--error" (click)="$event.stopPropagation()">
+    <div class="modal-glow-header"></div>
+    <div class="modal-inner">
+      <div class="modal-icon-circle modal-icon-circle--error">
+        <span>✕</span>
+      </div>
+      <h2 class="modal-title">Cannot Delete This Project</h2>
+      <p class="modal-message">
+        This project <strong>cannot be deleted</strong> because one or more
+        freelancers have already submitted an application to it.
+      </p>
+      <div class="modal-reason-box modal-reason-box--error">
+        <div class="reason-item">
+          <span class="reason-dot reason-dot--error">●</span>
+          Deleting a project with active applications would remove
+          the freelancers' submissions without notifying them.
+        </div>
+        <div class="reason-item">
+          <span class="reason-dot reason-dot--error">●</span>
+          To delete this project, you must first reject or remove
+          all pending applications from the applications panel.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal--close-error" (click)="closeBlockedAlert()">I Understand</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<app-project-form *ngIf="showAddModal" (close)="closeAddModal()"></app-project-form>
+<app-project-form *ngIf="showEditModal && selectedProject" [project]="selectedProject" (close)="closeEditModal()"></app-project-form>
+<app-project-details *ngIf="showDetailsModal && selectedProject" [project]="selectedProject" (close)="closeDetailsModal()"></app-project-details>
+<app-freelancer-apply *ngIf="showApplyModal && selectedProject" [project]="selectedProject"
+  (close)="closeApplyModal()" (applied)="onApplicationSubmitted()">
+</app-freelancer-apply>
+<app-freelancer-skills-setup *ngIf="showSkillsSetupModal" [freelancerId]="currentUserId"
+  (close)="closeSkillsSetupModal()" (skillsSaved)="onSkillsSetupDone()">
+</app-freelancer-skills-setup>
+<app-applicants-modal
+  *ngIf="showApplicantsModal && selectedProject"
+  [project]="selectedProject"
+  (close)="closeApplicantsModal()">
+</app-applicants-modal>
+<app-ai-recommendations
+  *ngIf="showAiRecommendations && isFreelancer && currentUserId"
+  [freelancerId]="currentUserId!"
+  [appliedProjectIds]="appliedProjectIds"
+  (close)="closeAiRecommendations()"
+  (applyProject)="openApplyModal($event)">
+</app-ai-recommendations>
+
+<!-- Toast -->
+<app-toast></app-toast>

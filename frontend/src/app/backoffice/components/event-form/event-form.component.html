@@ -1,0 +1,128 @@
+<div class="event-form-page">
+  <div class="container">
+
+    <div class="page-header">
+      <button class="btn-back" (click)="cancel()">
+        <i class="material-icons">arrow_back</i>
+      </button>
+      <div>
+        <h2 class="page-title">{{ isEditMode ? 'Edit Event' : 'Create Event' }}</h2>
+        <p class="page-subtitle">{{ isEditMode ? 'Update the event information and activities' : 'Fill in the form and add activities' }}</p>
+      </div>
+    </div>
+
+    <div class="alert alert-success" *ngIf="successMsg">
+      <i class="material-icons">check_circle</i> {{ successMsg }}
+    </div>
+    <div class="alert alert-danger" *ngIf="errorMsg">
+      <i class="material-icons">error</i> {{ errorMsg }}
+    </div>
+
+    <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-card">
+        <div class="form-card-header purple">
+          <i class="material-icons">event</i>
+          <span>Event Information</span>
+        </div>
+        <div class="form-card-body">
+
+          <div class="form-row">
+            <div class="form-group col-md-8">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" formControlName="title"
+                placeholder="Ex: AI Hackathon 2025">
+            </div>
+            <div class="form-group col-md-4">
+              <label class="form-label">Category</label>
+              <select class="form-control" formControlName="category">
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="3"
+              placeholder="Describe your event in detail..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label class="form-label">Start Date</label>
+              <input type="datetime-local" class="form-control" formControlName="startDate">
+            </div>
+            <div class="form-group col-md-6">
+              <label class="form-label">End Date</label>
+              <input type="datetime-local" class="form-control" formControlName="endDate">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-5">
+              <label class="form-label">Location</label>
+              <input type="text" class="form-control" formControlName="location"
+                placeholder="Ex: Tunis, Esprit Campus...">
+            </div>
+            <div class="form-group col-md-3">
+              <label class="form-label">Capacity</label>
+              <input type="number" class="form-control" formControlName="capacity" min="1">
+            </div>
+            <div class="form-group col-md-4">
+              <label class="form-label">Status</label>
+              <select class="form-control" formControlName="eventStatus">
+                <option *ngFor="let s of eventStatuses" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Image URL <span class="optional">(Optional)</span></label>
+            <input type="text" class="form-control" formControlName="imageUrl" placeholder="https://...">
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="form-card-header teal">
+          <i class="material-icons">local_activity</i>
+          <span>Activities ({{ activities.length }})</span>
+          <button type="button" class="btn-add-activity" (click)="addActivity()">
+            <i class="material-icons">add</i> Add Activity
+          </button>
+        </div>
+        <div class="form-card-body">
+
+          <div class="no-activities" *ngIf="activities.length === 0">
+            <i class="material-icons">event_note</i>
+            <p>No activities yet. Click "Add Activity" to get started.</p>
+          </div>
+
+          <div formArrayName="activities">
+            <ng-container *ngFor="let actCtrl of activities.controls; let i = index">
+              <app-activity-form
+                *ngIf="getActivityGroup(i)"
+                [activityForm]="getActivityGroup(i)"
+                [index]="i"
+                (removeActivity)="removeActivity($event)">
+              </app-activity-form>
+            </ng-container>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="cancel()">
+          <i class="material-icons">close</i> Cancel
+        </button>
+        <button type="submit" class="btn-submit" [disabled]="loading">
+          <i class="material-icons">{{ loading ? 'hourglass_empty' : (isEditMode ? 'save' : 'add_circle') }}</i>
+          {{ loading ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Create Event') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

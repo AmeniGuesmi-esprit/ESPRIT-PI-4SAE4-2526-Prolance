@@ -1,0 +1,67 @@
+<div class="success-overlay" *ngIf="isVisible" (click)="onOverlayClick($event)">
+
+  <div class="confetti-container">
+    <div class="confetti-piece" *ngFor="let piece of confettiPieces"
+         [style.left]="piece.left" [style.animation-delay]="piece.delay"
+         [style.background]="piece.color" [style.width]="piece.size"
+         [style.height]="piece.size">
+    </div>
+  </div>
+
+  <div class="success-modal" @popIn>
+    <div class="modal-glow" [attr.data-tier]="planTier"></div>
+
+    <div class="success-icon-wrapper" [attr.data-tier]="planTier">
+      <div class="success-icon">
+        <span class="check-mark">✓</span>
+      </div>
+      <div class="pulse-ring"></div>
+      <div class="pulse-ring delay"></div>
+    </div>
+
+    <div class="success-content" @fadeUp>
+      <h2 class="success-title">{{ motivationTitle }}</h2>
+
+      <div class="plan-badge" [attr.data-tier]="planTier">
+        {{ planName }} Plan Activated
+      </div>
+
+      <p class="success-message">{{ motivationMessage }}</p>
+
+      <div class="tips-section">
+        <h4 class="tips-title">Next steps to succeed:</h4>
+        <div class="tips-list">
+          <div class="tip-item" *ngFor="let tip of motivationTips; let i = index"
+               [style.animation-delay]="(i * 150 + 500) + 'ms'">
+            <span class="tip-text">{{ tip }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row" [attr.data-tier]="planTier">
+        <div class="stat-item">
+          <span class="stat-value" *ngIf="planTier === 'starter'">+45%</span>
+          <span class="stat-value" *ngIf="planTier === 'pro'">+180%</span>
+          <span class="stat-value" *ngIf="planTier === 'elite'">+320%</span>
+          <span class="stat-label">visibility boost</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" *ngIf="planTier === 'starter'">2x</span>
+          <span class="stat-value" *ngIf="planTier === 'pro'">3x</span>
+          <span class="stat-value" *ngIf="planTier === 'elite'">5x</span>
+          <span class="stat-label">more projects</span>
+        </div>
+      </div>
+
+      <div class="success-actions">
+        <button class="btn-invoice" (click)="onDownloadInvoice()">
+          📄 Download Invoice PDF
+        </button>
+        <button class="btn-start" [attr.data-tier]="planTier" (click)="onClose()">
+          Let's go! 🎉
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

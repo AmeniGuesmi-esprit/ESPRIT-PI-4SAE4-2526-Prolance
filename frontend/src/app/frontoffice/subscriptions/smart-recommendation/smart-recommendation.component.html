@@ -1,0 +1,216 @@
+<div class="smart-recommendation" [class.has-recommendation]="recommendation?.shouldUpgrade">
+  
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!--  ANALYZING STATE                                            -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="analyzing-container" *ngIf="analyzing">
+    <div class="ai-brain">
+      <div class="brain-rings">
+        <div class="ring ring-1"></div>
+        <div class="ring ring-2"></div>
+        <div class="ring ring-3"></div>
+      </div>
+      <div class="brain-icon">🧠</div>
+    </div>
+    
+    <h3 class="analyzing-title">Analyse IA en cours</h3>
+    
+    <div class="analysis-steps">
+      <div 
+        class="step" 
+        *ngFor="let step of analysisSteps; let i = index"
+        [class.done]="step.done"
+        [class.active]="currentStep === i && !step.done">
+        <span class="step-icon">{{ step.done ? '✓' : step.icon }}</span>
+        <span class="step-label">{{ step.label }}</span>
+      </div>
+    </div>
+    
+    <div class="analyzing-hint">
+      <span class="hint-icon">💡</span>
+      Notre IA analyse 47 facteurs pour générer votre recommandation personnalisée
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!--  RECOMMENDATION RESULT                                      -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <div class="recommendation-container" *ngIf="!analyzing && recommendation" @fadeIn>
+    
+    <!-- Header avec Score -->
+    <div class="rec-header">
+      <div class="score-section">
+        <div class="score-circle" [@pulse]="pulseState">
+          <svg viewBox="0 0 120 120">
+            <circle 
+              class="score-bg" 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              stroke="#e5e7eb" 
+              stroke-width="8"/>
+            <circle 
+              class="score-progress" 
+              cx="60" cy="60" r="54" 
+              fill="none" 
+              [attr.stroke]="getScoreColor()" 
+              stroke-width="8"
+              stroke-linecap="round"
+              [style.stroke-dasharray]="getCircumference()"
+              [style.stroke-dashoffset]="getScoreOffset()"
+              transform="rotate(-90 60 60)"/>
+          </svg>
+          <div class="score-value">
+            <span class="score-number">{{ displayScore }}</span>
+            <span class="score-percent">%</span>
+          </div>
+        </div>
+        <div class="score-label">Score de confiance</div>
+      </div>
+      
+      <div class="rec-info">
+        <div class="rec-badge" [class]="getUrgencyClass()">
+          <span class="badge-dot"></span>
+          Urgence {{ getUrgencyLabel() }}
+        </div>
+        <h2 class="rec-title" *ngIf="recommendation.shouldUpgrade">
+          Passez à <span class="highlight">{{ recommendation.recommendedPlanName }}</span>
+        </h2>
+        <h2 class="rec-title optimal" *ngIf="!recommendation.shouldUpgrade">
+          ✨ Vous êtes sur le plan optimal
+        </h2>
+        <p class="rec-summary">{{ recommendation.aiAnalysis.summary }}</p>
+      </div>
+    </div>
+
+    <!-- Projected Benefits -->
+    <div class="benefits-grid" *ngIf="recommendation.shouldUpgrade" @slideIn>
+      <div class="benefit-card roi">
+        <div class="benefit-icon">📈</div>
+        <div class="benefit-value">+{{ displayROI }}%</div>
+        <div class="benefit-label">ROI estimé</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">📁</div>
+        <div class="benefit-value">+{{ recommendation.projectedBenefits.additionalProjects }}</div>
+        <div class="benefit-label">Projets/mois</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">👁️</div>
+        <div class="benefit-value">+{{ recommendation.projectedBenefits.visibilityIncrease }}%</div>
+        <div class="benefit-label">Visibilité</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">⏱️</div>
+        <div class="benefit-value">{{ recommendation.projectedBenefits.timeToValue }}</div>
+        <div class="benefit-label">Rentabilisé en</div>
+      </div>
+    </div>
+
+    <!-- Key Factors -->
+    <div class="factors-section" *ngIf="recommendation.shouldUpgrade">
+      <button class="toggle-btn" (click)="toggleDetails()">
+        <span>{{ showDetails ? 'Masquer' : 'Voir' }} l'analyse détaillée</span>
+        <span class="toggle-icon" [class.open]="showDetails">▼</span>
+      </button>
+      
+      <div class="factors-container" *ngIf="showDetails" @staggerFactors>
+        <div 
+          class="factor-card" 
+          *ngFor="let factor of recommendation.aiAnalysis.keyFactors; let i = index"
+          [class.active]="activeFactorIndex === i"
+          [class]="getFactorImpactClass(factor.impact)"
+          (mouseenter)="setActiveFactor(i)"
+          (mouseleave)="setActiveFactor(null)">
+          <div class="factor-header">
+            <span class="factor-icon">{{ factor.icon }}</span>
+            <span class="factor-title">{{ factor.title }}</span>
+            <span class="factor-weight">{{ (factor.weight * 100) | number:'1.0-0' }}%</span>
+          </div>
+          <p class="factor-desc">{{ factor.description }}</p>
+          <div class="factor-metric" *ngIf="factor.metric">
+            <span class="metric-current">{{ factor.metric.current }}</span>
+            <span class="metric-trend" [class]="factor.metric.trend">
+              {{ getTrendIcon(factor.metric.trend) }}
+            </span>
+            <span class="metric-benchmark">vs {{ factor.metric.benchmark }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Peer Comparison -->
+    <div class="peer-section" *ngIf="recommendation.shouldUpgrade && recommendation.peerComparison">
+      <button class="toggle-btn secondary" (click)="togglePeerComparison()">
+        <span class="peer-icon">👥</span>
+        <span>Comparaison avec {{ recommendation.peerComparison.similarUsersCount }} profils similaires</span>
+        <span class="toggle-icon" [class.open]="showPeerComparison">▼</span>
+      </button>
+      
+      <div class="peer-container" *ngIf="showPeerComparison" @fadeIn>
+        <div class="peer-stats">
+          <div class="peer-stat">
+            <span class="peer-value">{{ recommendation.peerComparison.successRateAfterUpgrade }}%</span>
+            <span class="peer-label">Satisfaits après upgrade</span>
+          </div>
+          <div class="peer-stat">
+            <span class="peer-value">{{ recommendation.peerComparison.avgUpgradeTime }}j</span>
+            <span class="peer-label">Temps moyen avant upgrade</span>
+          </div>
+        </div>
+        <div class="peer-insight">
+          <span class="insight-icon">💡</span>
+          {{ recommendation.peerComparison.topPerformersInsight }}
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Detailed Insight -->
+    <div class="ai-insight-section" *ngIf="showDetails && recommendation.shouldUpgrade" @fadeIn>
+      <div class="ai-insight-card">
+        <div class="ai-header">
+          <span class="ai-icon">🤖</span>
+          <span class="ai-title">Analyse détaillée GPT-4</span>
+          <span class="ai-tokens">{{ recommendation.tokensUsed }} tokens</span>
+        </div>
+        <p class="ai-text">{{ recommendation.aiAnalysis.detailedInsight }}</p>
+        <div class="ai-risk" *ngIf="recommendation.aiAnalysis.riskAssessment">
+          <span class="risk-icon">🛡️</span>
+          <span>{{ recommendation.aiAnalysis.riskAssessment }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-section" *ngIf="recommendation.shouldUpgrade" @scaleIn>
+      <button class="btn-primary" (click)="goToUpgrade()">
+        {{ recommendation.primaryCTA }}
+        <span class="btn-arrow">→</span>
+      </button>
+      <button class="btn-secondary" *ngIf="recommendation.secondaryCTA" (click)="goToPlans()">
+        {{ recommendation.secondaryCTA }}
+      </button>
+    </div>
+
+    <!-- Optimal Plan State -->
+    <div class="optimal-section" *ngIf="!recommendation.shouldUpgrade" @fadeIn>
+      <div class="optimal-card">
+        <div class="optimal-icon">🏆</div>
+        <h3>Félicitations !</h3>
+        <p>{{ recommendation.aiAnalysis.detailedInsight }}</p>
+        <button class="btn-outline" (click)="goToPlans()">
+          {{ recommendation.primaryCTA }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="rec-footer">
+      <span class="model-info">
+        Généré par {{ recommendation.modelVersion }} • {{ recommendation.generatedAt | date:'short' }}
+      </span>
+      <button class="refresh-btn" (click)="refreshRecommendation()" title="Rafraîchir">
+        🔄
+      </button>
+    </div>
+  </div>
+</div>

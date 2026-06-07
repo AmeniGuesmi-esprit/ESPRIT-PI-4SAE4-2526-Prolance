@@ -1,0 +1,103 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">{{ project?.title }}</h2>
+      <button class="modal-close" (click)="closeModal()">×</button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="project-detail-section">
+        <h3>Description</h3>
+        <p>{{ project?.description }}</p>
+      </div>
+
+      <div class="project-detail-section">
+        <h3>Project Information</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Budget:</span>
+            <span class="value">{{ project?.budget | number:'1.0-0' }} TND</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Status:</span>
+            <span class="value">{{ project?.status }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Category:</span>
+            <span class="value">{{ project?.category }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Start Date:</span>
+            <span class="value">{{ project?.startDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">End Date:</span>
+            <span class="value">{{ project?.endDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Client:</span>
+            <span class="value">{{ project?.client?.name }} {{ project?.client?.lastName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="project-detail-section" *ngIf="project?.requiredSkills && project?.requiredSkills!.length > 0">
+        <h3>Required Skills</h3>
+        <div class="skills-list">
+          <span *ngFor="let skill of project?.requiredSkills" class="skill-tag">{{ skill.skillName }}</span>
+        </div>
+      </div>
+
+      <!-- TASKS SECTION -->
+      <div class="project-detail-section" *ngIf="project?.tasks && project?.tasks!.length > 0">
+        <div class="tasks-section-header">
+          <h3>Project Tasks ({{ project?.tasks?.length }})</h3>
+          <button class="btn-export-pdf" (click)="exportPdf()" [disabled]="isExporting">
+            <span *ngIf="!isExporting">📄 Export PDF</span>
+            <span *ngIf="isExporting">⏳ Generating...</span>
+          </button>
+        </div>
+
+        <div class="tasks-summary">
+          <span class="badge-high">🔴 {{ countByPriority('HIGH') }} High</span>
+          <span class="badge-medium">🟡 {{ countByPriority('MEDIUM') }} Medium</span>
+          <span class="badge-low">🟢 {{ countByPriority('LOW') }} Low</span>
+        </div>
+
+        <div class="tasks-list">
+          <div *ngFor="let task of project?.tasks; let i = index" class="task-item">
+            <div class="task-number">{{ i + 1 }}</div>
+            <div class="task-body">
+              <h4>{{ task.taskName }}</h4>
+              <p>{{ task.description }}</p>
+              <div class="task-info">
+                <span class="priority" [ngClass]="'priority-' + (task.priority | lowercase)">{{ task.priority }}</span>
+                <span class="dates" *ngIf="task.startDate || task.endDate">
+                  📅 {{ task.startDate | date:'shortDate' }} → {{ task.endDate | date:'shortDate' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-tasks" *ngIf="!project?.tasks || project?.tasks!.length === 0">
+        <div class="no-tasks-icon">📭</div>
+        <p>No tasks for this project yet.</p>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-export-pdf-footer" (click)="exportPdf()" [disabled]="isExporting"
+        *ngIf="project?.tasks && project?.tasks!.length > 0">
+        <span *ngIf="!isExporting">📄 Export Tasks PDF</span>
+        <span *ngIf="isExporting">⏳ Generating...</span>
+      </button>
+      <button class="btn-cancel-footer" (click)="closeModal()">Close</button>
+    </div>
+
+  </div>
+</div>

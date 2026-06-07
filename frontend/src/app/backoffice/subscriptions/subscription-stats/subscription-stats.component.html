@@ -1,0 +1,283 @@
+<div class="stats-container">
+
+  <!-- ═══ HEADER ═══ -->
+  <div class="stats-header">
+    <div class="header-left">
+      <div class="header-icon-wrap">
+        <span class="header-icon">📊</span>
+      </div>
+      <div>
+        <h1>Subscription Analytics</h1>
+        <p class="header-subtitle">Real-time overview of your subscription performance</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Live Data
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ LOADING ═══ -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="loader">
+      <div class="loader-ring"></div>
+      <span>Loading analytics...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loading">
+
+    <!-- ═══ KPI CARDS ═══ -->
+    <div class="kpi-grid">
+
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-icon-wrap">
+          <span>👥</span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Total Subscribers</span>
+          <span class="kpi-value">{{ animatedSubscribers }}</span>
+          <div class="kpi-trend positive">
+            <span class="trend-arrow">↑</span>
+            <span>+12% this month</span>
+          </div>
+        </div>
+        <div class="kpi-bg-glow"></div>
+      </div>
+
+      <div class="kpi-card kpi-green">
+        <div class="kpi-icon-wrap">
+          <span>💰</span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Monthly Revenue</span>
+          <span class="kpi-value">{{ animatedRevenue }} <small>DT</small></span>
+          <div class="kpi-trend positive">
+            <span class="trend-arrow">↑</span>
+            <span>+8.3% this month</span>
+          </div>
+        </div>
+        <div class="kpi-bg-glow"></div>
+      </div>
+
+      <div class="kpi-card kpi-cyan">
+        <div class="kpi-icon-wrap">
+          <span>📈</span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Growth Rate</span>
+          <span class="kpi-value">{{ animatedGrowth }}<small>%</small></span>
+          <div class="kpi-trend positive">
+            <span class="trend-arrow">↑</span>
+            <span>+3.2% vs last month</span>
+          </div>
+        </div>
+        <div class="kpi-bg-glow"></div>
+      </div>
+
+      <div class="kpi-card kpi-orange">
+        <div class="kpi-icon-wrap">
+          <span>💎</span>
+        </div>
+        <div class="kpi-content">
+          <span class="kpi-label">Avg. Revenue / User</span>
+          <span class="kpi-value">{{ animatedARPU }} <small>DT</small></span>
+          <div class="kpi-trend positive">
+            <span class="trend-arrow">↑</span>
+            <span>+5.1% this month</span>
+          </div>
+        </div>
+        <div class="kpi-bg-glow"></div>
+      </div>
+
+    </div>
+
+    <!-- ═══ CHARTS ROW ═══ -->
+    <div class="charts-row">
+
+      <!-- Revenue Trend -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Revenue Trend</h3>
+          <span class="chart-badge">Last 6 months</span>
+        </div>
+        <div class="trend-chart">
+          <div class="trend-bar-group" *ngFor="let item of monthlyTrend">
+            <span class="trend-value">{{ item.revenue }} DT</span>
+            <div class="trend-bar-track">
+              <div class="trend-bar-fill"
+                   [style.height.px]="getTrendBarHeight(item.revenue)">
+              </div>
+            </div>
+            <span class="trend-label">{{ item.month }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Subscribers by Plan -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Subscribers by Plan</h3>
+          <span class="chart-badge">{{ totalSubscribers }} total</span>
+        </div>
+        <div class="horizontal-bars">
+          <div class="h-bar-item" *ngFor="let item of planChartData">
+            <div class="h-bar-header">
+              <span class="h-bar-name">{{ item.name }}</span>
+              <span class="h-bar-count" [style.color]="item.color">{{ item.subscribers }}</span>
+            </div>
+            <div class="h-bar-track">
+              <div class="h-bar-fill"
+                   [style.width.%]="item.percentage"
+                   [style.background]="item.gradient">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ SECOND ROW ═══ -->
+    <div class="charts-row">
+
+      <!-- Type Distribution -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Distribution by Type</h3>
+        </div>
+        <div class="donut-container">
+          <div class="donut-chart">
+            <svg viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" class="donut-bg" />
+              <circle cx="60" cy="60" r="50" class="donut-freelancer"
+                      [style.stroke-dasharray]="(freelancerPercentage / 100) * 314 + ' 314'"
+                      stroke-dashoffset="0" />
+              <circle cx="60" cy="60" r="50" class="donut-client"
+                      [style.stroke-dasharray]="(clientPercentage / 100) * 314 + ' 314'"
+                      [style.stroke-dashoffset]="'-' + (freelancerPercentage / 100) * 314" />
+            </svg>
+            <div class="donut-center">
+              <span class="donut-total">{{ totalSubscribers }}</span>
+              <span class="donut-total-label">Total</span>
+            </div>
+          </div>
+          <div class="donut-legend">
+            <div class="legend-row">
+              <div class="legend-dot" style="background: #7c5cfc;"></div>
+              <div class="legend-info">
+                <span class="legend-name">Freelancer</span>
+                <span class="legend-detail">{{ freelancerCount }} subscribers · {{ freelancerPercentage }}%</span>
+              </div>
+            </div>
+            <div class="legend-row">
+              <div class="legend-dot" style="background: #00d4ff;"></div>
+              <div class="legend-info">
+                <span class="legend-name">Client</span>
+                <span class="legend-detail">{{ clientCount }} subscribers · {{ clientPercentage }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3>Key Metrics</h3>
+        </div>
+        <div class="quick-stats">
+          <div class="quick-stat-row">
+            <div class="qs-left">
+              <span class="qs-icon">🏆</span>
+              <div>
+                <span class="qs-label">Most Popular Plan</span>
+                <span class="qs-value">{{ popularPlan }}</span>
+              </div>
+            </div>
+            <span class="qs-badge purple">{{ popularPlanPercentage }}%</span>
+          </div>
+          <div class="quick-stat-row">
+            <div class="qs-left">
+              <span class="qs-icon">🔄</span>
+              <div>
+                <span class="qs-label">Cancellation Rate</span>
+                <span class="qs-value">{{ animatedCancellation }}%</span>
+              </div>
+            </div>
+            <span class="qs-badge red">-2% ↓</span>
+          </div>
+          <div class="quick-stat-row">
+            <div class="qs-left">
+              <span class="qs-icon">⚡</span>
+              <div>
+                <span class="qs-label">Active Plans</span>
+                <span class="qs-value">{{ subscriptions.length }}</span>
+              </div>
+            </div>
+            <span class="qs-badge cyan">Live</span>
+          </div>
+          <div class="quick-stat-row">
+            <div class="qs-left">
+              <span class="qs-icon">📊</span>
+              <div>
+                <span class="qs-label">Total Revenue</span>
+                <span class="qs-value">{{ animatedRevenue }} DT</span>
+              </div>
+            </div>
+            <span class="qs-badge green">+8%</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ REVENUE TABLE ═══ -->
+    <div class="table-section" *ngIf="revenueData.length > 0">
+      <div class="table-header">
+        <h3>💰 Revenue Breakdown</h3>
+        <span class="table-total">Total: <strong>{{ totalRevenue }} DT</strong></span>
+      </div>
+      <div class="table-wrapper">
+        <table class="revenue-table">
+          <thead>
+            <tr>
+              <th>Plan</th>
+              <th>Type</th>
+              <th>Subscribers</th>
+              <th>Unit Price</th>
+              <th>Revenue</th>
+              <th>Share</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of revenueData">
+              <td class="plan-name-cell">
+                <span class="plan-dot" [style.background]="row.type === 'FREELANCER' ? '#7c5cfc' : '#00d4ff'"></span>
+                {{ row.name }}
+              </td>
+              <td>
+                <span class="type-tag" [class.freelancer]="row.type === 'FREELANCER'" [class.client]="row.type === 'CLIENT'">
+                  {{ row.type === 'FREELANCER' ? '🧑‍💻 Freelancer' : '🏢 Client' }}
+                </span>
+              </td>
+              <td class="subs-cell">{{ row.subscribers }}</td>
+              <td>{{ row.price }} DT</td>
+              <td class="revenue-cell">{{ row.totalRevenue }} DT</td>
+              <td>
+                <div class="share-bar-wrap">
+                  <div class="share-bar" [style.width.%]="row.share"
+                       [style.background]="row.type === 'FREELANCER' ? '#7c5cfc' : '#00d4ff'"></div>
+                  <span class="share-text">{{ row.share }}%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>

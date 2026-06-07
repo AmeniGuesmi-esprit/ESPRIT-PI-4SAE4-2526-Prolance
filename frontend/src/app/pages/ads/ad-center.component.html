@@ -1,0 +1,540 @@
+<!-- ════════ TOAST NOTIFICATION ════════ -->
+<div class="toast-notification" *ngIf="showToast" [class.toast-success]="toastType === 'success'" [class.toast-error]="toastType === 'error'">
+  <i class="material-icons">{{ toastType === 'success' ? 'check_circle' : 'error' }}</i>
+  <span>{{ toastMessage }}</span>
+  <button class="toast-close" (click)="showToast = false"><i class="material-icons">close</i></button>
+</div>
+
+<div class="container ad-container role-theme" [class.theme-freelancer]="currentRole === 'FREELANCER'" [class.theme-client]="currentRole === 'CLIENT'">
+
+  <!-- ════════ PAGE HEADER ════════ -->
+  <div class="ad-header">
+    <div class="ad-header-text">
+      <h2>Ad Center <span class="role-label" [ngStyle]="{'background': roleColors.gradient}">{{ currentRole | titlecase }}</span></h2>
+      <p class="text-muted">
+        {{ currentRole === 'FREELANCER'
+          ? 'Boost your profile visibility and land more gigs.'
+          : 'Promote your job posts and attract top talent.' }}
+      </p>
+    </div>
+    <button class="btn-create" [ngStyle]="{'background': roleColors.gradient, 'box-shadow': '0 4px 15px ' + roleColors.rgbaFill}" (click)="openCreateModal()">
+      <i class="material-icons">add_circle</i>
+      <span>Create New Campaign</span>
+    </button>
+  </div>
+
+  <!-- ════════ AI INVOICE AGENT ════════ -->
+  <div class="invoice-agent-row">
+    <app-invoice-agent></app-invoice-agent>
+  </div>
+
+  <!-- ════════ PERFORMANCE CHART ════════ -->
+  <!-- COMMENTED OUT: Graph visualization removed per UI refactor -->
+  <!--
+  <div class="row">
+    <div class="col-12">
+      <div class="card ad-card">
+        <div class="card-header" [ngClass]="roleCardHeaderClass">
+          <h4 class="card-title">{{ perfTitle }}</h4>
+          <p class="card-category">{{ perfCategory }}</p>
+        </div>
+        <div class="card-body chart-body">
+          <canvas #perfChart></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  -->
+
+  <!-- ════════ MY CAMPAIGNS TABLE ════════ -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card ad-card">
+        <div class="card-header purple-table-header">
+          <h4 class="card-title">My Campaigns</h4>
+          <p class="card-category">{{ currentRole === 'FREELANCER' ? 'Your freelance promotion campaigns' : 'Your job promotion campaigns' }}</p>
+        </div>
+        <div class="card-body table-responsive">
+          <!-- Loading State -->
+          <div class="loading-state" *ngIf="isLoading">
+            <i class="material-icons spin">autorenew</i>
+            <p>Loading your campaigns...</p>
+          </div>
+
+          <table class="table ad-table" *ngIf="!isLoading && roleCampaigns.length > 0">
+            <thead>
+              <tr>
+                <th>Ad Preview</th>
+                <th>Campaign</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Performance</th>
+                <th>Trend</th>
+                <th class="text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of roleCampaigns">
+                <!-- Thumbnail -->
+                <td class="td-thumb">
+                  <img [src]="getAdImage(c)" [alt]="c.title" class="ad-thumbnail"
+                       loading="lazy" (error)="onImgError($event, c)" />
+                </td>
+                <!-- Campaign Info -->
+                <td>
+                  <span class="campaign-title">{{ c.title }}</span>
+                  <span class="campaign-date">{{ c.createdAt | date:'mediumDate' }}</span>
+                </td>
+                <!-- Type -->
+                <td>
+                  <span class="type-chip type-{{ c.planType?.toLowerCase() }}">
+                    {{ c.planName }}
+                  </span>
+                </td>
+                <!-- Status -->
+                <td>
+                  <span class="badge {{ statusBadgeClass(c.status) }}">{{ c.status }}</span>
+                  <span class="rejection-reason" *ngIf="c.status === 'REJECTED' && c.rejectionReason"
+                        [title]="c.rejectionReason">
+                    <i class="material-icons">info_outline</i>
+                  </span>
+                </td>
+                <!-- Performance -->
+                <td>
+                  <div class="perf-stats">
+                    <span><i class="material-icons">visibility</i> {{ formatNumber(c.views || 0) }}</span>
+                    <span><i class="material-icons">touch_app</i> {{ formatNumber(c.clicks || 0) }}</span>
+                  </div>
+                </td>
+                <!-- Sparkline -->
+                <td>
+                  <svg class="sparkline" viewBox="0 0 80 24" *ngIf="c.sparklineData">
+                    <path [attr.d]="getSparklinePath(c.sparklineData)"
+                          fill="none"
+                          [attr.stroke]="getSparklineColor(c.status)"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round" />
+                  </svg>
+                </td>
+                <!-- Actions -->
+                <td class="text-right td-actions">
+                  <button class="btn-action btn-edit" *ngIf="canEdit(c)" (click)="openEditModal(c)" title="Edit">
+                    <i class="material-icons">edit</i>
+                  </button>
+                  <button class="btn-action btn-delete" (click)="confirmDelete(c.id)" title="Delete">
+                    <i class="material-icons">delete</i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="!isLoading && roleCampaigns.length === 0">
+            <i class="material-icons">campaign</i>
+            <h4>No ads created yet.</h4>
+            <p>Start your first campaign above!</p>
+            <button class="btn-create sm" [ngStyle]="{'background': roleColors.gradient}" (click)="openCreateModal()">
+              <i class="material-icons">add_circle</i> Create Campaign
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- CREATE / EDIT CAMPAIGN MODAL                    -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+
+    <!-- Modal Header -->
+    <div class="modal-header-custom">
+      <h3>{{ isEditing ? 'Edit Campaign' : 'Create New Campaign' }}</h3>
+      <button class="modal-close" (click)="closeModal()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <!-- Step Indicator -->
+    <div class="step-indicator">
+      <div class="step" [class.active]="modalStep >= 1" [class.done]="modalStep > 1" (click)="goToStep(1)">
+        <div class="step-circle" [ngStyle]="modalStep >= 1 && modalStep <= 1 ? {'background': roleColors.gradient, 'color': '#fff'} : {}">1</div>
+        <span [ngStyle]="modalStep >= 1 ? {'color': roleColors.primary} : {}">Select Plan</span>
+      </div>
+      <div class="step-line" [class.active]="modalStep > 1" [ngStyle]="modalStep > 1 ? {'background': roleColors.gradient} : {}"></div>
+      <div class="step" [class.active]="modalStep >= 2" [class.done]="modalStep > 2" (click)="goToStep(2)">
+        <div class="step-circle" [ngStyle]="modalStep >= 2 && modalStep <= 2 ? {'background': roleColors.gradient, 'color': '#fff'} : {}">2</div>
+        <span [ngStyle]="modalStep >= 2 ? {'color': roleColors.primary} : {}">Details</span>
+      </div>
+      <div class="step-line" [class.active]="modalStep > 2" [ngStyle]="modalStep > 2 ? {'background': roleColors.gradient} : {}"></div>
+      <div class="step" [class.active]="modalStep >= 3" (click)="goToStep(3)">
+        <div class="step-circle" [ngStyle]="modalStep >= 3 ? {'background': roleColors.gradient, 'color': '#fff'} : {}">3</div>
+        <span [ngStyle]="modalStep >= 3 ? {'color': roleColors.primary} : {}">Preview</span>
+      </div>
+    </div>
+
+    <!-- ── STEP 1: Select Ad Type ── -->
+    <div class="modal-body-custom" *ngIf="modalStep === 1">
+      <p class="step-subtitle">Choose the ad type that best fits your goal.</p>
+      <!-- Plans Loading -->
+      <div class="loading-state" *ngIf="plansLoading">
+        <i class="material-icons spin">autorenew</i>
+        <p>Loading plans...</p>
+      </div>
+
+      <!-- Plans Error / Empty -->
+      <div class="empty-state compact" *ngIf="!plansLoading && plansError">
+        <i class="material-icons">cloud_off</i>
+        <p>No plans available at the moment.</p>
+      </div>
+
+      <div class="plan-grid" *ngIf="!plansLoading && rolePlans.length > 0">
+        <div class="plan-card" *ngFor="let plan of rolePlans"
+             [class.selected]="selectedPlanId === plan.id"
+             (click)="selectPlan(plan.id)">
+          <small class="plan-tier text-muted">{{ getPlanTier(plan) }}</small>
+          <div class="plan-icon-wrap" [ngStyle]="{'background': roleColors.gradient}">
+            <i class="material-icons">{{ plan.icon }}</i>
+          </div>
+          <h5>{{ plan.name }}</h5>
+          <p>{{ plan.description }}</p>
+          <div class="plan-meta">
+            <span class="plan-price" [ngStyle]="{'color': roleColors.primary}">${{ plan.price }}/mo</span>
+            <span class="plan-location">{{ plan.location.replace('_', ' ') }}</span>
+          </div>
+          <div class="plan-check" *ngIf="selectedPlanId === plan.id">
+            <i class="material-icons" [ngStyle]="{'color': roleColors.primary}">check_circle</i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 2: Campaign Details Form + Live Preview ── -->
+    <div class="modal-body-custom" *ngIf="modalStep === 2">
+      <p class="step-subtitle">Fill in your campaign details.</p>
+      
+      <!-- AI Suggestion Button -->
+      <div class="ai-suggestion-cta">
+        <button type="button" class="btn-ai-suggestion" (click)="openAiSuggestionModal()">
+          <i class="material-icons">auto_awesome</i>
+          Use AI Suggestion
+        </button>
+        <span class="ai-hint">Let our AI help you craft the perfect ad!</span>
+      </div>
+
+      <div class="step2-layout">
+        <!-- Form Column -->
+        <div class="step2-form">
+          <div class="form-group-custom">
+            <label>Campaign Title</label>
+            <input type="text" class="form-input" [(ngModel)]="formTitle" (input)="onFormFieldChange()" placeholder="e.g., Senior Developer Available" />
+          </div>
+          <div class="form-group-custom">
+            <label>Description</label>
+            <textarea class="form-input form-textarea" [(ngModel)]="formDescription" (input)="onFormFieldChange()" rows="3"
+                      placeholder="Describe your ad in a few sentences..."></textarea>
+          </div>
+          <div class="form-group-custom">
+            <label>Ad Image URL (Optional)</label>
+            <div class="url-input-wrapper">
+              <input type="url" class="form-input url-input" [(ngModel)]="formImageUrl"
+                     (input)="validateImageUrl()" placeholder="https://example.com/your-ad-image.jpg" />
+              <button type="button" class="btn-clear-url" *ngIf="formImageUrl" (click)="clearImageUrl()" title="Clear URL">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+            
+            <!-- Image Scanning States -->
+            <!-- Scanning Spinner -->
+            <div class="validation-state validation-scanning" *ngIf="isScanning">
+              <div class="spinner-small"></div>
+              <span>Scanning image for content safety...</span>
+            </div>
+            
+            <!-- State A: SAFE -->
+            <div class="validation-state validation-safe" *ngIf="!isScanning && imageValidationState === 'SAFE'">
+              <i class="material-icons">check_circle</i>
+              <span>{{ imageValidationMessage }}</span>
+            </div>
+            
+            <!-- State B: UNSAFE -->
+            <div class="validation-state validation-unsafe" *ngIf="!isScanning && imageValidationState === 'UNSAFE'">
+              <i class="material-icons">error</i>
+              <span>{{ imageValidationMessage }}</span>
+            </div>
+            
+            <!-- State C: UNCERTAIN -->
+            <div class="validation-state validation-uncertain" *ngIf="!isScanning && imageValidationState === 'UNCERTAIN'">
+              <i class="material-icons">warning</i>
+              <span>{{ imageValidationMessage }}</span>
+            </div>
+            
+            <small class="url-hint" *ngIf="!imageValidationState">Leave blank to use a default placeholder based on your role.</small>
+          </div>
+          <div class="form-group-custom">
+            <label>Target URL</label>
+            <input type="url" class="form-input" [(ngModel)]="formTargetUrl" placeholder="https://prolance.com/your-page" />
+          </div>
+        </div>
+        <!-- Live Preview Column -->
+        <div class="step2-preview">
+          <div class="live-preview-label">Live Preview</div>
+          <div class="live-preview-card" [ngStyle]="{'border-color': roleColors.rgbaFill}">
+            <div class="live-preview-img-wrap">
+              <img [src]="getPreviewImage()" alt="Preview" class="live-preview-img" (error)="onPreviewImgError($event)" />
+            </div>
+            <div class="live-preview-body">
+              <span class="live-preview-badge" [ngStyle]="{'background': roleColors.rgbaFill, 'color': roleColors.primary}">
+                {{ selectedPlan?.name || 'Ad Plan' }}
+              </span>
+              <h5 class="live-preview-title">{{ formTitle || 'Your Campaign Title' }}</h5>
+              <p class="live-preview-desc">{{ formDescription || 'Your campaign description will appear here...' }}</p>
+              <span class="live-preview-url">{{ formTargetUrl || 'https://prolance.com' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 3: Live Preview ── -->
+    <div class="modal-body-custom" *ngIf="modalStep === 3">
+      <p class="step-subtitle">Here's how your ad will look on the platform.</p>
+
+      <!-- Banner Preview -->
+      <div class="preview-container" *ngIf="selectedPlan?.type === 'BANNER'">
+        <div class="preview-label">Banner Preview — {{ selectedPlan?.location?.replace('_', ' ') }}</div>
+        <div class="preview-banner">
+          <img [src]="formImageUrl || 'https://placehold.co/728x90/9c27b0/white?text=Your+Banner'" alt="Banner Preview" />
+          <div class="preview-banner-overlay">
+            <h5>{{ formTitle || 'Your Campaign Title' }}</h5>
+            <p>{{ formDescription || 'Your campaign description appears here.' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Profile Preview -->
+      <div class="preview-container" *ngIf="selectedPlan?.type === 'FEATURED_PROFILE'">
+        <div class="preview-label">Profile Spotlight Preview — Search Results</div>
+        <div class="preview-profile">
+          <div class="preview-profile-badge">SPOTLIGHT</div>
+          <div class="preview-profile-card">
+            <div class="preview-avatar"><i class="material-icons">person</i></div>
+            <div class="preview-profile-info">
+              <h5>{{ formTitle || 'Your Name' }}</h5>
+              <p>{{ formDescription || 'Your tagline appears here.' }}</p>
+              <span class="preview-link">{{ formTargetUrl || 'https://prolance.com/profile' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Job Boost Preview -->
+      <div class="preview-container" *ngIf="selectedPlan?.type === 'JOB_BOOST'">
+        <div class="preview-label">Featured Job Preview — Job Feed</div>
+        <div class="preview-job">
+          <div class="preview-job-badge">FEATURED</div>
+          <div class="preview-job-card">
+            <h5>{{ formTitle || 'Job Title' }}</h5>
+            <p>{{ formDescription || 'Job description appears here.' }}</p>
+            <div class="preview-job-meta">
+              <span><i class="material-icons">work</i> Full-time</span>
+              <span><i class="material-icons">location_on</i> Remote</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cost Summary -->
+      <div class="preview-cost" *ngIf="selectedPlan">
+        <div class="cost-row">
+          <span>Plan</span>
+          <span>{{ selectedPlan.name }}</span>
+        </div>
+        <div class="cost-row">
+          <span>Location</span>
+          <span>{{ selectedPlan.location.replace('_', ' ') }}</span>
+        </div>
+        <div class="cost-row total">
+          <span>Monthly Cost</span>
+          <span>${{ selectedPlan.price }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer-custom">
+      <button class="btn-secondary" (click)="modalStep === 1 ? closeModal() : prevStep()">
+        {{ modalStep === 1 ? 'Cancel' : 'Back' }}
+      </button>
+      <button class="btn-primary-custom"
+              *ngIf="modalStep < 3"
+              [ngStyle]="{'background': roleColors.gradient}"
+              [disabled]="(modalStep === 1 && !selectedPlanId) || (modalStep === 2 && (!formTitle.trim() || !formDescription.trim() || !canSubmitCampaign || isScanning))"
+              (click)="nextStep()">
+        Next
+      </button>
+      <button class="btn-primary-custom" 
+              *ngIf="modalStep === 3" 
+              [ngStyle]="{'background': roleColors.gradient}" 
+              [disabled]="!canSubmitCampaign || isScanning"
+              (click)="submitCampaign()">
+        <i class="material-icons">rocket_launch</i>
+        {{ isEditing ? 'Update Campaign' : 'Launch Campaign' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- DELETE CONFIRMATION MODAL                       -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="modal-container modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header-custom">
+      <h3>Delete Campaign</h3>
+      <button class="modal-close" (click)="cancelDelete()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="modal-body-custom delete-body">
+      <div class="delete-icon-wrap">
+        <i class="material-icons">warning</i>
+      </div>
+      <p>Are you sure you want to delete this campaign? This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer-custom">
+      <button class="btn-secondary" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-danger" (click)="deleteCampaign()">
+        <i class="material-icons">delete_forever</i> Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- MARKET INSIGHTS SECTION (2 compact charts side-by-side) -->
+<!-- COMMENTED OUT: Graph visualizations removed per UI refactor -->
+<!--
+<div class="row mt-4 market-insights-section">
+  <div class="col-12">
+    <h4 class="section-title-insights">Market Insights</h4>
+    <p class="card-category">{{ marketInsightsSubtitle }}</p>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card card-chart compact-card">
+      <div class="card-header" [ngClass]="roleCardHeaderClass">
+        <h5 class="card-title">
+          <i class="material-icons">trending_up</i>
+          Reach Statistics
+        </h5>
+        <p class="card-category">Global impressions over time</p>
+      </div>
+      <div class="card-body compact-chart-body">
+        <canvas #reachChart></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card card-chart compact-card">
+      <div class="card-header" [ngClass]="roleCardHeaderClass">
+        <h5 class="card-title">
+          <i class="material-icons">bar_chart</i>
+          Conversion Statistics
+        </h5>
+        <p class="card-category">Average CTR by ad type</p>
+      </div>
+      <div class="card-body compact-chart-body">
+        <canvas #conversionChart></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+-->
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- AI SUGGESTION MODAL                              -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showAiSuggestionModal" (click)="closeAiSuggestionModal()">
+  <div class="modal-container modal-ai" (click)="$event.stopPropagation()">
+    <div class="modal-header-custom">
+      <h3 class="modal-title-custom">
+        <i class="material-icons">auto_awesome</i>
+        AI-Powered Ad Suggestion
+      </h3>
+      <button class="btn-close-modal" (click)="closeAiSuggestionModal()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body-custom">
+      <p class="ai-modal-subtitle">Describe your ad and our AI will generate a compelling title and description for you.</p>
+      
+      <div class="form-group-custom">
+        <label>Describe your ad</label>
+        <textarea class="form-input form-textarea" [(ngModel)]="aiPrompt" rows="5"
+                  placeholder="E.g., I'm a senior full-stack developer with 10 years of experience in React and Node.js, looking for remote freelance projects..."></textarea>
+      </div>
+
+      <div class="ai-loading" *ngIf="isGeneratingAi">
+        <div class="spinner-small"></div>
+        <span>Generating your perfect ad...</span>
+      </div>
+    </div>
+
+    <div class="modal-footer-custom">
+      <button class="btn-secondary" (click)="closeAiSuggestionModal()" [disabled]="isGeneratingAi">
+        Cancel
+      </button>
+      <button class="btn-primary-custom" 
+              [ngStyle]="{'background': roleColors.gradient}"
+              [disabled]="!aiPrompt.trim() || isGeneratingAi"
+              (click)="generateAiSuggestion()">
+        <i class="material-icons">auto_awesome</i>
+        Generate
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- CONTENT VIOLATION ALERT                          -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="violation-alert" *ngIf="showViolationAlert">
+  <div class="violation-card">
+    <button class="btn-close-alert" (click)="closeViolationAlert()">
+      <i class="material-icons">close</i>
+    </button>
+    
+    <div class="violation-icon">
+      <i class="material-icons">error</i>
+    </div>
+    
+    <h3 class="violation-title">Content Policy Violation Detected</h3>
+    
+    <p class="violation-message">
+      Your ad content has been flagged for violating our content policy.
+    </p>
+    
+    <div class="violation-category">
+      <strong>Violation Category:</strong> {{ violationCategory }}
+    </div>
+    
+    <p class="violation-instruction">
+      Please review your ad content and ensure it complies with our policies. 
+      Your submission has been blocked.
+    </p>
+    
+    <a class="btn-policy" routerLink="/ads-policy">
+      <i class="material-icons">policy</i>
+      Read about our Ad Policies
+    </a>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->

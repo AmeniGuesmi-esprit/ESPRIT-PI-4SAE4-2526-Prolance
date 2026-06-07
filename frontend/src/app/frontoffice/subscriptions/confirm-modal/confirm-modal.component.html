@@ -1,0 +1,143 @@
+<div class="modal-overlay" *ngIf="isVisible && plan" (click)="onOverlayClick($event)">
+  <div class="modal-container">
+
+    <!-- REVIEW STEP -->
+    <div *ngIf="step === 'review'">
+      <div class="modal-header">
+        <div class="header-icon">🛒</div>
+        <h2>Confirm your subscription</h2>
+        <p class="header-sub">Review the details before proceeding</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="plan-summary">
+          <div class="summary-left">
+            <h3 class="summary-name">{{ plan.name }}</h3>
+            <span class="summary-type">{{ getTypeName() }} · {{ getDuration() }}</span>
+          </div>
+          <span class="summary-price">{{ plan.price }} DT</span>
+        </div>
+
+        <div class="features-row">
+          <span class="feature-pill" *ngFor="let f of getFeaturesSummary()">{{ f }}</span>
+        </div>
+
+        <!-- Promo code -->
+        <div class="promo-section">
+          <label class="promo-label">Promo code</label>
+          <div class="promo-input-row" *ngIf="!promoValid">
+            <input type="text" class="promo-input" [(ngModel)]="promoCode"
+                   placeholder="Enter your code" [disabled]="promoLoading"
+                   (keyup.enter)="validatePromo()" />
+            <button class="btn-promo" (click)="validatePromo()"
+                    [disabled]="promoLoading || !promoCode.trim()">
+              <span *ngIf="!promoLoading">Apply</span>
+              <span *ngIf="promoLoading" class="mini-spinner"></span>
+            </button>
+          </div>
+          <div class="promo-applied" *ngIf="promoValid">
+            <span class="promo-tag">🎉 {{ promoCode | uppercase }} (-{{ discountPercent }}%)</span>
+            <button class="btn-remove-promo" (click)="removePromo()">✕</button>
+          </div>
+          <p class="promo-message" *ngIf="promoMessage && !promoValid" [class.error]="!promoValid">
+            {{ promoMessage }}
+          </p>
+        </div>
+
+        <!-- Price breakdown -->
+        <div class="price-breakdown">
+          <div class="price-line">
+            <span>Subtotal</span><span>{{ subtotal }} DT</span>
+          </div>
+          <div class="price-line discount" *ngIf="discountPercent > 0">
+            <span>Discount (-{{ discountPercent }}%)</span>
+            <span class="discount-value">-{{ discountAmount }} DT</span>
+          </div>
+          <div class="price-line">
+            <span>VAT (19%)</span><span>{{ tva }} DT</span>
+          </div>
+          <div class="price-line total">
+            <span>Total</span><span class="total-amount">{{ total }} DT</span>
+          </div>
+        </div>
+
+        <div class="auto-renew-row">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="autoRenew" />
+            <span class="checkbox-text">Auto-renewal</span>
+          </label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="onCancel()">Back</button>
+          <button class="btn-confirm" (click)="goToPayment()">Proceed to payment →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENT STEP -->
+    <div *ngIf="step === 'payment'">
+      <div class="modal-header">
+        <div class="header-icon">💳</div>
+        <h2>Secure Payment</h2>
+        <p class="header-sub">Enter your card information</p>
+      </div>
+
+      <div class="modal-body">
+        <div class="payment-summary">
+          <span>{{ plan.name }} · {{ getTypeName() }}</span>
+          <span class="payment-total">{{ total }} DT</span>
+        </div>
+
+        <div class="card-form">
+          <div class="card-visual">
+            <div class="card-chip"></div>
+            <div class="card-number-display">{{ cardNumber || '•••• •••• •••• ••••' }}</div>
+            <div class="card-bottom">
+              <span>{{ cardName || 'YOUR NAME' }}</span>
+              <span>{{ cardExpiry || 'MM/YY' }}</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Card number</label>
+            <input type="text" [(ngModel)]="cardNumber" (input)="formatCardNumber()"
+                   placeholder="1234 5678 9012 3456" maxlength="19" />
+          </div>
+          <div class="form-group">
+            <label>Name on card</label>
+            <input type="text" [(ngModel)]="cardName" placeholder="JOHN DOE" />
+          </div>
+          <div class="form-row">
+            <div class="form-group half">
+              <label>Expiry</label>
+              <input type="text" [(ngModel)]="cardExpiry" (input)="formatExpiry()"
+                     placeholder="MM/YY" maxlength="5" />
+            </div>
+            <div class="form-group half">
+              <label>CVC</label>
+              <input type="text" [(ngModel)]="cardCvc" (input)="formatCvc()"
+                     placeholder="123" maxlength="3" />
+            </div>
+          </div>
+        </div>
+
+        <div class="security-badges">
+          <span class="badge">🔒 SSL Secured</span>
+          <span class="badge">🛡️ Protected Payment</span>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-cancel" (click)="goBackToReview()" [disabled]="isProcessing">← Back</button>
+          <button class="btn-pay" (click)="onPay()" [disabled]="isProcessing || !isCardValid">
+            <span *ngIf="!isProcessing">🔐 Pay {{ total }} DT</span>
+            <span *ngIf="isProcessing" class="processing">
+              <span class="mini-spinner"></span> Processing...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

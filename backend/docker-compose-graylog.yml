@@ -1,0 +1,166 @@
+version: '3.8'
+
+# ═══════════════════════════════════════════════════════════════════
+#  STACK GRAYLOG — Centralisation des logs des 3 microservices
+#
+#  Services inclus :
+#    - mongodb      : stockage des métadonnées Graylog
+#    - opensearch   : stockage et indexation des logs (remplace Elasticsearch)
+#    - graylog      : interface web + réception GELF
+#
+#  Ports exposés :
+#    - 9001  : Interface web Graylog  → http://localhost:9001
+#    - 12201 : Input GELF UDP         → reçoit les logs des microservices
+#
+#  Identifiants par défaut :
+#    - Login    : admin
+#    - Password : admin
+#
+#  Commande de démarrage (une seule fois sur le serveur) :
+#    docker-compose -f docker-compose-graylog.yml up -d
+#
+#  Commande d'arrêt :
+#    docker-compose -f docker-compose-graylog.yml down
+#
+#  Commande de suppression complète (avec les volumes) :
+#    docker-compose -f docker-compose-graylog.yml down -v
+# ═══════════════════════════════════════════════════════════════════
+
+services:
+
+  # ─────────────────────────────────────────────────────────────────
+  # MONGODB 6
+  # Stocke la configuration Graylog : inputs, dashboards, alertes, users
+  # Pas besoin d'exposer de port — communication interne uniquement
+  # ─────────────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:6
+    container_name: graylog-mongodb
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - graylog-net
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ─────────────────────────────────────────────────────────────────
+  # OPENSEARCH 2
+  # Moteur de recherche et stockage des logs indexés
+  # Remplace Elasticsearch (compatible avec Graylog 5.x)
+  # DISABLE_SECURITY_PLUGIN=true : désactive TLS pour un usage local
+  # ─────────────────────────────────────────────────────────────────
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: graylog-opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    networks:
+      - graylog-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+
+  # ─────────────────────────────────────────────────────────────────
+  # GRAYLOG 5.2
+  # Interface web de gestion et analyse des logs
+  #
+  # GRAYLOG_PASSWORD_SECRET : clé de chiffrement (min 16 chars)
+  #   → générer avec : pwgen -N 1 -s 96
+  #
+  # GRAYLOG_ROOT_PASSWORD_SHA2 : hash SHA256 du mot de passe admin
+  #   → mot de passe "admin" hashé :
+  #   echo -n "admin" | sha256sum
+  #   = 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+  #
+  #   Pour changer le mot de passe, remplacer par :
+  #   echo -n "votre_mot_de_passe" | sha256sum
+  # ─────────────────────────────────────────────────────────────────
+  graylog:
+    image: graylog/graylog:5.2
+    container_name: graylog
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+    environment:
+      # Clé secrète pour le chiffrement des sessions et tokens
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpeppersomepasswordpepper
+
+      # Hash SHA256 du mot de passe admin (valeur par défaut = "admin")
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+
+      # URL externe de l'interface web (adapter si serveur distant)
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9001/
+
+      # Connexion à OpenSearch
+      - GRAYLOG_ELASTICSEARCH_HOSTS=http://opensearch:9200
+
+      # Connexion à MongoDB
+      - GRAYLOG_MONGODB_URI=mongodb://mongodb/graylog
+
+      # Timezone de l'interface web
+      - GRAYLOG_ROOT_TIMEZONE=Africa/Tunis
+
+      # Email de l'admin (optionnel)
+      - GRAYLOG_ROOT_EMAIL=admin@esprit.tn
+
+    ports:
+      # Interface web Graylog
+      - "9001:9000"
+      # Input GELF UDP — reçoit les logs des 3 microservices Spring Boot
+      # publication-service  → UDP GELF → port 12201
+      # commentaire-service  → UDP GELF → port 12201
+      # reaction-service     → UDP GELF → port 12201
+      - "12201:12201/udp"
+      # Input GELF TCP (optionnel, si on veut TCP en plus d'UDP)
+      - "12201:12201/tcp"
+
+    volumes:
+      - graylog_data:/usr/share/graylog/data
+    networks:
+      - graylog-net
+
+# ─────────────────────────────────────────────────────────────────
+# VOLUMES PERSISTANTS
+# Les données survivent aux redémarrages et au docker-compose down
+# Supprimés uniquement avec : docker-compose down -v
+# ─────────────────────────────────────────────────────────────────
+volumes:
+  mongo_data:
+    driver: local
+  opensearch_data:
+    driver: local
+  graylog_data:
+    driver: local
+
+# ─────────────────────────────────────────────────────────────────
+# RÉSEAU INTERNE
+# Les 3 containers communiquent entre eux par leur nom de service
+# ex: graylog → opensearch:9200, mongodb:27017
+# ─────────────────────────────────────────────────────────────────
+networks:
+  graylog-net:
+    driver: bridge

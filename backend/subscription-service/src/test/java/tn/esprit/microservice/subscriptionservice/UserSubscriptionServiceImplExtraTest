@@ -1,0 +1,239 @@
+package tn.esprit.microservice.subscriptionservice;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.entities.Subscription;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.entities.UserSubscription;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.enums.BillingCycle;
+import tn.esprit.microservice.subscriptionservice.subscription.domain.enums.SubscriptionStatus;
+import tn.esprit.microservice.subscriptionservice.subscription.dto.request.SubscribeRequest;
+import tn.esprit.microservice.subscriptionservice.subscription.dto.response.UserSubscriptionResponse;
+import tn.esprit.microservice.subscriptionservice.subscription.mapper.UserSubscriptionMapper;
+import tn.esprit.microservice.subscriptionservice.subscription.repository.SubscriptionRepository;
+import tn.esprit.microservice.subscriptionservice.subscription.repository.UserSubscriptionRepository;
+import tn.esprit.microservice.subscriptionservice.subscription.service.UserSubscriptionServiceImpl;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class UserSubscriptionServiceImplExtraTest {
+
+    @Mock private UserSubscriptionRepository userSubscriptionRepository;
+    @Mock private SubscriptionRepository subscriptionRepository;
+    @Mock private UserSubscriptionMapper userSubscriptionMapper;
+
+    @InjectMocks
+    private UserSubscriptionServiceImpl service;
+
+    private Subscription plan;
+    private UserSubscription userSub;
+    private UserSubscriptionResponse response;
+    private SubscribeRequest request;
+
+    @BeforeEach
+    void setUp() {
+        plan = new Subscription();
+        plan.setId(10L);
+        plan.setName("PRO");
+        plan.setPrice(new BigDecimal("29.99"));
+        plan.setBillingCycle(BillingCycle.ANNUELLE);
+        plan.setIsActive(true);
+        plan.setMaxProjects(10);
+        plan.setMaxProposals(20);
+
+        userSub = new UserSubscription();
+        userSub.setId(1L);
+        userSub.setUserId(100L);
+        userSub.setSubscription(plan);
+        userSub.setStatus(SubscriptionStatus.ACTIVE);
+        userSub.setCurrentProjects(0);
+        userSub.setCurrentProposals(0);
+        userSub.setStartDate(LocalDateTime.now());
+        userSub.setEndDate(LocalDateTime.now().plusYears(1));
+        userSub.setAutoRenew(true);
+
+        response = new UserSubscriptionResponse();
+        response.setId(1L);
+        response.setUserId(100L);
+
+        request = new SubscribeRequest();
+        request.setUserId(100L);
+        request.setSubscriptionId(10L);
+        request.setAutoRenew(true);
+        request.setAmountPaid(new BigDecimal("29.99"));
+        request.setPaymentMethod("CARD");
+        request.setTransactionId("TX123");
+    }
+
+    // ========== subscribe with MENSUELLE billing ==========
+
+    @Test
+    void subscribe_withMensuelleBilling_setsEndDatePlusOneMonth() {
+        plan.setBillingCycle(BillingCycle.MENSUELLE);
+        when(userSubscriptionRepository.existsByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(false);
+        when(subscriptionRepository.findById(10L)).thenReturn(Optional.of(plan));
+        when(userSubscriptionRepository.save(any(UserSubscription.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
+        when(userSubscriptionMapper.toResponse(any())).thenReturn(response);
+
+        UserSubscriptionResponse result = service.subscribe(request);
+
+        assertNotNull(result);
+        verify(userSubscriptionRepository).save(any(UserSubscription.class));
+    }
+
+    // ========== toggleAutoRenew to true ==========
+
+    @Test
+    void toggleAutoRenew_toTrue_setsAutoRenewTrue() {
+        userSub.setAutoRenew(false);
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.of(userSub));
+
+        service.toggleAutoRenew(100L, true);
+
+        assertTrue(userSub.getAutoRenew());
+        verify(userSubscriptionRepository).save(userSub);
+    }
+
+    // ========== toggleAutoRenew - no active sub ==========
+
+    @Test
+    void toggleAutoRenew_whenNoActiveSub_throwsException() {
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> service.toggleAutoRenew(100L, false));
+    }
+
+    // ========== incrementProjectCount - no active sub ==========
+
+    @Test
+    void incrementProjectCount_whenNoActiveSub_throwsException() {
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> service.incrementProjectCount(100L));
+    }
+
+    // ========== incrementProposalCount - no active sub ==========
+
+    @Test
+    void incrementProposalCount_whenNoActiveSub_throwsException() {
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> service.incrementProposalCount(100L));
+    }
+
+    // ========== decrementProjectCount - no active sub ==========
+
+    @Test
+    void decrementProjectCount_whenNoActiveSub_throwsException() {
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> service.decrementProjectCount(100L));
+    }
+
+    // ========== decrementProposalCount - no active sub ==========
+
+    @Test
+    void decrementProposalCount_whenNoActiveSub_throwsException() {
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> service.decrementProposalCount(100L));
+    }
+
+    // ========== getUserSubscriptionHistory - empty ==========
+
+    @Test
+    void getUserSubscriptionHistory_whenEmpty_returnsEmptyList() {
+        when(userSubscriptionRepository.findByUserIdOrderByCreatedAtDesc(100L))
+                .thenReturn(Collections.emptyList());
+
+        java.util.List<UserSubscriptionResponse> result =
+                service.getUserSubscriptionHistory(100L);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    // ========== renewSubscription - autoRenew false still works ==========
+
+    @Test
+    void renewSubscription_whenAutoRenewFalse_stillRenews() {
+        UserSubscription lastSub = new UserSubscription();
+        lastSub.setSubscription(plan);
+        lastSub.setAutoRenew(false);
+
+        when(userSubscriptionRepository.findByUserIdOrderByCreatedAtDesc(100L))
+                .thenReturn(Collections.singletonList(lastSub));
+        when(userSubscriptionRepository.existsByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(false);
+        when(userSubscriptionRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        when(userSubscriptionMapper.toResponse(any())).thenReturn(response);
+
+        UserSubscriptionResponse result = service.renewSubscription(100L);
+
+        assertNotNull(result);
+    }
+
+    // ========== cancelSubscription - sets cancelledAt ==========
+
+    @Test
+    void cancelSubscription_cancelledAtIsSetToNow() {
+        when(userSubscriptionRepository.findByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(Optional.of(userSub));
+
+        LocalDateTime before = LocalDateTime.now().minusSeconds(1);
+        service.cancelSubscription(100L);
+        LocalDateTime after = LocalDateTime.now().plusSeconds(1);
+
+        assertNotNull(userSub.getCancelledAt());
+        assertTrue(userSub.getCancelledAt().isAfter(before));
+        assertTrue(userSub.getCancelledAt().isBefore(after));
+    }
+
+    // ========== subscribe - sets fields on UserSubscription ==========
+
+    @Test
+    void subscribe_setsPaymentFieldsAndProjectCounters() {
+        when(userSubscriptionRepository.existsByUserIdAndStatus(100L, SubscriptionStatus.ACTIVE))
+                .thenReturn(false);
+        when(subscriptionRepository.findById(10L)).thenReturn(Optional.of(plan));
+
+        UserSubscription[] saved = {null};
+        when(userSubscriptionRepository.save(any(UserSubscription.class)))
+                .thenAnswer(inv -> {
+                    saved[0] = inv.getArgument(0);
+                    return saved[0];
+                });
+        when(userSubscriptionMapper.toResponse(any())).thenReturn(response);
+
+        service.subscribe(request);
+
+        assertNotNull(saved[0]);
+        assertEquals(100L, saved[0].getUserId());
+        assertEquals(SubscriptionStatus.ACTIVE, saved[0].getStatus());
+        assertEquals(0, saved[0].getCurrentProjects());
+        assertEquals(0, saved[0].getCurrentProposals());
+        assertEquals(new BigDecimal("29.99"), saved[0].getAmountPaid());
+        assertEquals("CARD", saved[0].getPaymentMethod());
+        assertEquals("TX123", saved[0].getTransactionId());
+    }
+}

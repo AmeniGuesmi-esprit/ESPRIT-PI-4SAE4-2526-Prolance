@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: promo-service
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: promo-service
+  template:
+    metadata:
+      labels:
+        app: promo-service
+    spec:
+      containers:
+        - name: promo-service
+          image: farahchbeb/promo-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8091
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql-service-promo:3306/pidev_promo?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret-promo
+                  key: mysql-root-password
+            - name: SERVER_PORT
+              value: "8091"
+            - name: EUREKA_CLIENT_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_COMPATIBILITY_VERIFIER_ENABLED
+              value: "false"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-service-promo
+  namespace: devops
+spec:
+  selector:
+    app: promo-service
+  ports:
+    - protocol: TCP
+      port: 8091
+      targetPort: 8091
+      nodePort: 32091
+  type: NodePort

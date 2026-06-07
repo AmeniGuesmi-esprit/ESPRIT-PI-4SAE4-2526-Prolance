@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: inscription-mysql-secret
+  namespace: devops
+type: Opaque
+stringData:
+  mysql-root-password: "root1234"
+  mysql-database: "pidev_inscriptions"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inscription-mysql
+  namespace: devops
+spec:                          # ← manquait ici
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inscription-mysql
+  template:
+    metadata:
+      labels:
+        app: inscription-mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inscription-mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: inscription-mysql-secret
+                  key: mysql-database
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inscription-mysql
+  namespace: devops
+spec:                          # ← manquait ici
+  selector:
+    app: inscription-mysql
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP

@@ -1,0 +1,416 @@
+<!-- Toast Notification -->
+<div class="toast-notification" *ngIf="showToast" [class.toast-success]="toastType === 'success'" [class.toast-error]="toastType === 'error'">
+  <i class="material-icons">{{ toastType === 'success' ? 'check_circle' : 'error' }}</i>
+  <span>{{ toastMessage }}</span>
+  <button class="toast-close" (click)="showToast = false"><i class="material-icons">close</i></button>
+</div>
+
+<div class="admin-ads compact">
+
+  <!-- ════════ PAGE HEADER + KPI STRIP ════════ -->
+  <div class="ads-header">
+    <div class="ads-header-text">
+      <h2 class="page-title">Ads Management</h2>
+      <p class="page-subtitle">Review, approve and monitor all advertising campaigns on the platform.</p>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-chip pending-chip">
+        <i class="material-icons">hourglass_top</i>
+        <span>{{ totalPending }} Pending</span>
+      </div>
+      <div class="kpi-chip active-chip">
+        <i class="material-icons">check_circle</i>
+        <span>{{ totalActive }} Active</span>
+      </div>
+      <div class="kpi-chip views-chip">
+        <i class="material-icons">visibility</i>
+        <span>{{ formatNumber(totalImpressions) }} Views</span>
+      </div>
+      <div class="kpi-chip revenue-chip">
+        <i class="material-icons">payments</i>
+        <span>{{ formatCurrency(totalRevenue) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- APPROVAL QUEUE                               -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="section-block">
+    <div class="section-head">
+      <div class="section-title-row">
+        <i class="material-icons section-icon">pending_actions</i>
+        <h3>Approval Queue</h3>
+        <span class="count-badge">{{ totalPending }}</span>
+      </div>
+      <p class="section-desc">Review pending ad submissions and approve or reject them.</p>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="isLoading">
+      <i class="material-icons spin">autorenew</i>
+      <p>Loading campaigns...</p>
+    </div>
+
+    <!-- Horizontal Scrollable Cards -->
+    <div class="approval-scroll" *ngIf="!isLoading && pendingCampaigns.length > 0">
+      <div class="approval-card"
+           *ngFor="let c of pendingCampaigns"
+           [class.fading-out]="isFadingOut(c.id)">
+
+        <!-- Ad Preview Image -->
+        <div class="approval-preview" (click)="openInspect(c)">
+          <img [src]="getAdImage(c)" [alt]="c.title" (error)="onImgError($event, c)" loading="lazy" />
+          <span class="text-only-label" *ngIf="!hasImage(c)">Text-only</span>
+          <div class="preview-overlay">
+            <i class="material-icons">zoom_in</i>
+          </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="approval-body">
+          <h4 class="approval-title" (click)="openInspect(c)">{{ c.title }}</h4>
+          <p class="approval-desc">{{ c.description | slice:0:80 }}{{ c.description.length > 80 ? '...' : '' }}</p>
+
+          <!-- Creator Info -->
+          <div class="creator-row">
+            <div class="avatar-circle">{{ getUserAvatar(c.userId) }}</div>
+            <div class="creator-info">
+              <span class="creator-name">User #{{ c.userId }}</span>
+              <span class="creator-meta">{{ c.createdAt | date:'shortDate' }}</span>
+            </div>
+            <span class="role-chip" [class.role-freelancer]="c.roleType === 'FREELANCER'" [class.role-client]="c.roleType === 'CLIENT'">
+              {{ getRoleBadge(c) }}
+            </span>
+          </div>
+
+          <!-- Plan Info -->
+          <div class="plan-row">
+            <span class="plan-tag"><i class="material-icons">style</i> {{ c.planName }}</span>
+            <span class="plan-tag"><i class="material-icons">place</i> {{ c.planLocation?.replace('_', ' ') }}</span>
+          </div>
+
+          <!-- Submitted Date -->
+          <div class="submitted-row">
+            <i class="material-icons">schedule</i>
+            <span>Submitted {{ c.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="approval-actions">
+          <button class="btn-approve" (click)="approveCampaign(c)" title="Approve Campaign">
+            <i class="material-icons">check</i>
+            <span>Approve</span>
+          </button>
+          <button class="btn-reject" (click)="openRejectModal(c.id)" title="Reject Campaign">
+            <i class="material-icons">close</i>
+            <span>Reject</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-queue" *ngIf="!isLoading && pendingCampaigns.length === 0">
+      <i class="material-icons">verified</i>
+      <p>All caught up! No campaigns awaiting approval.</p>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════ -->
+  <!-- ACTIVE INVENTORY TABLE                       -->
+  <!-- ════════════════════════════════════════════ -->
+  <section class="section-block">
+    <div class="section-head">
+      <div class="section-title-row">
+        <i class="material-icons section-icon">inventory_2</i>
+        <h3>Active Inventory</h3>
+        <span class="count-badge active-count">{{ totalActive }}</span>
+      </div>
+      <p class="section-desc">Currently running advertisements across the platform.</p>
+    </div>
+
+    <div class="table-wrap" *ngIf="!isLoading && activeCampaigns.length > 0">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Ad Preview</th>
+            <th>Owner</th>
+            <th>Plan Type</th>
+            <th>Status</th>
+            <th>Start Date</th>
+            <th>Performance</th>
+            <th>Trend</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of activeCampaigns"
+              [class.fading-out]="isFadingOut(c.id)"
+              (click)="openInspect(c)"
+              class="clickable-row">
+            <!-- Preview -->
+            <td class="td-preview">
+              <img [src]="getAdImage(c)" [alt]="c.title" class="table-thumb" (error)="onImgError($event, c)" loading="lazy" />
+              <span class="text-only-badge" *ngIf="!hasImage(c)">No img</span>
+            </td>
+            <!-- Owner -->
+            <td>
+              <div class="owner-cell">
+                <div class="avatar-circle sm">{{ getUserAvatar(c.userId) }}</div>
+                <div class="owner-info">
+                  <span class="owner-name">User #{{ c.userId }}</span>
+                  <span class="owner-role" [class.text-purple]="c.roleType === 'FREELANCER'" [class.text-teal]="c.roleType === 'CLIENT'">
+                    {{ getRoleBadge(c) }}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <!-- Plan -->
+            <td>
+              <span class="plan-cell">
+                <span class="plan-name">{{ c.planName }}</span>
+                <span class="plan-loc">{{ c.planLocation?.replace('_', ' ') }}</span>
+              </span>
+            </td>
+            <!-- Status -->
+            <td>
+              <span class="badge" [ngClass]="statusBadgeClass(c.status)">{{ c.status }}</span>
+            </td>
+            <!-- Start Date -->
+            <td>
+              <span class="date-cell">{{ c.createdAt | date:'mediumDate' }}</span>
+            </td>
+            <!-- Performance -->
+            <td>
+              <div class="perf-cell">
+                <span><i class="material-icons">visibility</i> {{ formatNumber(c.views || 0) }}</span>
+                <span><i class="material-icons">touch_app</i> {{ formatNumber(c.clicks || 0) }}</span>
+                <span class="ctr-label">{{ getCTR(c) }} CTR</span>
+              </div>
+            </td>
+            <!-- Trend -->
+            <td>
+              <svg class="sparkline" viewBox="0 0 80 24" *ngIf="c.sparklineData">
+                <path [attr.d]="getSparklinePath(c.sparklineData)"
+                      fill="none" stroke="#9333ea" stroke-width="2"
+                      stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </td>
+            <!-- Actions -->
+            <td class="text-right td-actions" (click)="$event.stopPropagation()">
+              <button class="btn-icon btn-inspect" (click)="openInspect(c)" title="Inspect">
+                <i class="material-icons">search</i>
+              </button>
+              <button class="btn-icon btn-stop" (click)="openDeleteConfirm(c.id)" title="Force Stop / Delete">
+                <i class="material-icons">block</i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-queue" *ngIf="!isLoading && activeCampaigns.length === 0">
+      <i class="material-icons">campaign</i>
+      <p>No active campaigns at the moment.</p>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- INSPECT SIDE DRAWER                             -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="drawer-overlay" [class.open]="inspectDrawerOpen" (click)="closeInspect()"></div>
+<aside class="inspect-drawer" [class.open]="inspectDrawerOpen">
+  <div class="drawer-header" *ngIf="inspectedCampaign">
+    <h3>Campaign Details</h3>
+    <button class="drawer-close" (click)="closeInspect()">
+      <i class="material-icons">close</i>
+    </button>
+  </div>
+
+  <div class="drawer-body" *ngIf="inspectedCampaign">
+    <!-- Large Preview -->
+    <div class="drawer-preview" *ngIf="hasImage(inspectedCampaign)">
+      <img [src]="inspectedCampaign.imageUrl" [alt]="inspectedCampaign.title"
+           (error)="onImgError($event, inspectedCampaign)" loading="lazy" />
+    </div>
+    <div class="drawer-no-image" *ngIf="!hasImage(inspectedCampaign)">
+      <i class="material-icons">hide_image</i>
+      <span>This ad is text-only (No image provided)</span>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="drawer-status-row">
+      <span class="badge {{ statusBadgeClass(inspectedCampaign.status) }}">{{ inspectedCampaign.status }}</span>
+      <span class="drawer-date">{{ inspectedCampaign.createdAt | date:'fullDate' }}</span>
+    </div>
+
+    <!-- Title & Description -->
+    <h4 class="drawer-title">{{ inspectedCampaign.title }}</h4>
+    <p class="drawer-desc">{{ inspectedCampaign.description }}</p>
+
+    <!-- Rejection Reason -->
+    <div class="drawer-rejection" *ngIf="inspectedCampaign.status === 'REJECTED' && inspectedCampaign.rejectionReason">
+      <i class="material-icons">error_outline</i>
+      <div>
+        <strong>Rejection Reason</strong>
+        <p>{{ inspectedCampaign.rejectionReason }}</p>
+      </div>
+    </div>
+
+    <!-- Target URL -->
+    <div class="drawer-field">
+      <label>Target URL</label>
+      <div class="url-row">
+        <span class="url-text">{{ inspectedCampaign.targetUrl }}</span>
+        <a [href]="inspectedCampaign.targetUrl" target="_blank" rel="noopener" class="btn-test-link">
+          <i class="material-icons">open_in_new</i> Test Link
+        </a>
+      </div>
+    </div>
+
+    <!-- Advertiser Info -->
+    <div class="drawer-field">
+      <label>Advertiser</label>
+      <div class="drawer-user-row">
+        <div class="avatar-circle">{{ getUserAvatar(inspectedCampaign.userId) }}</div>
+        <div>
+          <span class="drawer-user-name">User #{{ inspectedCampaign.userId }}</span>
+          <span class="drawer-user-email">ID: {{ inspectedCampaign.userId }}</span>
+        </div>
+        <span class="role-chip"
+              [class.role-freelancer]="inspectedCampaign.roleType === 'FREELANCER'"
+              [class.role-client]="inspectedCampaign.roleType === 'CLIENT'">
+          {{ getRoleBadge(inspectedCampaign) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Full DB Record Details -->
+    <div class="drawer-field">
+      <label>Campaign Record</label>
+      <div class="drawer-meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Campaign ID</span>
+          <span class="meta-value">#{{ inspectedCampaign.id }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Plan</span>
+          <span class="meta-value">{{ inspectedCampaign.planName }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Plan ID</span>
+          <span class="meta-value">#{{ inspectedCampaign.planId }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Type</span>
+          <span class="meta-value">{{ inspectedCampaign.planType?.replace('_', ' ') }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Location</span>
+          <span class="meta-value">{{ inspectedCampaign.planLocation?.replace('_', ' ') }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Role Type</span>
+          <span class="meta-value">{{ inspectedCampaign.roleType | titlecase }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Image URL</span>
+          <span class="meta-value" style="word-break: break-all">{{ inspectedCampaign.imageUrl || '(none)' }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Created</span>
+          <span class="meta-value">{{ inspectedCampaign.createdAt | date:'medium' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance (only for active/expired) -->
+    <div class="drawer-field" *ngIf="inspectedCampaign.views !== undefined && inspectedCampaign.views > 0">
+      <label>Performance</label>
+      <div class="drawer-perf-grid">
+        <div class="perf-box">
+          <span class="perf-num">{{ formatNumber(inspectedCampaign.views || 0) }}</span>
+          <span class="perf-label">Impressions</span>
+        </div>
+        <div class="perf-box">
+          <span class="perf-num">{{ formatNumber(inspectedCampaign.clicks || 0) }}</span>
+          <span class="perf-label">Clicks</span>
+        </div>
+        <div class="perf-box">
+          <span class="perf-num">{{ getCTR(inspectedCampaign) }}</span>
+          <span class="perf-label">CTR</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Drawer Actions -->
+    <div class="drawer-actions">
+      <button class="btn-approve full" *ngIf="inspectedCampaign.status === 'PENDING'" (click)="approveCampaign(inspectedCampaign); closeInspect()">
+        <i class="material-icons">check</i> Approve Campaign
+      </button>
+      <button class="btn-reject full" *ngIf="inspectedCampaign.status === 'PENDING'" (click)="closeInspect(); openRejectModal(inspectedCampaign.id)">
+        <i class="material-icons">close</i> Reject Campaign
+      </button>
+      <button class="btn-stop-full" *ngIf="inspectedCampaign.status === 'ACTIVE'" (click)="closeInspect(); openDeleteConfirm(inspectedCampaign.id)">
+        <i class="material-icons">block</i> Force Stop & Delete
+      </button>
+    </div>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- REJECT REASON MODAL                             -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showRejectModal" (click)="cancelReject()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3><i class="material-icons">gavel</i> Reject Campaign</h3>
+      <button class="modal-close" (click)="cancelReject()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-label">Provide a reason for rejection. This will be sent to the advertiser.</p>
+      <textarea class="reject-input"
+                [(ngModel)]="rejectReason"
+                rows="4"
+                placeholder="e.g., Image contains misleading claims. Please revise and resubmit."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" (click)="cancelReject()">Cancel</button>
+      <button class="btn-confirm-reject" (click)="confirmReject()">
+        <i class="material-icons">block</i> Confirm Rejection
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════ -->
+<!-- DELETE CONFIRMATION MODAL                       -->
+<!-- ════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDeleteConfirm" (click)="cancelDelete()">
+  <div class="modal-container modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <h3><i class="material-icons">warning</i> Force Stop & Delete</h3>
+      <button class="modal-close" (click)="cancelDelete()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+    <div class="modal-body center">
+      <div class="delete-icon-wrap">
+        <i class="material-icons">delete_forever</i>
+      </div>
+      <p>This will permanently remove the campaign and stop all impressions immediately. This action cannot be undone.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancel" (click)="cancelDelete()">Cancel</button>
+      <button class="btn-confirm-delete" (click)="confirmDelete()">
+        <i class="material-icons">delete</i> Delete Campaign
+      </button>
+    </div>
+  </div>
+</div>

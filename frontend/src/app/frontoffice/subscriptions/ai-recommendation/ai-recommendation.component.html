@@ -1,0 +1,172 @@
+<!-- ══════════════════════════════════════ -->
+<!--  AI RECOMMENDATION CARD             -->
+<!-- ══════════════════════════════════════ -->
+<div class="ai-recommendation" [class.urgent]="getUrgencyClass() === 'high'" @fadeIn>
+
+  <!-- Header with AI branding -->
+  <div class="ai-header">
+    <div class="ai-header-left">
+      <div class="ai-icon-wrap">
+        <span class="ai-icon">🤖</span>
+        <span class="ai-pulse"></span>
+      </div>
+      <div>
+        <h3 class="ai-title">AI Plan Advisor</h3>
+        <span class="ai-subtitle">Personalized recommendation based on your activity</span>
+      </div>
+    </div>
+    <div class="ai-badge">
+      <span class="sparkle">✨</span> Smart Analysis
+    </div>
+  </div>
+
+  <!-- ═══ LOADING / ANALYZING STATE ═══ -->
+  <div class="analysis-state" *ngIf="analyzing">
+    <div class="analysis-steps">
+      <div class="step-item"
+           *ngFor="let step of analysisSteps; let i = index"
+           [class.active]="i === currentStep"
+           [class.done]="step.done">
+        <div class="step-indicator">
+          <span class="step-dot" *ngIf="!step.done">
+            <span class="dot-pulse" *ngIf="i === currentStep"></span>
+          </span>
+          <span class="step-check" *ngIf="step.done">✓</span>
+        </div>
+        <span class="step-label">{{ step.label }}</span>
+      </div>
+    </div>
+    <div class="analysis-bar">
+      <div class="analysis-progress"
+           [style.width.%]="((currentStep + 1) / analysisSteps.length) * 100">
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ RECOMMENDATION RESULT ═══ -->
+  <div class="recommendation-result" *ngIf="!analyzing && recommendation" @fadeIn>
+
+    <!-- Score + Summary Row -->
+    <div class="result-top">
+
+      <!-- Confidence Score Circle -->
+      <div class="score-circle" @countUp>
+        <svg viewBox="0 0 100 100" class="score-svg">
+          <circle cx="50" cy="50" r="45" class="score-bg" />
+          <circle cx="50" cy="50" r="45" class="score-fill"
+                  [style.stroke]="getScoreColor()"
+                  [style.stroke-dashoffset]="getCircleOffset()" />
+        </svg>
+        <div class="score-text">
+          <span class="score-number">{{ displayScore }}</span>
+          <span class="score-percent">%</span>
+        </div>
+        <span class="score-label" [style.color]="getScoreColor()">
+          {{ getScoreLabel() }}
+        </span>
+      </div>
+
+      <!-- AI Insight -->
+      <div class="insight-section" @slideIn>
+        <div class="insight-header">
+          <span class="insight-icon">💡</span>
+          <span class="insight-tag">AI Insight</span>
+        </div>
+        <p class="insight-text">{{ recommendation.aiInsight }}</p>
+        <div class="benefit-estimate">
+          <span class="benefit-icon">📈</span>
+          <span>{{ recommendation.estimatedBenefit }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recommended Plan Card -->
+    <div class="recommended-plan" *ngIf="recommendation.shouldUpgrade"
+         [attr.data-tier]="recommendation.recommendedTier">
+      <div class="plan-glow"></div>
+      <div class="plan-content">
+        <div class="plan-left">
+          <span class="plan-rec-badge">
+            🎯 Recommended for you
+          </span>
+          <h4 class="plan-name">{{ recommendation.recommendedPlan }} Plan</h4>
+          <span class="plan-tier-badge" [attr.data-tier]="recommendation.recommendedTier">
+            {{ recommendation.recommendedTier | uppercase }}
+          </span>
+        </div>
+        <button class="btn-upgrade" [attr.data-tier]="recommendation.recommendedTier"
+                (click)="goToPlans()">
+          Upgrade Now →
+        </button>
+      </div>
+    </div>
+
+    <!-- Already on best plan -->
+    <div class="optimal-plan" *ngIf="!recommendation.shouldUpgrade">
+      <span class="optimal-icon">✅</span>
+      <div>
+        <strong>You're on the optimal plan!</strong>
+        <p>Based on your current usage, your plan is the best fit.</p>
+      </div>
+    </div>
+
+    <!-- Show/Hide Reasons -->
+    <button class="btn-details" (click)="toggleDetails()" *ngIf="recommendation.reasons.length > 0">
+      {{ showDetails ? 'Hide' : 'View' }} detailed analysis
+      <span class="arrow" [class.rotated]="showDetails">▼</span>
+    </button>
+
+    <!-- Detailed Reasons -->
+    <div class="reasons-section" *ngIf="showDetails" @staggerReasons>
+      <div class="reason-card"
+           *ngFor="let reason of recommendation.reasons"
+           [class.critical]="reason.severity === 'critical'"
+           [class.warning]="reason.severity === 'warning'">
+        <div class="reason-icon">{{ reason.icon }}</div>
+        <div class="reason-body">
+          <div class="reason-header">
+            <strong>{{ reason.title }}</strong>
+            <span class="reason-metric" [class]="reason.severity">{{ reason.metric }}</span>
+          </div>
+          <p>{{ reason.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Usage Mini-Chart -->
+    <div class="usage-mini" *ngIf="usageAnalysis">
+      <div class="mini-bar-group">
+        <span class="mini-label">Proposals</span>
+        <div class="mini-track">
+          <div class="mini-fill"
+               [style.width.%]="usageAnalysis.proposalsUsagePercent"
+               [class.high]="usageAnalysis.proposalsUsagePercent >= 80"
+               [class.medium]="usageAnalysis.proposalsUsagePercent >= 60 && usageAnalysis.proposalsUsagePercent < 80">
+          </div>
+        </div>
+        <span class="mini-value">{{ usageAnalysis.proposalsUsagePercent }}%</span>
+      </div>
+      <div class="mini-bar-group">
+        <span class="mini-label">Projects</span>
+        <div class="mini-track">
+          <div class="mini-fill"
+               [style.width.%]="usageAnalysis.projectsUsagePercent"
+               [class.high]="usageAnalysis.projectsUsagePercent >= 80"
+               [class.medium]="usageAnalysis.projectsUsagePercent >= 60 && usageAnalysis.projectsUsagePercent < 80">
+          </div>
+        </div>
+        <span class="mini-value">{{ usageAnalysis.projectsUsagePercent }}%</span>
+      </div>
+      <div class="mini-bar-group">
+        <span class="mini-label">Conversion</span>
+        <div class="mini-track">
+          <div class="mini-fill conversion"
+               [style.width.%]="usageAnalysis.conversionRate">
+          </div>
+        </div>
+        <span class="mini-value">{{ usageAnalysis.conversionRate }}%</span>
+      </div>
+    </div>
+
+  </div>
+</div>

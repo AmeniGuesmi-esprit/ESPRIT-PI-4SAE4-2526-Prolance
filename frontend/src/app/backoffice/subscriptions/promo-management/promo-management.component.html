@@ -1,0 +1,223 @@
+<div class="promo-management">
+  
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <span class="header-icon">🎫</span>
+      <div>
+        <h1>Promo Codes Management</h1>
+        <p>{{ promos.length }} codes disponibles</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-ai" (click)="openAIModal()">
+        <span class="btn-icon">🤖</span>
+        Générer AI
+      </button>
+      <button class="btn-primary" (click)="openCreateModal()">
+        <span class="btn-icon">+</span>
+        Nouveau Code
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="stats-grid" *ngIf="stats">
+    <div class="stat-card">
+      <span class="stat-icon">🎫</span>
+      <div class="stat-info">
+        <span class="stat-value">{{ stats.totalPromos }}</span>
+        <span class="stat-label">Total Codes</span>
+      </div>
+    </div>
+    <div class="stat-card success">
+      <span class="stat-icon">✅</span>
+      <div class="stat-info">
+        <span class="stat-value">{{ stats.activePromos }}</span>
+        <span class="stat-label">Codes Actifs</span>
+      </div>
+    </div>
+    <div class="stat-card info">
+      <span class="stat-icon">📊</span>
+      <div class="stat-info">
+        <span class="stat-value">{{ stats.totalUsages }}</span>
+        <span class="stat-label">Utilisations</span>
+      </div>
+    </div>
+    <div class="stat-card warning">
+      <span class="stat-icon">💰</span>
+      <div class="stat-info">
+        <span class="stat-value">{{ stats.averageDiscount }}%</span>
+        <span class="stat-label">Réduction Moy.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loader"></div>
+    <p>Chargement des codes promo...</p>
+  </div>
+
+  <!-- Promos Table -->
+  <div class="table-container" *ngIf="!loading">
+    <table class="promos-table">
+      <thead>
+        <tr>
+          <th>CODE</th>
+          <th>RÉDUCTION</th>
+          <th>DESCRIPTION</th>
+          <th>UTILISATIONS</th>
+          <th>EXPIRE LE</th>
+          <th>STATUT</th>
+          <th>ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let promo of promos" [class]="getStatusClass(promo)">
+          <td>
+            <code class="promo-code">{{ promo.code }}</code>
+          </td>
+          <td>
+            <span class="discount-badge">-{{ promo.discountPercent }}%</span>
+          </td>
+          <td class="description-cell">{{ promo.description || '-' }}</td>
+          <td>
+            <div class="usage-wrapper">
+              <div class="usage-bar">
+                <div class="usage-fill" [style.width.%]="getUsagePercent(promo)"></div>
+              </div>
+              <span class="usage-text">{{ promo.currentUses }}/{{ promo.maxUses }}</span>
+            </div>
+          </td>
+          <td>{{ formatDate(promo.expiresAt) }}</td>
+          <td>
+            <span class="status-badge" [class]="getStatusClass(promo)">
+              {{ getStatusLabel(promo) }}
+            </span>
+          </td>
+          <td class="actions-cell">
+            <button 
+              class="btn-icon toggle-btn" 
+              (click)="togglePromo(promo)" 
+              [title]="promo.isActive ? 'Désactiver' : 'Activer'">
+              <span *ngIf="promo.isActive">🔴</span>
+              <span *ngIf="!promo.isActive">🟢</span>
+            </button>
+            <button class="btn-icon edit-btn" (click)="openEditModal(promo)" title="Modifier">
+              ✏️
+            </button>
+            <button class="btn-icon delete-btn" (click)="deletePromo(promo.id)" title="Supprimer">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="promos.length === 0">
+      <span class="empty-icon">🎫</span>
+      <p>Aucun code promo</p>
+      <button class="btn-primary" (click)="openCreateModal()">Créer le premier</button>
+    </div>
+  </div>
+
+  <!-- Create/Edit Modal -->
+  <div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ editingPromo ? '✏️ Modifier' : '➕ Nouveau' }} Code Promo</h2>
+        <button class="close-btn" (click)="closeModal()">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Code</label>
+          <input type="text" [(ngModel)]="formData.code" placeholder="Ex: SUMMER25">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Réduction (%)</label>
+            <input type="number" [(ngModel)]="formData.discountPercent" min="1" max="100">
+          </div>
+          <div class="form-group">
+            <label>Max Utilisations</label>
+            <input type="number" [(ngModel)]="formData.maxUses" min="1">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Validité (jours)</label>
+          <input type="number" [(ngModel)]="formData.validDays" min="1">
+        </div>
+        
+        <div class="form-group">
+          <label>Description</label>
+          <textarea [(ngModel)]="formData.description" rows="2" placeholder="Description du code..."></textarea>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeModal()">Annuler</button>
+        <button class="btn-save" (click)="savePromo()">
+          {{ editingPromo ? 'Modifier' : 'Créer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Generate Modal -->
+  <div class="modal-overlay" *ngIf="showAIModal" (click)="closeAIModal()">
+    <div class="modal-content ai-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header ai-header">
+        <div class="ai-title">
+          <span class="ai-icon">🤖</span>
+          <h2>Générer avec IA</h2>
+        </div>
+        <button class="close-btn" (click)="closeAIModal()">✕</button>
+      </div>
+      
+      <p class="ai-description">
+        L'IA va générer automatiquement un code promo optimisé avec une description attractive.
+      </p>
+      
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Public cible</label>
+          <select [(ngModel)]="formData.targetType">
+            <option value="ALL">Tous</option>
+            <option value="FREELANCER">Freelancers</option>
+            <option value="CLIENT">Clients</option>
+          </select>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Réduction (%)</label>
+            <input type="number" [(ngModel)]="formData.discountPercent" min="5" max="50">
+          </div>
+          <div class="form-group">
+            <label>Max Utilisations</label>
+            <input type="number" [(ngModel)]="formData.maxUses" min="10">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>Validité (jours)</label>
+          <input type="number" [(ngModel)]="formData.validDays" min="7">
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAIModal()">Annuler</button>
+        <button class="btn-ai-generate" (click)="generateAIPromo()" [disabled]="aiGenerating">
+          <span *ngIf="!aiGenerating">🤖 Générer</span>
+          <span *ngIf="aiGenerating">⏳ Génération...</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

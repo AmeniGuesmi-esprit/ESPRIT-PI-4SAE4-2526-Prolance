@@ -1,0 +1,580 @@
+version: "3.9"
+
+services:
+
+  # ========================= INFRASTRUCTURE =========================
+
+  mysql:
+    image: mysql:8.0
+    container_name: dev-mysql
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ""
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - dev_mysql_data:/var/lib/mysql
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ========================= EUREKA =========================
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+    container_name: dev-eureka-server
+    ports:
+      - "8762:8761"
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
+
+  # ========================= API GATEWAY =========================
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: dev-api-gateway
+    ports:
+      - "8222:8222"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_APPLICATION_NAME: user-service
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+    restart: unless-stopped
+
+  # ========================= USER SERVICE =========================
+
+  user-service:
+    build:
+      context: ./user-service
+    container_name: dev-user-service
+    ports:
+      - "8091:8080"
+    command: ["java", "-jar", "app.jar", "--eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka/", "--spring.application.name=user-service"]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_users?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: dummy@gmail.com
+      SPRING_MAIL_PASSWORD: dummypassword
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy_client_id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy_client_secret
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_APPLICATION_NAME: user-service
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  # ========================= OTHER TEAM SERVICES (not started by default) =========================
+
+  publication-service:
+    build:
+      context: ./publication-service
+    container_name: dev-publication-service
+    ports:
+      - "8092:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_publication?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: dummy@gmail.com
+      SPRING_MAIL_PASSWORD: dummypassword
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy_client_id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy_client_secret
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  commentaire-service:
+    build:
+      context: ./commentaire-service
+    container_name: dev-commentaire-service
+    ports:
+      - "8093:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_commentaire?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: dummy@gmail.com
+      SPRING_MAIL_PASSWORD: dummypassword
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy_client_id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy_client_secret
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  reaction-service:
+    build:
+      context: ./reaction-service
+    container_name: dev-reaction-service
+    ports:
+      - "8094:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_reaction?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: dummy@gmail.com
+      SPRING_MAIL_PASSWORD: dummypassword
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy_client_id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy_client_secret
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  promo-service:
+    build:
+      context: ./promo-service
+    container_name: dev-promo-service
+    ports:
+      - "8095:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_promo?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: dummy@gmail.com
+      SPRING_MAIL_PASSWORD: dummypassword
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy_client_id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy_client_secret
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  subscription-service:
+    build:
+      context: ./subscription-service
+    container_name: dev-subscription-service
+    ports:
+      - "8096:8086"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_subscription?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: dummy@gmail.com
+      SPRING_MAIL_PASSWORD: dummypassword
+      GROQ_API_KEY: ${GROQ_API_KEY}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: dummy_client_id
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: dummy_client_secret
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  skill-service:
+    build:
+      context: ./skill-service
+    container_name: dev-skill-service
+    ports:
+      - "8097:8096"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_skill?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  project-service:
+    build:
+      context: ./project-service
+    container_name: dev-project-service
+    ports:
+      - "8098:8094"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_project?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  application-service:
+    build:
+      context: ./application-service
+    container_name: dev-application-service
+    ports:
+      - "8099:8095"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_application?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  event-service:
+    build:
+      context: ./event-service
+    container_name: dev-event-service
+    ports:
+      - "8100:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_event?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  activity-service:
+    build:
+      context: ./activity-service
+    container_name: dev-activity-service
+    ports:
+      - "8101:8093"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_activity?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  inscription-service:
+    build:
+      context: ./inscription-service
+    container_name: dev-inscription-service
+    ports:
+      - "8102:8097"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_inscription?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  recommandation-service:
+    build:
+      context: ./recommandation-service
+    container_name: dev-recommandation-service
+    ports:
+      - "8103:8098"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/dev_recommandation?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ""
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - microservices-net
+
+  # ========================= ADS SERVICE INFRASTRUCTURE =========================
+
+  ads-db:
+    image: postgres:15-alpine
+    container_name: dev-ads-postgres
+    environment:
+      POSTGRES_USER: ads_user
+      POSTGRES_PASSWORD: ads_pass
+      POSTGRES_DB: ads_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - ads_data:/var/lib/postgresql/data
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ads_user -d ads_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: dev-kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://kafka:9093'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    networks:
+      - microservices-net
+
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: dev-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    networks:
+      - microservices-net
+
+  # Optimized for low RAM: flash attention, single model, 1024 context window
+  ollama:
+    image: ollama/ollama:latest
+    container_name: dev-ollama
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_storage:/root/.ollama
+    environment:
+      OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_HOST: 0.0.0.0:11434
+      OLLAMA_NUM_PARALLEL: 1
+      OLLAMA_FLASH_ATTENTION: 1
+      OLLAMA_MAX_LOADED_MODELS: 1
+      OLLAMA_NUM_CTX: 1024
+    networks:
+      - microservices-net
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: dev-clickhouse
+    depends_on:
+      - kafka
+    ports:
+      - "8123:8123"
+      - "9005:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./ads-service/clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./ads-service/clickhouse/users.xml:/etc/clickhouse-server/users.d/default-user.xml
+    environment:
+      CLICKHOUSE_DB: ads_analytics
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    networks:
+      - microservices-net
+
+  grafana:
+    build:
+      context: ./ads-service/grafana
+    container_name: dev-grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./ads-service/grafana/provisioning:/etc/grafana/provisioning
+      - ./ads-service/grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - clickhouse
+    networks:
+      - microservices-net
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: dev-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8085:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    networks:
+      - microservices-net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: dev-ads-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: fawzi-admin@pidev4sae4.com
+      PGADMIN_DEFAULT_PASSWORD: fawzi
+    ports:
+      - "5050:80"
+    depends_on:
+      - ads-db
+    networks:
+      - microservices-net
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: dev-sonarqube
+    depends_on:
+      - sonar-db
+    ports:
+      - "9001:9000"
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonar-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    networks:
+      - microservices-net
+
+  sonar-db:
+    image: postgres:15-alpine
+    container_name: dev-sonar-postgres
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    ports:
+      - "5433:5432"
+    volumes:
+      - sonar_data:/var/lib/postgresql/data
+    networks:
+      - microservices-net
+
+  # ========================= ADS SERVICE =========================
+
+  ads-service:
+    build:
+      context: ./ads-service
+    container_name: dev-ads-service
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ads-db:5432/ads_db
+      SPRING_DATASOURCE_USERNAME: ads_user
+      SPRING_DATASOURCE_PASSWORD: ads_pass
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      QDRANT_URL: http://qdrant:6333
+      SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+      JWT_SECRET: super-secret-key-that-is-at-least-32-chars!
+    depends_on:
+      ads-db:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      qdrant:
+        condition: service_started
+    networks:
+      - microservices-net
+
+# ========================= VOLUMES =========================
+
+volumes:
+  dev_mysql_data:
+  ads_data:
+  qdrant_data:
+  ollama_storage:
+  clickhouse_data:
+  sonar_data:
+  grafana_data:
+
+# ========================= NETWORK =========================
+
+networks:
+  microservices-net:
+    driver: bridge

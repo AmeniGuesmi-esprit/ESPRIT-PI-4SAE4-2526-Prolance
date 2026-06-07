@@ -1,0 +1,307 @@
+<div class="insc-overlay" (click)="onOverlayClick($event)">
+  <div class="insc-modal" role="dialog" aria-modal="true" aria-labelledby="insc-title">
+
+    <!-- ── HEADER ── -->
+    <div class="insc-header">
+      <div class="insc-header-left">
+        <div class="insc-icon">
+          <i class="material-icons">how_to_reg</i>
+        </div>
+        <div class="insc-header-text">
+          <h2 id="insc-title">Demande d'inscription</h2>
+          <p class="insc-event-name" *ngIf="eventTitle">
+            <i class="material-icons">event</i> {{ eventTitle }}
+          </p>
+        </div>
+      </div>
+      <button class="insc-close-btn" (click)="close()" aria-label="Fermer">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <!-- ── DÉJÀ INSCRIT ── -->
+    <div class="insc-already" *ngIf="alreadyRegistered">
+      <div class="already-icon-wrap">
+        <i class="material-icons">info</i>
+      </div>
+      <div class="already-content">
+        <h3>Vous êtes déjà inscrit à cet événement</h3>
+        <p>Une demande d'inscription a déjà été soumise pour votre compte.</p>
+
+        <div class="already-card" *ngIf="existingInscriptionInfo">
+          <div class="already-card-row">
+            <span class="already-label"><i class="material-icons">badge</i> Rôle</span>
+            <span class="already-value">{{ roleLabels[existingInscriptionInfo.participantRole] }}</span>
+          </div>
+          <div class="already-card-row">
+            <span class="already-label"><i class="material-icons">category</i> Domaine</span>
+            <span class="already-value">{{ domaineLabels[existingInscriptionInfo.domaine] }}</span>
+          </div>
+          <div class="already-card-row">
+            <span class="already-label"><i class="material-icons">calendar_today</i> Date</span>
+            <span class="already-value">{{ existingInscriptionInfo.registrationDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="already-card-row">
+            <span class="already-label"><i class="material-icons">flag</i> Statut</span>
+            <span class="already-status" [ngClass]="'status-' + existingInscriptionInfo.status.toLowerCase()">
+              <i class="material-icons">{{ statusIcons[existingInscriptionInfo.status] }}</i>
+              {{ statusLabels[existingInscriptionInfo.status] }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="already-footer">
+        <button class="insc-btn-primary" (click)="close()">
+          <i class="material-icons">close</i> Fermer
+        </button>
+      </div>
+    </div>
+
+    <!-- ✅ CAPACITÉ MAXIMALE ATTEINTE ── -->
+    <div class="insc-full" *ngIf="isEventFull && !alreadyRegistered">
+      <div class="full-icon-wrap">
+        <i class="material-icons">group_off</i>
+      </div>
+      <div class="full-content">
+        <h3>Inscription impossible</h3>
+        <p>Le nombre maximum de participants pour cet événement a été atteint.<br>
+           Aucune nouvelle demande ne peut être acceptée.</p>
+      </div>
+      <div class="already-footer">
+        <button class="insc-btn-primary" (click)="close()">
+          <i class="material-icons">close</i> Fermer
+        </button>
+      </div>
+    </div>
+
+    <!-- ── ÉTAT ERREUR ── -->
+    <div class="insc-error-block" *ngIf="submitError && !submitSuccess && !alreadyRegistered && !isEventFull"
+      style="margin: 0 1.5rem 1rem; padding: 0.85rem 1rem; background: #fff1f0;
+             border-left: 4px solid #ef4444; border-radius: 8px;
+             color: #c0392b; display: flex; align-items: center; gap: 0.5rem;">
+      <i class="material-icons" style="font-size: 20px;">error_outline</i>
+      <span>{{ submitError }}</span>
+    </div>
+
+    <!-- ── ÉTAT SUCCÈS ── -->
+    <div class="insc-success" *ngIf="submitSuccess && !alreadyRegistered">
+      <div class="success-circle">
+        <i class="material-icons">check</i>
+      </div>
+      <h3>Demande envoyée !</h3>
+      <p>Votre demande d'inscription a été soumise avec succès.<br>
+         Vous recevrez une notification dès qu'elle sera traitée.</p>
+      <button class="insc-btn-primary" (click)="resetAndClose()">
+        <i class="material-icons">done</i> Fermer
+      </button>
+    </div>
+
+    <!-- ── FORMULAIRE ── -->
+    <form
+      [formGroup]="inscriptionForm"
+      (ngSubmit)="onSubmit()"
+      *ngIf="!submitSuccess && !alreadyRegistered && !isEventFull"
+      novalidate
+    >
+      <div class="insc-body">
+
+        <!-- Photo du participant -->
+        <div class="insc-field">
+          <label>
+            <i class="material-icons">photo_camera</i> Photo <span class="optional">(optionnel)</span>
+          </label>
+          <div class="photo-upload-area">
+            <div class="photo-preview-wrapper">
+              <div
+                class="photo-preview"
+                [class.has-image]="photoPreviewUrl"
+                (click)="triggerFileInput()"
+              >
+                <img *ngIf="photoPreviewUrl" [src]="photoPreviewUrl" alt="Aperçu photo" />
+                <div class="photo-placeholder" *ngIf="!photoPreviewUrl">
+                  <i class="material-icons">person</i>
+                  <span>Photo</span>
+                </div>
+                <div class="photo-overlay" *ngIf="photoPreviewUrl">
+                  <i class="material-icons">edit</i>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="photo-remove-btn"
+                *ngIf="photoPreviewUrl"
+                (click)="removePhoto()"
+                aria-label="Supprimer la photo"
+              >
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+            <div class="photo-info">
+              <p><strong>Photo de profil</strong><br>JPG, PNG ou WEBP · Max. 2 Mo</p>
+              <button type="button" class="photo-upload-btn" (click)="triggerFileInput()">
+                <i class="material-icons">upload</i>
+                {{ photoPreviewUrl ? 'Changer la photo' : 'Choisir une photo' }}
+              </button>
+              <span class="photo-size-error" *ngIf="photoSizeError">
+                <i class="material-icons">error_outline</i> Fichier trop lourd (max. 2 Mo)
+              </span>
+            </div>
+          </div>
+          <input
+            #fileInput
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onFileSelected($event)"
+            hidden
+          />
+        </div>
+
+        <!-- Nom / Prénom -->
+        <div class="insc-row">
+          <div class="insc-field">
+            <label for="nom">
+              <i class="material-icons">person_outline</i> Nom <span class="req">*</span>
+            </label>
+            <input
+              id="nom"
+              type="text"
+              formControlName="participantNom"
+              placeholder="Votre nom"
+              [class.field-error]="f['participantNom'].invalid && f['participantNom'].touched"
+            />
+            <span class="err-msg" *ngIf="f['participantNom'].invalid && f['participantNom'].touched">
+              <i class="material-icons">error_outline</i> Nom requis (min. 2 caractères)
+            </span>
+          </div>
+
+          <div class="insc-field">
+            <label for="prenom">
+              <i class="material-icons">person_outline</i> Prénom <span class="req">*</span>
+            </label>
+            <input
+              id="prenom"
+              type="text"
+              formControlName="participantPrenom"
+              placeholder="Votre prénom"
+              [class.field-error]="f['participantPrenom'].invalid && f['participantPrenom'].touched"
+            />
+            <span class="err-msg" *ngIf="f['participantPrenom'].invalid && f['participantPrenom'].touched">
+              <i class="material-icons">error_outline</i> Prénom requis (min. 2 caractères)
+            </span>
+          </div>
+        </div>
+
+        <!-- Domaine -->
+        <div class="insc-field">
+          <label>
+            <i class="material-icons">category</i> Domaine <span class="req">*</span>
+          </label>
+          <div class="domaine-grid">
+            <label
+              class="domaine-card"
+              *ngFor="let d of domaines"
+              [class.domaine-selected]="f['domaine'].value === d"
+            >
+              <input type="radio" formControlName="domaine" [value]="d" hidden />
+              <i class="material-icons">{{ domaineIcons[d] }}</i>
+              <span>{{ domaineLabels[d] }}</span>
+              <span class="check-mark" *ngIf="f['domaine'].value === d">
+                <i class="material-icons">check_circle</i>
+              </span>
+            </label>
+          </div>
+          <span class="err-msg" *ngIf="f['domaine'].invalid && f['domaine'].touched">
+            <i class="material-icons">error_outline</i> Veuillez sélectionner un domaine
+          </span>
+        </div>
+
+        <!-- Rôle -->
+        <div class="insc-field">
+          <label>
+            <i class="material-icons">badge</i> Rôle souhaité <span class="req">*</span>
+          </label>
+          <div class="role-grid">
+            <label
+              class="role-card"
+              *ngFor="let role of roles"
+              [class.role-selected]="f['participantRole'].value === role"
+            >
+              <input type="radio" formControlName="participantRole" [value]="role" hidden />
+              <i class="material-icons">{{ roleIcons[role] }}</i>
+              <span class="role-label">{{ roleLabels[role] }}</span>
+            </label>
+          </div>
+          <span class="err-msg" *ngIf="f['participantRole'].invalid && f['participantRole'].touched">
+            <i class="material-icons">error_outline</i> Veuillez choisir un rôle
+          </span>
+        </div>
+
+        <!-- Message -->
+        <div class="insc-field">
+          <label for="message">
+            <i class="material-icons">chat_bubble_outline</i>
+            Message <span class="optional">(optionnel)</span>
+          </label>
+          <textarea
+            id="message"
+            formControlName="message"
+            rows="3"
+            placeholder="Décrivez brièvement vos motivations ou posez une question..."
+          ></textarea>
+        </div>
+
+        <!-- ── CONDITIONS D'INSCRIPTION ── -->
+        <div class="insc-conditions" [class.conditions-error-border]="conditionsError">
+          <div class="conditions-header">
+            <i class="material-icons">gavel</i>
+            <span>Conditions d'inscription</span>
+          </div>
+          <ul class="conditions-list">
+            <li>
+              <i class="material-icons">check</i>
+              Chaque participant ne peut s'inscrire qu'<strong>une seule fois</strong> par événement.
+            </li>
+            <li>
+              <i class="material-icons">check</i>
+              Votre demande sera examinée par les organisateurs avant confirmation.
+            </li>
+            <li>
+              <i class="material-icons">check</i>
+              Vous recevrez une notification par e-mail dès que votre statut sera mis à jour.
+            </li>
+            <li>
+              <i class="material-icons">check</i>
+              Toute inscription validée engage votre participation à l'événement.
+            </li>
+          </ul>
+          <label class="conditions-checkbox" (click)="toggleConditions()">
+            <div class="checkbox-box" [class.checked]="conditionsAccepted">
+              <i class="material-icons" *ngIf="conditionsAccepted">check</i>
+            </div>
+            <span>J'ai lu et j'accepte les conditions d'inscription <span class="req">*</span></span>
+          </label>
+          <span class="err-msg" *ngIf="conditionsError">
+            <i class="material-icons">error_outline</i> Vous devez accepter les conditions pour continuer
+          </span>
+        </div>
+
+      </div>
+
+      <!-- ── FOOTER ── -->
+      <div class="insc-footer">
+        <button type="button" class="insc-btn-secondary" (click)="close()">
+          Annuler
+        </button>
+        <!-- ✅ Bouton désactivé si isSubmitting OU isEventFull -->
+        <button type="submit" class="insc-btn-primary" [disabled]="isSubmitting || isEventFull">
+          <span class="btn-spinner" *ngIf="isSubmitting"></span>
+          <i class="material-icons" *ngIf="!isSubmitting && !isEventFull">send</i>
+          <i class="material-icons" *ngIf="isEventFull">block</i>
+          {{ isSubmitting ? 'Envoi en cours...' : isEventFull ? 'Maximum participants atteint' : 'Envoyer la demande' }}
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>

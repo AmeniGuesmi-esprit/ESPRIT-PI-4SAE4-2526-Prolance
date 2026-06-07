@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+
+    environment {
+        SERVICE_NAME     = 'promo-service'
+        DOCKER_NAMESPACE = 'farahchbeb'
+        IMAGE_NAME       = "${DOCKER_NAMESPACE}/${SERVICE_NAME}"
+        APP_PORT         = '8091'
+        CONTAINER_NAME   = 'promo-service-live'
+    }
+
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        timestamps()
+    }
+
+    stages {
+        stage('📥 Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('📌 Récupérer le tag depuis le CI') {
+            steps {
+                copyArtifacts(
+                    projectName: 'promo-service-ci',
+                    filter: 'last-build.txt',
+                    selector: lastSuccessful()
+                )
+                script {
+                    env.IMAGE_TAG = readFile('last-build.txt').trim()
+                    echo "==> Déploiement de ${IMAGE_NAME}:${env.IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('🔐 Login & Pull image') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker pull ${IMAGE_NAME}:${IMAGE_TAG}
+                    '''
+                }
+            }
+        }
+
+        stage('🚀 Déploiement') {
+            steps {
+                sh '''
+                    docker stop ${CONTAINER_NAME} 2>/dev/null || true
+                    docker rm ${CONTAINER_NAME} 2>/dev/null || true
+
+                    docker run -d \
+                      --name ${CONTAINER_NAME} \
+                      -p ${APP_PORT}:${APP_PORT} \
+                      --restart unless-stopped \
+                      ${IMAGE_NAME}:${IMAGE_TAG}
+                '''
+            }
+        }
+
+        stage('✅ Vérifier que le container tourne') {
+            steps {
+                sh '''
+                    sleep 10
+                    docker ps | grep ${CONTAINER_NAME}
+                    docker logs --tail 20 ${CONTAINER_NAME}
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "🎉 CD réussi : ${IMAGE_NAME}:${env.IMAGE_TAG} déployé sur le port ${APP_PORT}"
+        }
+        failure {
+            echo "💥 CD échoué"
+        }
+        always {
+            sh 'docker logout || true'
+            cleanWs()
+        }
+    }
+}

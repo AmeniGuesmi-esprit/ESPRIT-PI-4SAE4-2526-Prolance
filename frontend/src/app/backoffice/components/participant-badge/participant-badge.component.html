@@ -1,0 +1,170 @@
+<ng-container *ngIf="inscription">
+
+  <!-- ══ OVERLAY ══ -->
+  <div class="badge-overlay" [class.visible]="isOpen" (click)="onOverlayClick($event)">
+    <div class="badge-modal">
+
+      <!-- Close -->
+      <button class="close-btn" (click)="close()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6"  y2="18"/>
+          <line x1="6"  y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <!-- Modal header -->
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-icon">🎫</span>
+          <div>
+            <h2 class="modal-title">Badge Participant</h2>
+            <p class="modal-subtitle">Prévisualisation &amp; téléchargement</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-download" (click)="downloadBadge()" [disabled]="isGenerating">
+            <svg *ngIf="!isGenerating" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span class="spinner" *ngIf="isGenerating"></span>
+            {{ isGenerating ? 'Génération...' : 'Télécharger PNG' }}
+          </button>
+          <button class="btn-print" (click)="printBadge()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 6 2 18 2 18 9"/>
+              <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+            Imprimer
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ BADGE CARD (exportable via html2canvas) ══ -->
+      <div class="badge-stage">
+        <div class="badge-card" #badgeCard>
+
+          <!-- Background deco -->
+          <div class="badge-bg-grid"></div>
+          <div class="badge-bg-glow top-left"></div>
+          <div class="badge-bg-glow bottom-right"></div>
+
+          <!-- Corner accents -->
+          <div class="corner tl"></div>
+          <div class="corner tr"></div>
+          <div class="corner bl"></div>
+          <div class="corner br"></div>
+
+          <!-- TOP BAR -->
+          <div class="badge-topbar">
+            <div class="app-identity">
+              <div class="app-logo-ring">
+                <img *ngIf="appLogoUrl" [src]="appLogoUrl" class="app-logo-img" alt="logo"/>
+                <span *ngIf="!appLogoUrl" class="app-logo-fallback">EP</span>
+              </div>
+              <div class="app-text">
+                <span class="app-name">ESPRIT EVENTS</span>
+                <span class="app-tagline">Official Participant Badge</span>
+              </div>
+            </div>
+            <div class="badge-label-chip">
+              <span class="badge-label-dot"></span>
+              BADGE OFFICIEL
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="hline"></div>
+
+          <!-- MAIN BODY -->
+          <div class="badge-body">
+
+            <!-- Left: info -->
+            <div class="badge-info">
+
+              <div class="role-chip">
+                <span class="role-icon">{{ getRoleIcon() }}</span>
+                {{ inscription.participantRole || 'PARTICIPANT' }}
+              </div>
+
+              <h1 class="participant-name">
+                {{ inscription.participantPrenom }}
+                <span class="name-last">{{ inscription.participantNom }}</span>
+              </h1>
+
+              <div class="domain-badge" *ngIf="inscription.domaine">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                  <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                </svg>
+                {{ inscription.domaine }}
+              </div>
+
+              <div class="event-pills">
+                <div class="event-pill">
+                  <span class="pill-label">Événement</span>
+                  <span class="pill-value">{{ inscription.eventTitle || 'N/A' }}</span>
+                </div>
+                <div class="event-pill">
+                  <span class="pill-label">Date</span>
+                  <span class="pill-value">{{ formatDate(eventStartDate) }}</span>
+                </div>
+                <div class="event-pill">
+                  <span class="pill-label">Lieu</span>
+                  <span class="pill-value">{{ eventLocation || 'À définir' }}</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Right: avatar -->
+            <div class="badge-avatar-col">
+              <div class="avatar-frame">
+                <div class="avatar-ring outer"></div>
+                <div class="avatar-ring inner"></div>
+                <img
+                  *ngIf="showPhoto"
+                  [src]="inscription.imageUrl"
+                  class="avatar-img"
+                  (error)="onImgError()"
+                  alt="photo"
+                />
+                <div *ngIf="!showPhoto" class="avatar-initials">
+                  {{ getInitials() }}
+                </div>
+              </div>
+              <div class="verified-chip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="3">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                Accepté
+              </div>
+            </div>
+
+          </div><!-- /badge-body -->
+
+          <!-- FOOTER -->
+          <div class="badge-footer">
+            <span class="footer-id">ID #{{ inscription.id }}</span>
+            <div class="footer-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="footer-date">
+              Enregistré le {{ formatDate(inscription.registrationDate) }}
+            </span>
+          </div>
+
+        </div><!-- /badge-card -->
+      </div><!-- /badge-stage -->
+
+    </div><!-- /badge-modal -->
+  </div><!-- /badge-overlay -->
+
+</ng-container>

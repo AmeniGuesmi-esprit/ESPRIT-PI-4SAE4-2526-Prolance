@@ -1,0 +1,65 @@
+<div class="policy-container">
+  <!-- Header -->
+  <div class="policy-header">
+    <button class="btn-back-circle" (click)="goBack()" title="Go Back">
+      <i class="material-icons">arrow_back</i>
+    </button>
+    <div class="header-content">
+      <h1 class="policy-title">Things we do not tolerate in our Ads</h1>
+      <p class="policy-subtitle">
+        At Prolance, we're committed to maintaining a safe, professional, and respectful marketplace. 
+        Our content moderation uses advanced AI (Llama-Guard) to ensure all ads comply with our strict policies.
+      </p>
+    </div>
+  </div>
+
+  <!-- Intro Section -->
+  <div class="policy-intro">
+    <div class="intro-card">
+      <i class="material-icons">verified_user</i>
+      <h3>Why This Matters</h3>
+      <p>
+        We believe in creating a platform where freelancers and clients can connect with confidence. 
+        By enforcing these policies, we protect our community and maintain the trust that makes Prolance special.
+      </p>
+    </div>
+  </div>
+
+  <!-- Llama-Guard Categories Grid -->
+  <div class="categories-section">
+    <h2 class="section-title">Prohibited Content Categories</h2>
+    <p class="section-subtitle">
+      Our AI system automatically scans all ad submissions against these 14 categories. 
+      Any violation will result in immediate rejection.
+    </p>
+
+    <div class="categories-grid">
+      <div class="category-card" *ngFor="let category of llamaGuardCategories">
+        <div class="category-header">
+          <div class="category-icon">
+            <i class="material-icons">{{ category.icon }}</i>
+          </div>
+          <div class="category-code">{{ category.code }}</div>
+        </div>
+        <h4 class="category-name">{{ category.name }}</h4>
+        <p class="category-description">{{ category.description }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer CTA -->
+  <div class="policy-footer">
+    <div class="footer-card">
+      <i class="material-icons">support_agent</i>
+      <h3>Questions About Our Policies?</h3>
+      <p>
+        If you believe your ad was incorrectly flagged or have questions about our content policies, 
+        please contact our support team. We're here to help ensure a fair and transparent process.
+      </p>
+      <button class="btn-contact">
+        <i class="material-icons">email</i>
+        Contact Support
+      </button>
+    </div>
+  </div>
+</div>

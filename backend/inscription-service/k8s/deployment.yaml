@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inscription-service
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: inscription-service
+  template:
+    metadata:
+      labels:
+        app: inscription-service
+    spec:
+      containers:
+        - name: inscription-service
+          image: marahmarah123/inscription-service:IMAGE_TAG
+          ports:
+            - containerPort: 8097
+          imagePullPolicy: Always
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://inscription-mysql.devops.svc.cluster.local:3306/pidev_inscriptions?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: inscription-mysql-secret
+                  key: mysql-root-password
