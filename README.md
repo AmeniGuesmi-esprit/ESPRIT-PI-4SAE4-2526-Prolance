@@ -72,7 +72,7 @@ Developed at **Esprit School of Engineering – Tunisia** **PIDEV – 4SAE4 | 20
     cd backend
     docker-compose up -d
     ```
-    * **Frontend:**
+  * **Frontend:**
     ```bash
     cd Frontend
     rm -rf node_modules package-lock.json
